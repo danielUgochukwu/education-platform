@@ -2,7 +2,18 @@ import { Button } from "@/components/ui/button";
 import { Bell, Menu, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-export function Topbar() {
+interface TopbarProps {
+    role?: "applicant" | "scholar" | "donor" | "admin";
+}
+
+const searchPlaceholders = {
+    applicant: "Search applications, deadlines, or announcements...",
+    scholar: "Search milestones, mentors, messages, or placements...",
+    donor: "Search scholars, reports, or funding updates...",
+    admin: "Search applications, scholars, or funding...",
+};
+
+export function Topbar({ role = "admin" }: TopbarProps) {
     return (
         <header className="h-16 border-b bg-background flex items-center justify-between px-4 md:px-6 sticky top-0 z-30">
             <div className="flex items-center flex-1">
@@ -14,7 +25,7 @@ export function Topbar() {
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                         type="search"
-                        placeholder="Search applications, programs, or scholars..."
+                        placeholder={searchPlaceholders[role]}
                         className="w-full pl-9 bg-muted/50 border-transparent focus-visible:bg-background h-9"
                     />
                 </div>

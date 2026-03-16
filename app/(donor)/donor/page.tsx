@@ -22,7 +22,14 @@ import {
     sponsoredScholars,
 } from "@/mock-data/donor";
 
-const dashboardIcons = [Users, Banknote, Banknote, Target, GraduationCap, Briefcase];
+const dashboardIcons = [
+  Users,
+  Banknote,
+  Banknote,
+  Target,
+  GraduationCap,
+  Briefcase,
+];
 
 export default function DonorDashboardPage() {
     const averageProgress = Math.round(

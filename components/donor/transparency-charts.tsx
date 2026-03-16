@@ -38,13 +38,14 @@ export function DonutBreakdownChart({
         },
         { current: 0, values: [] }
     ).values;
+    const donutBackground = segments.length > 0 ? `conic-gradient(${segments.join(", ")})` : "var(--color-muted)";
 
     return (
         <div className={cn("grid gap-6 lg:grid-cols-[190px_1fr] lg:items-center", className)}>
             <div className="mx-auto">
                 <div
                     className="relative h-44 w-44 rounded-full border border-border/60 shadow-inner"
-                    style={{ background: `conic-gradient(${segments.join(", ")})` }}
+                    style={{ background: donutBackground }}
                 >
                     <div className="absolute inset-[22px] flex flex-col items-center justify-center rounded-full bg-background shadow-sm">
                         <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{totalLabel}</span>

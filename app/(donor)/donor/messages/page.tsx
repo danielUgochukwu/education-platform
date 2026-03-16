@@ -1,13 +1,18 @@
+"use client";
+
+import { useState } from "react";
 import { PageContainer } from "@/components/layout/page-container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { Mail, Send } from "lucide-react";
 import { donorMessages } from "@/mock-data/donor";
 
 export default function DonorMessagesPage() {
-    const activeThread = donorMessages.length > 0 ? donorMessages[0] : null;
+    const [selectedThreadId, setSelectedThreadId] = useState<string | null>(donorMessages[0]?.id ?? null);
+    const activeThread = donorMessages.find((thread) => thread.id === selectedThreadId) ?? null;
 
     return (
         <PageContainer
@@ -25,19 +30,32 @@ export default function DonorMessagesPage() {
                         <CardDescription>Recent donor conversations and reporting requests.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        {donorMessages.map((thread) => (
-                            <div key={thread.id} className="rounded-xl border bg-background p-4">
-                                <div className="flex items-start justify-between gap-3">
-                                    <div>
-                                        <p className="font-medium">{thread.participant}</p>
-                                        <p className="text-xs text-muted-foreground">{thread.role}</p>
+                        {donorMessages.map((thread) => {
+                            const isActive = thread.id === selectedThreadId;
+
+                            return (
+                                <button
+                                    key={thread.id}
+                                    type="button"
+                                    onClick={() => setSelectedThreadId(thread.id)}
+                                    aria-pressed={isActive}
+                                    className={cn(
+                                        "w-full rounded-xl border bg-background p-4 text-left transition-colors",
+                                        isActive ? "border-primary/40 bg-primary/5" : "hover:bg-muted/30"
+                                    )}
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div>
+                                            <p className="font-medium">{thread.participant}</p>
+                                            <p className="text-xs text-muted-foreground">{thread.role}</p>
+                                        </div>
+                                        {thread.unreadCount > 0 && <Badge>{thread.unreadCount}</Badge>}
                                     </div>
-                                    {thread.unreadCount > 0 && <Badge>{thread.unreadCount}</Badge>}
-                                </div>
-                                <p className="mt-3 text-sm text-muted-foreground">{thread.lastMessage}</p>
-                                <p className="mt-2 text-xs text-muted-foreground">{thread.timestamp}</p>
-                            </div>
-                        ))}
+                                    <p className="mt-3 text-sm text-muted-foreground">{thread.lastMessage}</p>
+                                    <p className="mt-2 text-xs text-muted-foreground">{thread.timestamp}</p>
+                                </button>
+                            );
+                        })}
                     </CardContent>
                 </Card>
 

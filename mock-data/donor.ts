@@ -128,10 +128,10 @@ export const scholarFundingBreakdown = [
 ];
 
 export const impactMetrics = [
-    { label: "Graduation rate", value: "96.2%", description: "Across supported cohorts" },
-    { label: "Placement rate", value: "91.4%", description: "Within six months of graduation" },
-    { label: "Community beneficiaries", value: "1,480", description: "Reached by scholar-led projects" },
-    { label: "Research outputs", value: "27", description: "Papers, prototypes, and policy briefs" },
+    { label: "Graduation rate", value: 96.2, description: "Across supported cohorts", unit: "%" },
+    { label: "Placement rate", value: 91.4, description: "Within six months of graduation", unit: "%" },
+    { label: "Community beneficiaries", value: 1480, description: "Reached by scholar-led projects" },
+    { label: "Research outputs", value: 27, description: "Papers, prototypes, and policy briefs" },
 ];
 
 export const scholarOutcomeBreakdown = [
@@ -152,8 +152,8 @@ export const sectorPlacementBreakdown = [
 export const cohortSuccessRates = [
     { cohort: "2022", retention: 98, graduation: 96, placement: 93 },
     { cohort: "2023", retention: 97, graduation: 95, placement: 91 },
-    { cohort: "2024", retention: 99, graduation: 0, placement: 68 },
-    { cohort: "2025", retention: 100, graduation: 0, placement: 24 },
+    { cohort: "2024", retention: 99, graduation: null, placement: 68 },
+    { cohort: "2025", retention: 100, graduation: null, placement: null },
 ];
 
 export const programGrowth = [

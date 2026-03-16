@@ -1,8 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import {
     DonutBreakdownChart,
     HorizontalBarChart,
 } from "@/components/donor/transparency-charts";
 import { PageContainer } from "@/components/layout/page-container";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +18,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Banknote, Target } from "lucide-react";
+import { AlertCircle, Banknote, Target } from "lucide-react";
 import {
     cohortSuccessRates,
     fundDistribution,
@@ -24,14 +28,62 @@ import {
     sponsoredScholars,
 } from "@/mock-data/donor";
 
+function getFilenameFromDisposition(contentDisposition: string | null) {
+    const match = contentDisposition?.match(/filename="?([^"]+)"?/i);
+    return match?.[1] ?? "allocation-summary.txt";
+}
+
 export default function FundingAllocationPage() {
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [downloadError, setDownloadError] = useState<string | null>(null);
+
+    async function downloadAllocationSummary() {
+        setIsDownloading(true);
+        setDownloadError(null);
+
+        try {
+            const response = await fetch("/api/donor/allocation-summary");
+
+            if (!response.ok) {
+                throw new Error("Unable to download the allocation summary right now.");
+            }
+
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+
+            link.href = downloadUrl;
+            link.download = getFilenameFromDisposition(response.headers.get("content-disposition"));
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+        } catch (error) {
+            setDownloadError(error instanceof Error ? error.message : "Unable to download the allocation summary right now.");
+        } finally {
+            setIsDownloading(false);
+        }
+    }
+
     return (
         <PageContainer
             title="Funding Allocation"
             description="A transparent view of allocation tracking, scholar support, and the outcomes your funding is enabling."
-            action={<Button>Download Allocation Summary</Button>}
+            action={
+                <Button onClick={downloadAllocationSummary} disabled={isDownloading} aria-busy={isDownloading}>
+                    Download Allocation Summary
+                </Button>
+            }
         >
             <div className="space-y-6">
+                {downloadError && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Download failed</AlertTitle>
+                        <AlertDescription>{downloadError}</AlertDescription>
+                    </Alert>
+                )}
+
                 <div className="grid gap-6 xl:grid-cols-2">
                     <Card className="border-border/60">
                         <CardHeader>

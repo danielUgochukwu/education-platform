@@ -146,10 +146,10 @@ export default function Step4Documents() {
 
                 <Card className="border-border/50">
                     <CardFooter className="flex justify-between p-5">
-                        <Link href="/portal/apply/step-3">
+                        <Link href="/application/step-3">
                             <Button variant="outline" className="gap-2"><ArrowLeft className="h-4 w-4" /> Back</Button>
                         </Link>
-                        <Link href="/portal/apply/step-5">
+                        <Link href="/application/step-5">
                             <Button className="gap-2 font-semibold">
                                 Save & Continue <ArrowRight className="h-4 w-4" />
                             </Button>

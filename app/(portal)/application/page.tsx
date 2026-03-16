@@ -76,11 +76,11 @@ export default function StartApplicationPage() {
 
                                         <div className="shrink-0">
                                             {isCompleted ? (
-                                                <Link href={`/portal/apply/step-${step.step}`}>
+                                                <Link href={`/application/step-${step.step}`}>
                                                     <Button variant="outline" size="sm">Edit</Button>
                                                 </Link>
                                             ) : isActive ? (
-                                                <Link href={`/portal/apply/step-${step.step}`}>
+                                                <Link href={`/application/step-${step.step}`}>
                                                     <Button size="sm">
                                                         Continue <ArrowRight className="ml-1 h-3.5 w-3.5" />
                                                     </Button>

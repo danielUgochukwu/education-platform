@@ -69,7 +69,7 @@ export default function Step5Review() {
                 </div>
 
                 {/* Personal Info Review */}
-                <ReviewSection title="Personal Information" icon={FileText} editHref="/portal/apply/step-1">
+                <ReviewSection title="Personal Information" icon={FileText} editHref="/application/step-1">
                     <div className="space-y-3">
                         <InfoRow label="Full Name" value={`${pi?.firstName} ${pi?.lastName}`} />
                         <Separator />
@@ -87,7 +87,7 @@ export default function Step5Review() {
                 </ReviewSection>
 
                 {/* Academic Review */}
-                <ReviewSection title="Academic Background" icon={GraduationCap} editHref="/portal/apply/step-2">
+                <ReviewSection title="Academic Background" icon={GraduationCap} editHref="/application/step-2">
                     <div className="space-y-3">
                         <InfoRow label="Preferred Programme" value={mockApplication.programChoice} />
                         <Separator />
@@ -102,7 +102,7 @@ export default function Step5Review() {
                 </ReviewSection>
 
                 {/* Essays Review */}
-                <ReviewSection title="Essays" icon={ScrollText} editHref="/portal/apply/step-3">
+                <ReviewSection title="Essays" icon={ScrollText} editHref="/application/step-3">
                     <div className="space-y-4">
                         {[
                             { label: "Why are you applying?", value: mockApplication.essays?.whyApply },
@@ -128,7 +128,7 @@ export default function Step5Review() {
                 </ReviewSection>
 
                 {/* Documents Review */}
-                <ReviewSection title="Documents" icon={Upload} editHref="/portal/apply/step-4">
+                <ReviewSection title="Documents" icon={Upload} editHref="/application/step-4">
                     <div className="space-y-2">
                         {mockDocuments.map((doc) => (
                             <div key={doc.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/20">
@@ -170,7 +170,7 @@ export default function Step5Review() {
 
                 {/* Submit Buttons */}
                 <div className="flex flex-col sm:flex-row justify-between gap-4 pb-8">
-                    <Link href="/portal/apply/step-4">
+                    <Link href="/application/step-4">
                         <Button variant="outline" className="gap-2 w-full sm:w-auto">
                             <ArrowLeft className="h-4 w-4" /> Back to Documents
                         </Button>

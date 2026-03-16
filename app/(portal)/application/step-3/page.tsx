@@ -118,12 +118,12 @@ export default function Step3Essays() {
                 <Card className="border-border/50">
                     <CardFooter className="flex justify-between p-5">
                         <div className="flex gap-2">
-                            <Link href="/portal/apply/step-2">
+                            <Link href="/application/step-2">
                                 <Button variant="outline" className="gap-2"><ArrowLeft className="h-4 w-4" /> Back</Button>
                             </Link>
                             <Button variant="ghost" className="gap-2"><Save className="h-4 w-4" /> Save Draft</Button>
                         </div>
-                        <Link href="/portal/apply/step-4">
+                        <Link href="/application/step-4">
                             <Button className="gap-2 font-semibold">
                                 Save & Continue <ArrowRight className="h-4 w-4" />
                             </Button>

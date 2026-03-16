@@ -138,7 +138,7 @@ export default function Step1PersonalInfo() {
                         <Button variant="outline" className="gap-2">
                             <Save className="h-4 w-4" /> Save Progress
                         </Button>
-                        <Link href="/portal/apply/step-2">
+                        <Link href="/application/step-2">
                             <Button className="gap-2 font-semibold">
                                 Save & Continue <ArrowRight className="h-4 w-4" />
                             </Button>

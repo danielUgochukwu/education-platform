@@ -1,0 +1,31 @@
+import { Button } from "@/components/ui/button";
+import { Bell, Menu, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+
+export function Topbar() {
+    return (
+        <header className="h-16 border-b bg-background flex items-center justify-between px-4 md:px-6 sticky top-0 z-30">
+            <div className="flex items-center flex-1">
+                <Button variant="ghost" size="icon" className="md:hidden mr-2">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle Sidebar</span>
+                </Button>
+                <div className="hidden md:flex relative w-full max-w-md">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        type="search"
+                        placeholder="Search applications, programs, or scholars..."
+                        className="w-full pl-9 bg-muted/50 border-transparent focus-visible:bg-background h-9"
+                    />
+                </div>
+            </div>
+            <div className="flex items-center gap-4">
+                <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="h-5 w-5" />
+                    <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary" />
+                    <span className="sr-only">Notifications</span>
+                </Button>
+            </div>
+        </header>
+    );
+}

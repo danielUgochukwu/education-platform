@@ -37,12 +37,12 @@ import {
 } from "@/mock-data/admin";
 
 const dashboardIcons = [
-    Users,
-    ClipboardList,
-    GraduationCap,
-    Flag,
-    Banknote,
-    BarChart3,
+  Users,
+  ClipboardList,
+  GraduationCap,
+  Flag,
+  Banknote,
+  BarChart3,
 ];
 
 export default function AdminDashboardPage() {

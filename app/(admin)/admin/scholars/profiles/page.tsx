@@ -29,7 +29,11 @@ export default function ScholarProfilesPage() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {adminScholars.map((scholar) => (
-                                <div key={scholar.id} className="rounded-xl border bg-background p-4">
+                                <Link
+                                    key={scholar.id}
+                                    href={`/admin/scholars/profiles`}
+                                    className="block rounded-xl border bg-background p-4 transition-colors hover:bg-muted/20"
+                                >
                                     <div className="flex items-start gap-3">
                                         <Avatar size="lg">
                                             <AvatarFallback className="bg-primary/10 font-semibold text-primary">
@@ -47,7 +51,7 @@ export default function ScholarProfilesPage() {
                                             </p>
                                         </div>
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </CardContent>
                     </Card>

@@ -42,10 +42,13 @@ export default function ApplicationReviewPage() {
     );
 
     const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
+    const totalPossibleScore = featuredApplicationReview.rubric.reduce((sum, item) => sum + item.max, 0);
 
-    function updateScore(label: string, rawValue: string) {
+    function updateScore(label: string, rawValue: string, maxScore: number) {
         const nextValue = Number(rawValue);
-        const clamped = Number.isNaN(nextValue) ? 0 : Math.max(0, Math.min(20, nextValue));
+       const clamped = Number.isNaN(nextValue)
+         ? 0
+         : Math.max(0, Math.min(item.max, nextValue));
         setScores((current) => ({ ...current, [label]: clamped }));
         setFeedback("Review draft updated locally.");
     }
@@ -105,7 +108,7 @@ export default function ApplicationReviewPage() {
                                 </div>
                                 <div className="rounded-xl border bg-muted/15 p-4">
                                     <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Total score</p>
-                                    <p className="mt-2 text-2xl font-bold tracking-tight">{totalScore} / 100</p>
+                                    <p className="mt-2 text-2xl font-bold tracking-tight">{totalScore} / {totalPossibleScore}</p>
                                 </div>
                             </div>
 
@@ -254,7 +257,7 @@ export default function ApplicationReviewPage() {
                                                     min={0}
                                                     max={item.max}
                                                     value={scores[item.label]}
-                                                    onChange={(event) => updateScore(item.label, event.target.value)}
+                                                    onChange={(event) => updateScore(item.label, event.target.value, item.max)}
                                                 />
                                             </div>
                                         </div>

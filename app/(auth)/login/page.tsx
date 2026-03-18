@@ -17,9 +17,9 @@ export default function LoginPage() {
                     </div>
                     <span className="font-bold text-lg">National Talent Initiative</span>
                 </Link>
-                <h1 className="text-2xl font-bold tracking-tight">Applicant Sign In</h1>
+                <h1 className="text-2xl font-bold tracking-tight">Sign In</h1>
                 <p className="text-muted-foreground text-sm mt-1">
-                    Access your application dashboard
+                    Access your secure portal
                 </p>
             </div>
 
@@ -53,21 +53,12 @@ export default function LoginPage() {
                                 placeholder="••••••••"
                                 className="pl-9 pr-9"
                             />
-                            <button
-                                type="button"
-                                className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
-                                aria-label="Toggle password visibility"
-                            >
-                                <Eye className="h-4 w-4" />
-                            </button>
                         </div>
                     </div>
 
-                    <Link href="/portal/dashboard">
-                        <Button className="w-full h-10 font-semibold mt-2">
-                            Sign In to Portal <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                    </Link>
+                    <Button className="w-full h-10 font-semibold mt-2">
+                        Sign In to Portal <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
 
                     <Separator className="my-2" />
 

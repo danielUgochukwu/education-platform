@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Download, Activity, PieChart, BarChart3, TrendingUp, Users, GraduationCap, MapPin } from "lucide-react";
-import { mockImpactMetrics, mockScholars } from "@/mock-data";
+import { mockScholars, mockImpactDetails } from "@/mock-data";
 import Link from "next/link";
 
 const statCards = [
@@ -58,7 +58,7 @@ export default function ImpactPage() {
             <SectionWrapper title="Scholar Placement by Sector" className="bg-muted/20 border-t" description="Where our graduates are actively driving national impact.">
                 <div className="grid md:grid-cols-2 gap-12 mt-8 items-start">
                     <div className="space-y-5">
-                        {mockImpactMetrics.sectorBreakdown.map((sector, i) => (
+                        {mockImpactDetails.sectorBreakdown.map((sector, i) => (
                             <div key={i} className="space-y-2">
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="font-medium">{sector.sector}</span>
@@ -96,7 +96,7 @@ export default function ImpactPage() {
             <SectionWrapper title="Funding Utilisation" description="100% of donor contributions are routed directly to scholar support. Operational costs are covered by foundational endowments." className="bg-background border-t">
                 <div className="grid md:grid-cols-2 gap-12 mt-8 items-center">
                     <div className="space-y-6">
-                        {mockImpactMetrics.fundingBreakdown.map((item, i) => (
+                        {mockImpactDetails.fundingBreakdown.map((item, i) => (
                             <div key={i} className="space-y-2">
                                 <div className="flex justify-between text-sm font-medium">
                                     <span>{item.label}</span>

@@ -85,3 +85,18 @@ export const reportCoverageBreakdown = [
     { label: "Placement", value: 82, color: "#d97706" },
     { label: "Social Impact", value: 76, color: "#dc2626" },
 ];
+export const mockImpactDetails = {
+    sectorBreakdown: [
+        { sector: "Technology & Engineering", count: 420, pct: 33.6 },
+        { sector: "Healthcare & Life Sciences", count: 280, pct: 22.4 },
+        { sector: "Public Policy & Governance", count: 215, pct: 17.2 },
+        { sector: "Financial Infrastructure", count: 185, pct: 14.8 },
+        { sector: "Environmental Science", count: 150, pct: 12.0 },
+    ],
+    fundingBreakdown: [
+        { label: "Scholar Tuition & Institutional Fees", pct: 65 },
+        { label: "Direct Living Stipends", pct: 20 },
+        { label: "Research & Travel Grants", pct: 10 },
+        { label: "Mentorship & Leadership Prep", pct: 5 },
+    ],
+};

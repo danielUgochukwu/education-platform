@@ -73,7 +73,7 @@ export default function ScholarsPage() {
                         <Card key={i} className="border-border/50 hover:shadow-md transition-shadow overflow-hidden">
                             <div className="bg-primary/5 p-8 border-b">
                                 <Quote className="h-8 w-8 text-primary/30 mb-4" />
-                                <p className="text-base italic leading-relaxed text-foreground/90">"{scholar.quote}"</p>
+                                <p className="text-base italic leading-relaxed text-foreground/90">&ldquo;{scholar.quote}&rdquo;</p>
                             </div>
                             <CardContent className="p-6 space-y-4">
                                 <div className="flex items-center gap-3">
@@ -185,7 +185,7 @@ export default function ScholarsPage() {
             <section className="bg-muted/30 border-t py-20">
                 <div className="container mx-auto px-4 text-center max-w-2xl space-y-5">
                     <h2 className="text-3xl font-bold tracking-tight">Join the Next Cohort</h2>
-                    <p className="text-lg text-muted-foreground">Applications for the 2025 cohort are now open. Are you ready to be listed among Nigeria's most exceptional scholars?</p>
+                    <p className="text-lg text-muted-foreground">Applications for the 2025 cohort are now open. Are you ready to be listed among Nigeria&apos;s most exceptional scholars?</p>
                     <Link href="/apply">
                         <Button size="lg" className="h-12 px-8 font-semibold">Apply Now</Button>
                     </Link>

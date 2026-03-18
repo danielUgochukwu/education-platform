@@ -112,7 +112,12 @@ export interface Scholar {
     applicantId: string;
     cohortId: string;
     programId: string;
+    name: string;
+    cohort: string;
+    discipline: string;
     institution: string;
+    state: string;
+    placement: string;
     status: "active" | "graduated" | "suspended";
     progressScore: number; // 0-100
     mentorId?: string;
@@ -126,6 +131,8 @@ export interface Program {
     title: string;
     description: string;
     focusAreaId: string;
+    modules: string[];
+    outcomes: string[];
     lead: string;
     location: string;
     duration: string;

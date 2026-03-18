@@ -18,16 +18,19 @@ export function Hero() {
                                 A national commitment to identify, fund, and deploy exceptional Nigerian talent — transforming brilliance into measurable impact across every sector of the economy.
                             </p>
                         </div>
-                        <div className="flex flex-wrap gap-4">
+                        <div className="flex flex-wrap gap-4 items-center">
                             <Link href="/apply">
                                 <Button size="lg" className="rounded-full px-8 py-6 text-base font-semibold bg-[#1A1A1A] text-white hover:bg-[#2A2A2A]">
-                                    Apply Now <ArrowRight className="ml-2 h-5 w-5" />
+                                    Apply for Scholarship <ArrowRight className="ml-2 h-5 w-5" />
                                 </Button>
                             </Link>
-                            <Link href="/about">
-                                <Button size="lg" variant="ghost" className="rounded-full px-8 py-6 text-base font-semibold text-[#1A1A1A]">
-                                    About the Initiative
+                            <Link href="/donate">
+                                <Button size="lg" variant="outline" className="rounded-full px-8 py-6 text-base font-semibold border-[#1A1A1A] text-[#1A1A1A] hover:bg-muted/50">
+                                    Become a Donor
                                 </Button>
+                            </Link>
+                            <Link href="/partner-with-us" className="text-sm font-semibold text-[#4A4A4A] hover:text-primary transition-colors ml-2">
+                                Partner with Us
                             </Link>
                         </div>
                     </div>

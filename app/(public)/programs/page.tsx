@@ -29,7 +29,7 @@ export default function ProgramsPage() {
                 <div className="container mx-auto px-4 max-w-5xl space-y-5">
                     <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Focus Areas & Programs</h1>
                     <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl">
-                        Our curriculum and scholar support structures are intentionally designed to address Nigeria's most pressing socio-economic and technological gaps.
+                        Our curriculum and scholar support structures are intentionally designed to address Nigeria&apos;s most pressing socio-economic and technological gaps.
                     </p>
                     <div className="flex flex-wrap gap-2 mt-3 text-sm">
                         {["All", "Technology", "Healthcare", "Energy", "Manufacturing"].map((cat, i) => (

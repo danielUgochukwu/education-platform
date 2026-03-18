@@ -10,23 +10,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { getDefaultRedirectPath, getRoleFromMetadata } from "@/lib/auth/roles";
+import { ArrowRight, Eye, EyeOff, Lock, Mail, Shield } from "lucide-react";
+import { toast } from "sonner";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { getDefaultRedirectPath, getRoleFromMetadata } from "@/lib/auth/roles";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const router = useRouter();
-    const [isSubmitting, setIsSubmitting] = React.useState(false);
-    const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
-    const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
-        const formData = new FormData(event.currentTarget);
-        const email = formData.get("email")?.toString().trim() ?? "";
-        const password = formData.get("password")?.toString() ?? "";
-
+    const handleSignIn = async (e: React.FormEvent) => {
+        e.preventDefault();
         setIsSubmitting(true);
-        setErrorMessage(null);
+        setErrorMessage("");
 
         try {
             const supabase = getSupabaseBrowserClient();
@@ -37,14 +38,24 @@ export default function LoginPage() {
 
             if (error) {
                 setErrorMessage(error.message);
+                toast.error("Sign-in failed", {
+                    description: error.message,
+                });
                 return;
             }
 
             const role = getRoleFromMetadata(data.user.user_metadata);
+            toast.success("Welcome back!", {
+                description: "You have successfully signed in.",
+            });
             router.replace(getDefaultRedirectPath(role));
             router.refresh();
         } catch (error) {
-            setErrorMessage(error instanceof Error ? error.message : "Unable to sign you in right now.");
+            const message = error instanceof Error ? error.message : "Unable to sign you in right now.";
+            setErrorMessage(message);
+            toast.error("Authentication error", {
+                description: message,
+            });
         } finally {
             setIsSubmitting(false);
         }
@@ -66,14 +77,21 @@ export default function LoginPage() {
             </div>
 
             <Card className="border-border/60 shadow-sm">
-                <CardContent className="p-6">
-                    {errorMessage && (
-                        <Alert variant="destructive" className="mb-5">
-                            <CircleAlert />
-                            <AlertTitle>Sign-in failed</AlertTitle>
-                            <AlertDescription>{errorMessage}</AlertDescription>
-                        </Alert>
-                    )}
+                <CardContent className="p-6 space-y-5">
+                    <div className="space-y-2">
+                        <Label htmlFor="email">Email Address</Label>
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder="you@example.com"
+                                className="pl-9"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </div>
+                    </div>
 
                     <form onSubmit={handleSignIn} className="space-y-5">
                         <div className="space-y-2">

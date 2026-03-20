@@ -15,6 +15,32 @@ function getDaysUntilDueDate(dueDate: string) {
     return Math.ceil((due.getTime() - today.getTime()) / MS_PER_DAY);
 }
 
+function getApplicationPermissionErrorMessage(rawMessage?: string, action: "save" | "submit" = "save") {
+    const message = (rawMessage || "").toLowerCase();
+    const isMissingApplicantProfileError =
+        message.includes("applications_applicant_id_fkey") ||
+        (message.includes("foreign key constraint") && message.includes("applicant_id"));
+    const isPermissionError =
+        message.includes("permission denied") ||
+        message.includes("row-level security") ||
+        message.includes("violates row-level security policy");
+    const isApplicationsTableError =
+        message.includes("application") ||
+        message.includes("applications");
+
+    if (isMissingApplicantProfileError) {
+        return "Your applicant profile is not initialized yet. Please sign out and sign in again, then retry. If it persists, run the latest database migrations.";
+    }
+
+    if (isPermissionError && isApplicationsTableError) {
+        return action === "submit"
+            ? "You do not have permission to submit this application yet. Please contact support or run the latest database migrations."
+            : "You do not have permission to save this application yet. Please contact support or run the latest database migrations.";
+    }
+
+    return rawMessage || "An unexpected error occurred.";
+}
+
 export async function getScholarDashboardData(scholarId: string) {
     const supabase = await createSupabaseServerClient();
 
@@ -424,7 +450,7 @@ export async function submitApplication(): Promise<{ error: string | null }> {
         .maybeSingle();
 
     if (fetchError) {
-        return { error: fetchError.message };
+        return { error: getApplicationPermissionErrorMessage(fetchError.message, "submit") };
     }
 
     if (!application) {
@@ -447,7 +473,7 @@ export async function submitApplication(): Promise<{ error: string | null }> {
         .eq("id", application.id);
 
     if (error) {
-        return { error: error.message };
+        return { error: getApplicationPermissionErrorMessage(error.message, "submit") };
     }
 
     return { error: null };
@@ -488,7 +514,7 @@ export async function saveApplicationStep(
         .maybeSingle();
 
     if (fetchError) {
-        return { error: fetchError.message };
+        return { error: getApplicationPermissionErrorMessage(fetchError.message, "save") };
     }
 
     const targetStep = isNext ? step + 1 : step;
@@ -505,7 +531,7 @@ export async function saveApplicationStep(
         : await supabase.from("applications").insert(payload);
 
     if (writeResult.error) {
-        return { error: writeResult.error.message };
+        return { error: getApplicationPermissionErrorMessage(writeResult.error.message, "save") };
     }
 
     return { error: null };

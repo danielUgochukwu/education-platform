@@ -42,6 +42,25 @@ const statusLabel: Record<DocumentStatus, string> = {
     expiring: "Expiring Soon",
 };
 
+function getDocumentPermissionErrorMessage(rawMessage?: string, action: "upload" | "delete" = "upload") {
+    const message = (rawMessage || "").toLowerCase();
+    const isPermissionError =
+        message.includes("permission denied") ||
+        message.includes("row-level security") ||
+        message.includes("violates row-level security policy");
+    const isDocumentsTableError =
+        message.includes("document") ||
+        message.includes("documents");
+
+    if (isPermissionError && isDocumentsTableError) {
+        return action === "delete"
+            ? "You do not have permission to delete this document yet. Please contact support or run the latest database migrations."
+            : "You do not have permission to upload documents yet. Please contact support or run the latest database migrations.";
+    }
+
+    return rawMessage || "Unexpected error.";
+}
+
 export function DocumentUploadForm({ documents }: DocumentUploadFormProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -91,7 +110,7 @@ export function DocumentUploadForm({ documents }: DocumentUploadFormProps) {
                 });
 
                 if (error) {
-                    toast.error("Upload failed.", { description: error.message });
+                    toast.error("Upload failed.", { description: getDocumentPermissionErrorMessage(error.message, "upload") });
                     return;
                 }
 
@@ -129,7 +148,7 @@ export function DocumentUploadForm({ documents }: DocumentUploadFormProps) {
                 .eq("scholar_id", auth.user.id);
 
             if (error) {
-                toast.error("Delete failed.", { description: error.message });
+                toast.error("Delete failed.", { description: getDocumentPermissionErrorMessage(error.message, "delete") });
                 return;
             }
 
@@ -202,9 +221,9 @@ export function DocumentUploadForm({ documents }: DocumentUploadFormProps) {
                                                 </p>
                                             )}
                                         </div>
-                                        <button onClick={() => handleDelete(uploaded.id)} className="text-muted-foreground hover:text-destructive transition-colors">
+                                        <Button onClick={() => handleDelete(uploaded.id)} className="text-muted-foreground hover:text-destructive transition-colors">
                                             <Trash2 className="h-4 w-4" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 ) : (
                                     <div

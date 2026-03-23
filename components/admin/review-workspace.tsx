@@ -17,7 +17,9 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import type { ApplicationStatus } from "@/types";
-import { CalendarDays, ClipboardPen, FileText, UserCheck } from "lucide-react";
+import { CalendarDays, ClipboardPen, FileText, UserCheck, Loader2 } from "lucide-react";
+import { updateApplicationDecision } from "@/lib/supabase/actions";
+import { useRouter } from "next/navigation";
 
 interface ReviewWorkspaceProps {
     application: any;
@@ -32,6 +34,8 @@ export function ReviewWorkspace({ application }: ReviewWorkspaceProps) {
         "Service Potential": 0,
         "Mission Fit": 0
     });
+    const [isSaving, setIsSaving] = useState(false);
+    const router = useRouter();
 
     const rubric = [
         { label: "Academic Readiness", note: "Previous grades and technical foundation", max: 40 },
@@ -55,9 +59,28 @@ export function ReviewWorkspace({ application }: ReviewWorkspaceProps) {
         setFeedback("Review draft saved to local state. Integration with database pending Phase 2.");
     }
 
-    function handleDecision(nextDecision: ApplicationStatus, message: string) {
-        setDecision(nextDecision);
-        setFeedback(message);
+    async function handleDecision(nextDecision: ApplicationStatus, message: string) {
+        setIsSaving(true);
+        try {
+            const { error } = await updateApplicationDecision(
+                application.id,
+                nextDecision,
+                notes,
+                scores
+            );
+
+            if (error) {
+                setFeedback(`Error: ${error}`);
+            } else {
+                setDecision(nextDecision);
+                setFeedback(message);
+                router.refresh();
+            }
+        } catch (err: any) {
+            setFeedback(`Error: ${err.message || "An unexpected error occurred."}`);
+        } finally {
+            setIsSaving(false);
+        }
     }
 
     return (
@@ -124,13 +147,16 @@ export function ReviewWorkspace({ application }: ReviewWorkspaceProps) {
                         </div>
 
                         <div className="flex flex-wrap gap-3 pt-4">
-                            <Button type="button" onClick={() => handleDecision("shortlisted", "Candidate shortlisted for interview planning.")}>
+                            <Button disabled={isSaving} type="button" onClick={() => handleDecision("shortlisted", "Candidate shortlisted for interview planning.")}>
+                                {isSaving && decision === "shortlisted" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Shortlist
                             </Button>
-                            <Button type="button" variant="outline" onClick={() => handleDecision("accepted", "Candidate marked approved.")}>
+                            <Button disabled={isSaving} type="button" variant="outline" onClick={() => handleDecision("accepted", "Candidate marked approved.")}>
+                                {isSaving && decision === "accepted" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Approve
                             </Button>
-                            <Button type="button" variant="destructive" onClick={() => handleDecision("rejected", "Candidate marked rejected.")}>
+                            <Button disabled={isSaving} type="button" variant="destructive" onClick={() => handleDecision("rejected", "Candidate marked rejected.")}>
+                                {isSaving && decision === "rejected" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Reject
                             </Button>
                         </div>

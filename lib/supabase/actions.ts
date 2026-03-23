@@ -1,7 +1,7 @@
 "use server";
 
 import { createSupabaseServerClient } from "./server";
-import { Scholar, Milestone, Announcement, ImpactMetric, FundingRecord } from "@/types";
+import { Scholar, Milestone, Announcement, ImpactMetric, FundingRecord, ApplicationStatus } from "@/types";
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
@@ -129,20 +129,30 @@ export async function getDonorDashboardData(donorId: string) {
         profileRes,
         detailsRes,
         fundingRes,
-        scholarsRes,
         impactRes
     ] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", donorId).single(),
         supabase.from("donor_details").select("*").eq("id", donorId).single(),
         supabase.from("funding_records").select("*, programs(name)").eq("sponsor_id", donorId),
-        supabase.from("profiles").select("*").eq("role", "scholar").limit(5), // Improved for demo
         supabase.from("impact_metrics").select("*").limit(10) // Showing global impact for donors
     ]);
+
+    const scholarIds = Array.from(new Set(
+        (fundingRes.data || [])
+            .map((fr: any) => fr.scholar_id)
+            .filter(Boolean)
+    ));
+
+    let sponsoredScholars: any[] = [];
+    if (scholarIds.length > 0) {
+        const { data } = await supabase.from("profiles").select("*").in("id", scholarIds);
+        sponsoredScholars = data || [];
+    }
 
     return {
         profile: { ...profileRes.data, ...detailsRes.data },
         fundingRecords: fundingRes.data || [],
-        sponsoredScholars: scholarsRes.data || [],
+        sponsoredScholars,
         impactMetrics: impactRes.data || [],
     };
 }
@@ -605,6 +615,80 @@ export async function saveApplicationStep(
 
     if (writeResult.error) {
         return { error: getApplicationPermissionErrorMessage(writeResult.error.message, "save") };
+    }
+
+    return { error: null };
+}
+
+export async function updateApplicationDecision(
+    applicationId: string,
+    decision: ApplicationStatus,
+    notes: string,
+    scores: Record<string, number>
+): Promise<{ error: string | null }> {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+        return { error: "Unauthorized" };
+    }
+
+    const { error: appError, data: application } = await supabase
+        .from("applications")
+        .update({ status: decision, review_notes: notes })
+        .eq("id", applicationId)
+        .select()
+        .single();
+
+    if (appError) {
+        return { error: appError.message };
+    }
+
+    if (decision === "accepted" && application) {
+        const { error: profileError } = await supabase
+            .from("profiles")
+            .update({ role: "scholar" })
+            .eq("id", application.applicant_id);
+
+        if (profileError) {
+            return { error: "Application updated, but failed to update user role." };
+        }
+    }
+
+    return { error: null };
+}
+
+export async function allocateFunding(
+    sponsorId: string,
+    scholarId: string,
+    amount: number,
+    programId?: string
+): Promise<{ error: string | null }> {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+        return { error: "Unauthorized" };
+    }
+
+    const payload: any = {
+        sponsor_id: sponsorId,
+        scholar_id: scholarId,
+        amount,
+        type: "disbursement",
+        status: "completed",
+    };
+
+    if (programId) {
+        payload.program_id = programId;
+    }
+
+    const { error } = await supabase
+        .from("funding_records")
+        .insert(payload);
+
+    if (error) {
+        return { error: error.message };
     }
 
     return { error: null };

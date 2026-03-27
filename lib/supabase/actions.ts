@@ -106,15 +106,19 @@ function normalizeCohortRecord<T>(cohort: T): T {
         getNumericValue(source.review_completion_percentage) ??
         getNumericValue(source.review_completion) ??
         0;
+    const fundingReleased =
+        getNumericValue(source.funding_released) ??
+        0;
     const readinessStatus =
         getTrimmedString(source.readiness_status) ??
         getTrimmedString(source.readiness) ??
-        "";
+        "planned";
 
     return {
         ...source,
         programs: normalizedPrograms,
         review_completion_percentage: reviewCompletionPercentage,
+        funding_released: fundingReleased,
         readiness_status: readinessStatus,
     } as T;
 }

@@ -78,7 +78,9 @@ export default async function ApplicationsManagementPage() {
         {
             label: "Screening",
             value: Math.round(
-                (visibleApplications.filter((application: AdminApplication) => application.status !== "draft").length / (totalApplicants || 1)) * 100
+                (visibleApplications.filter((application: AdminApplication) =>
+                    !["submitted"].includes(application.status)
+                ).length / (totalApplicants || 1)) * 100
             ),
             color: "#0284c7",
         },

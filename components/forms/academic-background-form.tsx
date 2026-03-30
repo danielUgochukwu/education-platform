@@ -114,7 +114,7 @@ export function AcademicBackgroundForm({
                 <Label htmlFor="program">Preferred NTDI Programme *</Label>
                 <Select
                   name="programChoice"
-                  defaultValue={ab.programChoice || ""}
+                  defaultValue={application?.programChoice || application?.program_choice || ""}
                 >
                   <SelectTrigger id="program">
                     <SelectValue />

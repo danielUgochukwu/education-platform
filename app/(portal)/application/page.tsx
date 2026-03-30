@@ -38,7 +38,8 @@ export default async function StartApplicationPage() {
   const status = application?.status || "draft";
   const programName =
     application?.program_name ||
-    application?.academic_background?.programChoice ||
+    application?.programChoice ||
+    application?.program_choice || // Fallback for case inconsistency
     "Not Started";
   const cohortLabel = application?.cohort_year
     ? `Cohort ${application.cohort_year}`
@@ -91,24 +92,22 @@ export default async function StartApplicationPage() {
             return (
               <Card
                 key={step.step}
-                className={`border transition-colors ${
-                  isActive
+                className={`border transition-colors ${isActive
                     ? "border-primary/40 shadow-sm"
                     : isCompleted
-                    ? "border-emerald-200 bg-emerald-50/30 dark:bg-emerald-900/10"
-                    : "border-border/50 opacity-70"
-                }`}
+                      ? "border-emerald-200 bg-emerald-50/30 dark:bg-emerald-900/10"
+                      : "border-border/50 opacity-70"
+                  }`}
               >
                 <CardContent className="p-5">
                   <div className="flex items-center gap-4">
                     <div
-                      className={`h-12 w-12 rounded-xl flex items-center justify-center shrink-0 ${
-                        isCompleted
+                      className={`h-12 w-12 rounded-xl flex items-center justify-center shrink-0 ${isCompleted
                           ? "bg-emerald-100 text-emerald-600"
                           : isActive
-                          ? "bg-primary/10 text-primary"
-                          : "bg-muted text-muted-foreground/40"
-                      }`}
+                            ? "bg-primary/10 text-primary"
+                            : "bg-muted text-muted-foreground/40"
+                        }`}
                     >
                       {isCompleted ? (
                         <CheckCircle2 className="h-6 w-6" />

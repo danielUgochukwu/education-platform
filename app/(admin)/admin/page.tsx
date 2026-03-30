@@ -156,7 +156,7 @@ export default async function AdminDashboardPage() {
                                 </div>
                                 <div className="mt-4 space-y-4">
                                     {[
-                                        { label: "Review queue", value: applicationCounts.reviewQueue.toLocaleString(), detail: "Applications pending internal reviewer action" },
+                                         { label: "Review queue", value: (applicationCounts.reviewQueue || 0).toLocaleString(), detail: "Applications pending internal reviewer action" },
                                         { label: "Active scholars", value: counts.scholars.toLocaleString(), detail: "Scholars currently tracked across all programs" },
                                         { label: "Live cohorts", value: cohorts.length.toString(), detail: "Scholar intake windows currently being managed" },
                                     ].map((item) => (

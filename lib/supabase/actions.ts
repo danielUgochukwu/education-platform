@@ -348,12 +348,12 @@ function normalizeAdminApplicationRecord<T>(application: T): T {
     }
 
     const source = application as Record<string, unknown>;
-    const fallbackProgramName = getProgramChoiceFromAcademicBackground(source.academic_background);
+    const programChoice = (source.programChoice || source.program_choice || getProgramChoiceFromAcademicBackground(source.academic_background)) as string | null;
     const normalizedPrograms =
         source.programs && typeof source.programs === "object"
             ? normalizeProgramRecord(source.programs)
-            : fallbackProgramName
-                ? { name: fallbackProgramName }
+            : programChoice
+                ? { name: programChoice }
                 : source.programs;
     const normalizedDocuments = normalizeApplicationDocuments(source.documents);
     const normalizedScore =
@@ -369,7 +369,7 @@ function normalizeAdminApplicationRecord<T>(application: T): T {
         documents: normalizedDocuments,
         score: normalizedScore,
         cohort_year: normalizedCohortYear,
-        program_name: getProgramName(normalizedPrograms) || fallbackProgramName,
+        program_name: getProgramName(normalizedPrograms) || programChoice,
     } as T;
 }
 
@@ -1271,7 +1271,7 @@ export async function getApplicantDashboardData(userId: string) {
             : null;
     const programName =
         getProgramName(normalizedProgram) ||
-        getProgramChoiceFromAcademicBackground(applicationData?.academic_background);
+        (applicationData?.programChoice || applicationData?.program_choice || getProgramChoiceFromAcademicBackground(applicationData?.academic_background));
 
     const application = applicationData
         ? {

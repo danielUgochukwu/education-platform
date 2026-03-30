@@ -36,7 +36,13 @@ export default async function StartApplicationPage() {
   // Default values if no application exists yet
   const currentStep = application?.step || application?.current_step || 1;
   const status = application?.status || "draft";
-  const programName = application?.program_id || "Not Started";
+  const programName =
+    application?.program_name ||
+    application?.academic_background?.programChoice ||
+    "Not Started";
+  const cohortLabel = application?.cohort_year
+    ? `Cohort ${application.cohort_year}`
+    : "Cohort Pending";
   const appId = application?.id
     ? `NTDI-${application.id.slice(0, 8)}`
     : "New Application";
@@ -64,7 +70,7 @@ export default async function StartApplicationPage() {
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
-                <Badge variant="outline">2025 Cohort</Badge>
+                <Badge variant="outline">{cohortLabel}</Badge>
                 <Badge variant="secondary">Deadline: April 30, 2026</Badge>
               </div>
             </div>

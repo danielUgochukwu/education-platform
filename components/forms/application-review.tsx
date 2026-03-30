@@ -209,7 +209,7 @@ export function ApplicationReview({
         <div className="space-y-3">
           <InfoRow
             label="Preferred Programme"
-            value={toOptionalString(application?.program_id)}
+            value={ab.programChoice}
           />
           <Separator />
           <InfoRow label="Secondary School" value={ab.secondarySchool} />

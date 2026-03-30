@@ -9,6 +9,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import type { ApplicationStatus, DocumentStatus, UploadedDocument } from "@/types";
 import {
     AlertCircle,
@@ -27,25 +34,28 @@ import {
 import { useRouter } from "next/navigation";
 
 interface ReviewWorkspaceApplication {
-  id: string;
-  applicant_id: string;
-  status: ApplicationStatus;
-  score?: number | null;
-  review_notes?: string | null;
-  review_scores?: Record<string, number> | null;
-  cohort_year?: string | number | null;
-  created_at: string;
-  documents?: UploadedDocument[];
-  profiles?: {
-    first_name?: string | null;
-    last_name?: string | null;
-    state?: string | null;
-    state_of_origin?: string | null;
-  } | null;
+    id: string;
+    applicant_id: string;
+    program_id?: string | null;
+    status: ApplicationStatus;
+    score?: number | null;
+    review_notes?: string | null;
+    review_scores?: Record<string, number> | null;
+    cohort_id?: string | null;
+    cohort_year?: string | number | null;
+    created_at: string;
+    documents?: UploadedDocument[];
+    profiles?: {
+        first_name?: string | null;
+        last_name?: string | null;
+        state?: string | null;
+        state_of_origin?: string | null;
+    } | null;
 }
 
 interface ReviewWorkspaceProps {
     application: ReviewWorkspaceApplication;
+    cohorts: Array<{ id: string; year: string | number; programId: string; programName: string }>;
 }
 
 const rubric = [
@@ -118,13 +128,14 @@ function getDocumentStatusClassName(status: DocumentStatus): string {
     }
 }
 
-export function ReviewWorkspace({ application }: ReviewWorkspaceProps) {
+export function ReviewWorkspace({ application, cohorts }: ReviewWorkspaceProps) {
     const [decision, setDecision] = useState<ApplicationStatus>(application.status as ApplicationStatus);
     const [requestedDecision, setRequestedDecision] = useState<ApplicationStatus | null>(null);
     const [feedback, setFeedback] = useState<string | null>(null);
     const [notes, setNotes] = useState(application.review_notes ?? "");
     const [scores, setScores] = useState<Record<string, number>>(() => getInitialScores(application));
     const [documents, setDocuments] = useState<UploadedDocument[]>(application.documents || []);
+    const [selectedCohortId, setSelectedCohortId] = useState<string | null>(application.cohort_id || null);
     const [isSaving, setIsSaving] = useState(false);
     const [documentAction, setDocumentAction] = useState<{ id: string; status: DocumentStatus } | null>(null);
     const router = useRouter();
@@ -144,8 +155,34 @@ export function ReviewWorkspace({ application }: ReviewWorkspaceProps) {
         setFeedback("Review draft updated.");
     }
 
-    function handleSaveDraft() {
-        setFeedback("Review draft saved to local state. Integration with database pending Phase 2.");
+    async function handleSaveDraft() {
+        setRequestedDecision(decision);
+        setIsSaving(true);
+
+        try {
+            const { error } = await updateApplicationDecision(
+                application.id,
+                application.applicant_id,
+                decision,
+                notes,
+                scores,
+                selectedCohortId
+            );
+
+            if (error) {
+                setFeedback(`Error: ${error}`);
+                return;
+            }
+
+            setFeedback("Review draft saved.");
+            router.refresh();
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Unable to save review draft.";
+            setFeedback(`Error: ${message}`);
+        } finally {
+            setIsSaving(false);
+            setRequestedDecision(null);
+        }
     }
 
     async function handleDecision(nextDecision: ApplicationStatus, message: string) {
@@ -158,7 +195,8 @@ export function ReviewWorkspace({ application }: ReviewWorkspaceProps) {
                 application.applicant_id,
                 nextDecision,
                 notes,
-                scores
+                scores,
+                selectedCohortId
             );
 
             if (error) {
@@ -283,6 +321,27 @@ export function ReviewWorkspace({ application }: ReviewWorkspaceProps) {
                                 <p className="font-medium">Current Reviewer</p>
                             </div>
                             <p className="mt-2 text-lg font-semibold">System Administrator</p>
+                        </div>
+
+                        <div className="space-y-3 pt-2">
+                            <Label htmlFor="cohort-selection" className="text-xs uppercase tracking-wider text-muted-foreground">Assign Scholar Cohort</Label>
+                            <Select
+                                value={selectedCohortId || "unassigned"}
+                                onValueChange={(value) => setSelectedCohortId(value === "unassigned" ? null : value)}
+                            >
+                                <SelectTrigger id="cohort-selection" className="bg-background">
+                                    <SelectValue placeholder="Select a cohort" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="unassigned">Not assigned</SelectItem>
+                                    {cohorts.map((cohort) => (
+                                        <SelectItem key={cohort.id} value={cohort.id}>
+                                            {cohort.programName} ({cohort.year})
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <p className="text-[10px] text-muted-foreground italic">Required for scholarship tracking once approved.</p>
                         </div>
 
                         <div className="flex flex-wrap gap-3 pt-4">
@@ -423,7 +482,7 @@ export function ReviewWorkspace({ application }: ReviewWorkspaceProps) {
                                 />
                             </div>
 
-                            <Button type="button" variant="outline" className="w-full" onClick={handleSaveDraft}>
+                            <Button type="button" variant="outline" className="w-full" onClick={handleSaveDraft} disabled={isSaving}>
                                 Save Draft Review
                             </Button>
                         </CardContent>

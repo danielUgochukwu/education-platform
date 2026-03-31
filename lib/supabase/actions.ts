@@ -196,8 +196,8 @@ async function getCohortYearMap(
     const { data, error } = await runWithTablePermissionFallback(
         supabase,
         "cohorts",
-        (client) =>
-            client
+        async (client) =>
+            await client
                 .from("cohorts")
                 .select("id, year")
                 .in("id", uniqueCohortIds)
@@ -273,8 +273,8 @@ async function getAdminCohortsData(
     const cohortsWithProgramsRes = await runWithTablePermissionFallback(
         supabase,
         "cohorts",
-        (client) =>
-            client
+        async (client) =>
+            await client
                 .from("cohorts")
                 .select(`
       *,
@@ -298,8 +298,8 @@ async function getAdminCohortsData(
     const fallbackCohortsRes = await runWithTablePermissionFallback(
         supabase,
         "cohorts",
-        (client) =>
-            client
+        async (client) =>
+            await client
                 .from("cohorts")
                 .select("*")
                 .order("year", { ascending: false })
@@ -487,8 +487,8 @@ async function resolveProgramAndCohortSelection(
     const { data: latestCohort, error: cohortError } = await runWithTablePermissionFallback(
         supabase,
         "cohorts",
-        (client) =>
-            client
+        async (client) =>
+            await client
                 .from("cohorts")
                 .select("id")
                 .eq("program_id", programId)

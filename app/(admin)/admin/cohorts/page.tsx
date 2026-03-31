@@ -16,8 +16,8 @@ import { Flag, GraduationCap, ListChecks, Users } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAdminCohorts } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
-
-type AdminCohort = Awaited<ReturnType<typeof getAdminCohorts>>[number];
+// Fallback to any since the Supabase RPC return type inference resolves to unknown
+type AdminCohort = any;
 
 export default async function CohortsManagementPage() {
     const supabase = await createSupabaseServerClient();

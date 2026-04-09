@@ -45,7 +45,7 @@ export default async function ContentManagementPage() {
             audience: "Platform",
             owner: c.author || "Admin",
             updatedAt: new Date(c.published_date || c.created_at || new Date()).toLocaleDateString(),
-            status: (c.status?.charAt(0).toUpperCase() + c.status?.slice(1)) as any || "Draft"
+            status: (c.status ? c.status.charAt(0).toUpperCase() + c.status.slice(1) : "Draft") as any
         }))
         : adminContentItems;
 

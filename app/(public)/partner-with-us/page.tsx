@@ -32,7 +32,7 @@ export default function PartnerWithUsPage() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                        <Link href="/signup?intent=partner">
+                        <Link href="/support?type=partner">
                             <Button size="lg" className="h-14 px-10 text-lg font-bold">
                                 Continue as Partner <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
@@ -115,9 +115,9 @@ export default function PartnerWithUsPage() {
                 <div className="container mx-auto px-4 text-center max-w-3xl space-y-8">
                     <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Begin Institutional Partnership</h2>
                     <p className="text-xl text-primary-foreground/80">
-                        Ready to integrate with Nigeria's most rigorous talent engine?
+                        Ready to integrate with Nigeria&apos;s most rigorous talent engine?
                     </p>
-                    <Link href="/signup?intent=partner">
+                    <Link href="/support?type=partner">
                         <Button size="lg" variant="secondary" className="h-16 px-12 text-xl font-bold">
                             Create Partner Account <ArrowRight className="ml-2 h-6 w-6" />
                         </Button>

@@ -30,11 +30,11 @@ export default async function FundingAllocationPage() {
 
     const { profile, fundingRecords, sponsoredScholars, impactMetrics } = await getDonorDashboardData(user.id);
 
-    const totalAllocated = fundingRecords.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+    const totalAllocated = fundingRecords.reduce((acc: number, curr: any) => acc + (Number(curr.amount_allocated) || 0), 0);
 
-    const fundDistribution = fundingRecords.map((r, i) => ({
-        label: r.programs?.name || "Support Line",
-        value: r.amount || 0,
+    const fundDistribution = fundingRecords.map((r: any, i: number) => ({
+        label: r.applications?.university_programs?.program_name || "Support Line",
+        value: Number(r.amount_allocated) || 0,
         color: ["#0f766e", "#0284c7", "#d97706", "#dc2626"][i % 4]
     }));
 

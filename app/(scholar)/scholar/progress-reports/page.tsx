@@ -20,6 +20,7 @@ import { ClipboardList, FileText, TrendingUp } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getScholarProgressReports } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default async function ProgressReportsPage() {
   const supabase = await createSupabaseServerClient();
@@ -54,7 +55,11 @@ export default async function ProgressReportsPage() {
     <PageContainer
       title="Progress Reports"
       description="Quarterly reporting across academic delivery, placement readiness, and impact tracking."
-      action={<Button>Create Draft Update</Button>}
+      action={
+        <Button asChild>
+          <Link href="/scholar/progress-reports/new">Create Draft Update</Link>
+        </Button>
+      }
     >
       <div className="space-y-6">
         <Card className="border-border/60 bg-[linear-gradient(135deg,rgba(90,200,120,0.10),rgba(255,255,255,0.96)_55%,rgba(238,250,242,0.9))]">

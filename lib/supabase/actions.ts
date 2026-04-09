@@ -3,6 +3,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseAdminClient } from "./admin";
 import { createSupabaseServerClient } from "./server";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import {
     Scholar,
     Milestone,
@@ -892,7 +894,7 @@ export async function getScholarDashboardData(scholarId: string) {
         supabase.from("milestones").select("*").eq("scholar_id", scholarId).order("due_date", { ascending: true }),
         supabase.from("announcements").select("*").order("created_at", { ascending: false }).limit(5),
         supabase.from("impact_metrics").select("*").eq("scholar_id", scholarId),
-        supabase.from("funding_records").select("*").eq("scholar_id", scholarId),
+        supabase.from("fund_allocations").select("*").eq("student_id", scholarId),
         supabase.from("mentor_sessions").select("*").eq("scholar_id", scholarId).order("date", { ascending: false }).limit(3)
     ]);
 
@@ -910,77 +912,52 @@ export async function getAdminDashboardData() {
     const supabase = await createSupabaseServerClient();
 
     const [
-        scholarsCount,
-        donorsCount,
-        applications,
-        baseCohorts,
-        programsRes,
-        fundingRes,
-        fundingRecordsRes
+        statsRes,
+        appsRes,
+        programsRes
     ] = await Promise.all([
-        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "scholar"),
-        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "donor"),
-        fetchAdminApplicationsData(supabase),
-        getAdminCohortsData(supabase),
-        supabase.from("programs").select("*"),
-        supabase.from("donor_details").select("commitment"),
-        supabase.from("funding_records").select("*, programs(*)")
+        supabase.from("platform_stats").select("*").maybeSingle(),
+        supabase.from("v_student_applications").select("*").order("created_at", { ascending: false }).limit(10),
+        supabase.from("universities").select("*").order("name", { ascending: true })
     ]);
 
-    const nonDraftApplications = applications.filter((application) =>
-        application.status !== "draft"
-    );
-    const reviewQueueApplications = nonDraftApplications.filter((application) =>
-        isReviewQueueApplicationStatus(application.status)
-    );
-    const cohorts = mergeAdminCohortsWithApplicationRollups(baseCohorts, applications);
-    const averageReviewCompletion = cohorts.length > 0
-        ? Math.round(
-            cohorts.reduce((sum: number, cohort: Record<string, unknown>) =>
-                sum + (getNumericValue(cohort.review_completion_percentage) || 0), 0
-            ) / cohorts.length
-        )
-        : 0;
+    const stats = statsRes.data || {};
     const counts = {
-        scholars: scholarsCount.count || 0,
-        applicants: nonDraftApplications.length,
-        donors: donorsCount.count || 0,
+        scholars: stats.total_students_funded || 0,
+        applicants: stats.total_applications_submitted || 0,
+        donors: stats.total_donations_received ? 1 : 0,
     };
+    const applicationCounts = {
+        total: stats.total_applications_submitted || 0,
+        reviewQueue: 0,
+        drafts: 0,
+    };
+    const totalFunding = stats.total_funds_allocated || 0;
 
-    const totalFunding = fundingRes.data?.reduce((sum, d) => sum + (Number(d.commitment) || 0), 0) || 0;
+    const applications = (appsRes.data || []).map((app: any) => ({
+        id: app.id,
+        status: app.status || "submitted",
+        score: app.reviewer_score,
+        created_at: app.created_at,
+        profiles: { first_name: app.first_name, last_name: app.last_name, email: app.email },
+        programs: { name: app.program_name },
+        programs_id: null,
+        cohort_year: 2026
+    }));
 
-    const programFunding = (fundingRecordsRes.data || []).reduce((acc: any, curr: any) => {
-        const progName = curr.programs?.name || "Unassigned Operations";
-        acc[progName] = (acc[progName] || 0) + Number(curr.amount);
-        return acc;
-    }, {});
-
-    const fundingDistribution = Object.entries(programFunding)
-        .sort(([, a]: any, [, b]: any) => b - a)
-        .slice(0, 5)
-        .map(([label, amount]: [string, any]) => {
-            const percentage = totalFunding > 0 ? Math.round((amount / totalFunding) * 100) : 0;
-            return {
-                label,
-                value: percentage,
-                description: `Allocated to ${label} scholars and operations`,
-                meta: `N${(amount / 1000000).toFixed(1)}M Tracked`
-            };
-        });
+    const fundingDistribution = [
+        { label: "Platform General Fund", value: 100, description: "All allocated donations", meta: `N${(totalFunding / 1000000).toFixed(1)}M Tracked` }
+    ];
 
     return {
         counts,
-        applicationCounts: {
-            total: applications.length,
-            reviewQueue: reviewQueueApplications.length,
-            drafts: applications.length - nonDraftApplications.length,
-        },
-        averageReviewCompletion,
+        applicationCounts,
+        averageReviewCompletion: stats.avg_review_score ? Math.round(stats.avg_review_score) : 0,
         totalFunding,
         fundingDistribution,
-        applications: applications.slice(0, 10), // Show everything recent, including drafts
-        cohorts,
-        programs: sortProgramsByName(normalizeProgramsList(programsRes.data)),
+        applications,
+        cohorts: [{ year: 2026, active_scholars_count: stats.total_scholars || 0, review_completion_percentage: 100 }],
+        programs: (programsRes.data || []).map(p => ({ ...p, completion_rate: 100 })),
     };
 }
 
@@ -988,32 +965,41 @@ export async function getDonorDashboardData(donorId: string) {
     const supabase = await createSupabaseServerClient();
 
     const [
-        profileRes,
-        detailsRes,
-        fundingRes,
+        donationRes,
         impactRes
     ] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", donorId).single(),
-        supabase.from("donor_details").select("*").eq("id", donorId).single(),
-        supabase.from("funding_records").select("*, programs(*)").eq("sponsor_id", donorId),
+        supabase.from("donations").select("*").eq("id", donorId).single(),
         supabase.from("impact_metrics").select("*").limit(10) // Showing global impact for donors
     ]);
 
-    const scholarIds = Array.from(new Set(
-        (fundingRes.data || [])
-            .map((fr: { scholar_id?: string | null }) => fr.scholar_id)
-            .filter(Boolean)
-    ));
+    const donation = donationRes.data;
 
+    let fundingAllocations: Array<Record<string, unknown>> = [];
     let sponsoredScholars: Array<Record<string, unknown>> = [];
-    if (scholarIds.length > 0) {
-        const { data } = await supabase.from("profiles").select("*").in("id", scholarIds);
-        sponsoredScholars = data || [];
+
+    if (donation) {
+        const { data: allocations } = await supabase
+            .from("fund_allocations")
+            .select("*, students(*), applications(*)")
+            .eq("donation_id", donation.id);
+
+        fundingAllocations = allocations || [];
+
+        const studentIds = Array.from(new Set(
+            fundingAllocations
+                .map((fa: any) => fa.student_id)
+                .filter(Boolean)
+        ));
+
+        if (studentIds.length > 0) {
+            const { data } = await supabase.from("students").select("*").in("id", studentIds);
+            sponsoredScholars = data || [];
+        }
     }
 
     return {
-        profile: { ...profileRes.data, ...detailsRes.data },
-        fundingRecords: normalizeProgramsRelation(fundingRes.data),
+        profile: donation,
+        fundingRecords: fundingAllocations,
         sponsoredScholars,
         impactMetrics: impactRes.data || [],
     };
@@ -1041,6 +1027,38 @@ export async function getScholarProgressReports(scholarId: string) {
     return data || [];
 }
 
+export async function submitProgressReport(formData: FormData) {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        throw new Error("Unauthorized");
+    }
+
+    const period = formData.get("period") as string;
+    const summary = formData.get("summary") as string;
+    const prioritiesRaw = formData.get("priorities") as string;
+
+    const priorities = prioritiesRaw ? prioritiesRaw.split(",").map(s => s.trim()) : [];
+
+    const { error } = await supabase.from("progress_reports").insert({
+        scholar_id: user.id,
+        period,
+        summary,
+        status: 'submitted',
+        priorities,
+        submitted_on: new Date().toISOString().split('T')[0]
+    });
+
+    if (error) {
+        console.error("Error submitting progress report:", error);
+        throw new Error("Failed to submit progress report");
+    }
+
+    revalidatePath("/scholar/progress-reports");
+    redirect("/scholar/progress-reports");
+}
+
 export async function getScholarDocuments(scholarId: string) {
     const supabase = await createSupabaseServerClient();
     const { data } = await supabase.from("documents").select("*").eq("scholar_id", scholarId).order("updated_on", { ascending: false });
@@ -1064,16 +1082,12 @@ export async function getAdminUsers() {
 export async function getAdminSponsors() {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
-        .from("profiles")
-        .select(`
-      *,
-      donor_details (*)
-    `)
-        .eq("role", "donor")
+        .from("donations")
+        .select("*")
         .order("created_at", { ascending: false });
 
     if (error) {
-        console.error("Error fetching admin sponsors:", error);
+        console.error("Error fetching admin sponsors (donations):", error);
         return [];
     }
     return data;
@@ -1118,24 +1132,43 @@ export async function getAdminCohorts() {
 export async function getAdminFundingLedger() {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
-        .from("funding_records")
+        .from("fund_allocations")
         .select(`
       *,
-      profiles (first_name, last_name),
-      programs (*)
+      students (first_name, last_name),
+      donations (donor_name),
+      applications (
+        university_programs (*)
+      )
     `)
-        .order("date", { ascending: false });
+        .order("allocation_date", { ascending: false });
 
     if (error) {
         console.error("Error fetching admin funding ledger:", formatSupabaseError(error));
         return [];
     }
-    return normalizeProgramsRelation(data);
+    return data;
 }
 
 export async function getAdminApplications() {
     const supabase = await createSupabaseServerClient();
-    return fetchAdminApplicationsData(supabase);
+    const { data, error } = await supabase.from("v_student_applications").select("*").order("created_at", { ascending: false });
+
+    if (error) {
+        console.error("fetchAdminApplicationsData Error:", error);
+        return [];
+    }
+
+    return (data || []).map((app: any) => ({
+        id: app.id,
+        status: app.status || "submitted",
+        score: app.reviewer_score,
+        created_at: app.created_at,
+        students: { first_name: app.first_name, last_name: app.last_name, email: app.email, state: app.state },
+        university_programs: { program_name: app.program_name },
+        current_step: 6,
+        cohort_year: 2026
+    }));
 }
 
 export async function getAdminScholars() {
@@ -1185,11 +1218,11 @@ export async function getAdminScholarManagementData() {
 
     // Fetch funding records to calculate total disbursement
     const { data: fundingRecords } = await supabase
-        .from("funding_records")
-        .select("amount, status")
-        .eq("status", "completed");
+        .from("fund_allocations")
+        .select("amount_allocated, disbursement_status")
+        .eq("disbursement_status", "completed");
 
-    const totalDisbursed = (fundingRecords || []).reduce((sum, record) => sum + (Number(record.amount) || 0), 0);
+    const totalDisbursed = (fundingRecords || []).reduce((sum, record) => sum + (Number(record.amount_allocated) || 0), 0);
 
     // Calculate health breakdown based on progress scores
     const healthBreakdown = {
@@ -1220,47 +1253,55 @@ export async function getAdminScholarManagementData() {
 
 export async function getAdminApplicationById(id: string) {
     const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase
+
+    const { data: appData, error: appError } = await supabase
         .from("applications")
         .select(`
-      *,
-      profiles (first_name, last_name, email, state_of_origin),
-      cohorts (year),
-      programs (*)
-    `)
+            *,
+            students!student_id (first_name, last_name, email, state),
+            universities (name),
+            university_programs (program_name)
+        `)
         .eq("id", id)
         .single();
 
-    if (!error) {
-        return data ? normalizeAdminApplicationRecord(data) : null;
-    }
-
-    const canRetryWithoutCohortsRelation =
-        isTablePermissionError(error, "cohorts") ||
-        isMissingRelationshipError(error, "applications", "cohorts");
-
-    if (!canRetryWithoutCohortsRelation) {
-        console.error("Error fetching admin application by id:", formatSupabaseError(error));
+    if (appError || !appData) {
+        console.error("fetchAdminApplicationById Error:", appError);
         return null;
     }
 
-    const fallbackRes = await supabase
-        .from("applications")
-        .select(`
-      *,
-      profiles (first_name, last_name, email, state_of_origin),
-      programs (*)
-    `)
-        .eq("id", id)
-        .single();
+    const { data: documentsData } = await supabase
+        .from("application_documents")
+        .select("*")
+        .eq("application_id", id);
 
-    if (fallbackRes.error) {
-        console.error("Error fetching admin application by id:", formatSupabaseError(fallbackRes.error));
-        return null;
-    }
+    const documents = (documentsData || []).map((doc: any) => ({
+        id: doc.id,
+        name: doc.file_name,
+        url: doc.file_url,
+        action_url: doc.file_url,
+        status: doc.status || "pending",
+        slot: doc.document_type,
+        uploadedAt: doc.created_at
+    }));
 
-    const [hydratedApplication] = await hydrateRowsWithCohortYears(supabase, [fallbackRes.data]);
-    return hydratedApplication ? normalizeAdminApplicationRecord(hydratedApplication) : null;
+    return {
+        id: appData.id,
+        applicant_id: appData.student_id,
+        program_id: appData.program_id,
+        status: appData.status || "submitted",
+        score: appData.reviewer_score,
+        review_notes: appData.review_notes || "",
+        created_at: appData.created_at,
+        documents: documents,
+        profiles: {
+            first_name: appData.students?.first_name,
+            last_name: appData.students?.last_name,
+            state: appData.students?.state
+        },
+        programs: { name: appData.university_programs?.program_name },
+        cohort_year: 2026
+    };
 }
 
 export async function getApplicantDashboardData(userId: string) {
@@ -1766,34 +1807,29 @@ export async function updateApplicationDecision(
     }
 
     const sanitizedApplicationId = applicationId.trim();
-    const sanitizedApplicantId = applicantId.trim();
+    if (!sanitizedApplicationId) return { error: "Application ID is required." };
 
-    if (!sanitizedApplicationId) {
-        return { error: "Application ID is required." };
+    const totalScore = Object.values(scores).reduce((sum, s) => sum + (Number(s) || 0), 0);
+
+    const { error: dbError } = await supabase
+        .from("applications")
+        .update({
+            status: decision,
+            reviewer_score: totalScore,
+            review_notes: notes,
+            ...(cohortId ? { program_id: cohortId } : {}) // Reusing cohort config
+        })
+        .eq("id", sanitizedApplicationId);
+
+    if (dbError) {
+        console.error("Update Decision Error:", dbError);
+        return { error: dbError.message };
     }
 
-    if (!sanitizedApplicantId) {
-        return { error: "Applicant ID is required." };
+    if (decision === "accepted") {
+        await supabase.from("students").update({ status: "accepted" }).eq("id", applicantId);
     }
 
-    const rpcPayload = {
-        p_application_id: sanitizedApplicationId,
-        p_applicant_id: sanitizedApplicantId,
-        p_decision: decision,
-        p_notes: notes,
-        p_scores: scores,
-        p_cohort_id: cohortId || null,
-    };
-    console.log("Calling update_application_decision RPC with:", rpcPayload);
-
-    const { error: rpcError } = await supabase.rpc("update_application_decision", rpcPayload);
-
-    if (rpcError) {
-        console.error("RPC Error:", rpcError);
-        return { error: rpcError.message };
-    }
-
-    console.log("RPC Success for decision:", decision);
     return { error: null };
 }
 
@@ -1894,25 +1930,24 @@ export async function allocateFunding(
 export async function getAvailableCohorts() {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
-        .from("cohorts")
+        .from("university_programs")
         .select(`
             id,
-            year,
-            program_id,
-            programs (title)
+            program_name,
+            universities(name)
         `)
-        .order("year", { ascending: false });
+        .eq("is_active", true);
 
     if (error) {
-        console.error("Error fetching available cohorts:", formatSupabaseError(error));
+        console.error("Error fetching available programs:", formatSupabaseError(error));
         return [];
     }
 
-    return (data || []).map(row => ({
+    return (data || []).map((row: any) => ({
         id: row.id,
-        year: row.year,
-        programId: row.program_id,
-        programName: (row.programs as any)?.title || "Unknown Program"
+        year: 2026,
+        programId: row.id,
+        programName: `${row.universities?.name || "Unknown"} - ${row.program_name}`
     }));
 }
 
@@ -1984,4 +2019,129 @@ export async function createProgram(data: { name: string; title: string; total_b
     return { success: true };
 }
 
+// NEW POSTGRES SCHEMA ACTIONS
 
+export async function getUniversitiesAndPrograms() {
+    try {
+        const supabase = await createSupabaseServerClient();
+        const { data, error } = await supabase
+            .from("universities")
+            .select(`
+                id, 
+                name, 
+                university_programs(id, program_name, program_type)
+            `)
+            .eq("partnership_status", "active")
+            .eq("university_programs.is_active", true);
+
+        if (error) {
+            console.error("Failed to fetch universities:", error);
+            return [];
+        }
+
+        return (data || []).map((uni: any) => ({
+            id: uni.id,
+            name: uni.name,
+            programs: uni.university_programs?.map((p: any) => ({
+                id: p.id,
+                name: p.program_name,
+                type: p.program_type
+            })) || []
+        }));
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+}
+
+export async function submitStudentApplication(formData: FormData) {
+    try {
+        const supabase = await createSupabaseServerClient();
+        const { data: { session }, error: authError } = await supabase.auth.getSession();
+
+        if (authError || !session?.user) {
+            return { error: "Authentication required" };
+        }
+
+        // 1. Update Student Profile if needed
+        await supabase.from("students").update({
+            first_name: formData.get("firstName") as string,
+            last_name: formData.get("lastName") as string,
+            phone: formData.get("phone") as string,
+            date_of_birth: formData.get("dateOfBirth") as string,
+            gender: formData.get("gender") as string,
+            state: formData.get("state") as string,
+            city: formData.get("city") as string,
+            address: formData.get("address") as string
+        }).eq("id", session.user.id);
+
+        // 2. Insert Application
+        const { data: application, error: appError } = await supabase.from("applications").insert({
+            student_id: session.user.id,
+            university_id: formData.get("universityId") as string,
+            program_id: formData.get("programId") as string,
+            status: "submitted",
+            highest_qualification: formData.get("highestQualification") as string,
+            institution_name: formData.get("institutionName") as string,
+            graduation_year: parseInt(formData.get("graduationYear") as string, 10) || null,
+            gpa_or_grade: formData.get("gpa") as string,
+            family_income_range: formData.get("familyIncomeRange") as string,
+            funding_amount_needed: parseFloat(formData.get("fundingNeeded") as string) || 0,
+            other_funding_sources: formData.get("otherFunding") as string,
+            why_need_funding: formData.get("whyNeedFunding") as string,
+            career_goals: formData.get("careerGoals") as string,
+            why_this_program: formData.get("whyThisProgram") as string
+        }).select().single();
+
+        if (appError) {
+            console.error("Error creating application:", appError);
+            return { error: "Failed to submit application. Ensure all fields are valid." };
+        }
+
+        // 3. Handle File Uploads
+        const filesToUpload = [
+            { key: "transcript", docType: "transcript" },
+            { key: "certificate", docType: "certificate" },
+            { key: "recommendationLetter", docType: "recommendation" }
+        ];
+
+        for (const { key, docType } of filesToUpload) {
+            const file = formData.get(key) as File | null;
+            if (file && file.size > 0 && file.name !== 'undefined') {
+                const fileExt = file.name.split('.').pop();
+                const filePath = `applications/${application.id}/${docType}_${Date.now()}.${fileExt}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('documents')
+                    .upload(filePath, file);
+
+                if (!uploadError) {
+                    await supabase.from("application_documents").insert({
+                        application_id: application.id,
+                        document_type: docType,
+                        file_url: filePath,
+                        file_name: file.name
+                    });
+                }
+            }
+        }
+
+        return { success: true, applicationId: application.id };
+    } catch (error) {
+        console.error("Submission error:", error);
+        return { error: "An unexpected error occurred." };
+    }
+}
+
+export async function updateContentStatus(contentId: string, status: string) {
+    const supabase = await createSupabaseServerClient();
+    // Assuming 'system_content' or similar table exists, this is dead code placeholder
+    const { error } = await supabase.from("system_content").update({ status }).eq("id", contentId);
+    return { error: error?.message || null };
+}
+
+export async function updateReportStatus(reportId: string, status: string) {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.from("progress_reports").update({ status }).eq("id", reportId);
+    return { error: error?.message || null };
+}

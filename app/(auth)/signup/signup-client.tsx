@@ -1,15 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   CircleAlert,
   CircleCheck,
-  GraduationCap,
-  Handshake,
-  Heart,
   Lock,
   Mail,
   Phone,
@@ -30,45 +26,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
-  getDefaultRedirectPath,
-  getRoleForIntent,
-  isAuthIntent,
-  type AuthIntent,
-} from "@/lib/auth/roles";
+import { getDefaultRedirectPath } from "@/lib/auth/roles";
 import { nigerianStates } from "@/constants/nigeria";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
-const CONFIG: Record<
-  AuthIntent,
-  { title: string; subtitle: string; cta: string; icon: LucideIcon }
-> = {
-  applicant: {
-    title: "Create Applicant Account",
-    subtitle:
-      "Start your application for education support and national impact.",
-    cta: "Continue as Applicant",
-    icon: GraduationCap,
-  },
-  donor: {
-    title: "Create Donor Account",
-    subtitle: "Track donations, sponsorships, and real-time impact metrics.",
-    cta: "Continue as Donor",
-    icon: Heart,
-  },
-  partner: {
-    title: "Create Partner Account",
-    subtitle:
-      "Begin institutional collaboration with the national talent engine.",
-    cta: "Continue as Partner",
-    icon: Handshake,
-  },
-};
+const APPLICANT_REDIRECT_ROLE = "applicant";
 
 export function SignupClient() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const rawIntent = searchParams.get("intent");
   const [stateOfOrigin, setStateOfOrigin] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
@@ -76,16 +41,8 @@ export function SignupClient() {
     null
   );
 
-  const currentIntent = isAuthIntent(rawIntent) ? rawIntent : null;
-
   const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    if (!currentIntent) {
-      setErrorMessage("Choose an account type before creating an account.");
-      setSuccessMessage(null);
-      return;
-    }
 
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -102,7 +59,7 @@ export function SignupClient() {
       return;
     }
 
-    if (currentIntent === "applicant" && !stateOfOrigin) {
+    if (!stateOfOrigin) {
       setErrorMessage("Select your state of origin to continue.");
       setSuccessMessage(null);
       return;
@@ -113,8 +70,8 @@ export function SignupClient() {
     setSuccessMessage(null);
 
     try {
-      const role = getRoleForIntent(currentIntent);
       const supabase = getSupabaseBrowserClient();
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -124,10 +81,12 @@ export function SignupClient() {
             last_name: lastName,
             full_name: `${firstName} ${lastName}`.trim(),
             phone,
-            state_of_origin:
-              currentIntent === "applicant" ? stateOfOrigin : null,
-            role,
-            account_type: currentIntent,
+            state: stateOfOrigin || null,
+            state_of_origin: stateOfOrigin || null,
+            country: "Nigeria",
+            role: "student",
+            account_type: "applicant",
+            status: "pending",
           },
         },
       });
@@ -138,7 +97,7 @@ export function SignupClient() {
       }
 
       if (data.session?.user) {
-        router.replace(getDefaultRedirectPath(role));
+        router.replace(getDefaultRedirectPath(APPLICANT_REDIRECT_ROLE));
         router.refresh();
         return;
       }
@@ -169,43 +128,14 @@ export function SignupClient() {
           <span className="font-bold text-lg">National Talent Initiative</span>
         </Link>
         <h1 className="text-2xl font-bold tracking-tight">
-          {currentIntent ? CONFIG[currentIntent].title : "Create Your Account"}
+          Create Applicant Account
         </h1>
         <p className="text-muted-foreground text-sm mt-1 max-w-xs mx-auto">
-          {currentIntent
-            ? CONFIG[currentIntent].subtitle
-            : "Select your account type to get started."}
+          Start your application for education support and national impact.
         </p>
       </div>
 
-      {!currentIntent && (
-        <div className="grid grid-cols-3 gap-3 mb-8">
-          {(Object.keys(CONFIG) as AuthIntent[]).map((key) => {
-            const Icon = CONFIG[key].icon;
-
-            return (
-              <Link
-                key={key}
-                href={`/signup?intent=${key}`}
-                className="flex flex-col items-center gap-3 p-4 rounded-xl border bg-background hover:border-primary/50 hover:bg-primary/5 transition-all group"
-              >
-                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                  <Icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-                <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground group-hover:text-primary">
-                  {key}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
-
-      <Card
-        className={`border-border/60 shadow-sm transition-opacity duration-300 ${
-          !currentIntent ? "opacity-50 pointer-events-none" : "opacity-100"
-        }`}
-      >
+      <Card className="border-border/60 shadow-sm">
         <CardContent className="p-6">
           {errorMessage && (
             <Alert variant="destructive" className="mb-5">
@@ -283,23 +213,21 @@ export function SignupClient() {
               </div>
             </div>
 
-            {currentIntent === "applicant" && (
-              <div className="space-y-2">
-                <Label htmlFor="state">State of Origin</Label>
-                <Select value={stateOfOrigin} onValueChange={setStateOfOrigin}>
-                  <SelectTrigger id="state">
-                    <SelectValue placeholder="Select your state of origin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {nigerianStates.map((state) => (
-                      <SelectItem key={state} value={state}>
-                        {state}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="state">State of Origin</Label>
+              <Select value={stateOfOrigin} onValueChange={setStateOfOrigin}>
+                <SelectTrigger id="state">
+                  <SelectValue placeholder="Select your state of origin" />
+                </SelectTrigger>
+                <SelectContent>
+                  {nigerianStates.map((state) => (
+                    <SelectItem key={state} value={state}>
+                      {state}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -358,13 +286,9 @@ export function SignupClient() {
             <Button
               type="submit"
               className="w-full h-10 font-semibold"
-              disabled={!currentIntent || isSubmitting}
+              disabled={isSubmitting}
             >
-              {isSubmitting
-                ? "Creating account..."
-                : currentIntent
-                ? CONFIG[currentIntent].cta
-                : "Create Account"}{" "}
+              {isSubmitting ? "Creating account..." : "Create Applicant Account"}{" "}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </form>
@@ -375,7 +299,7 @@ export function SignupClient() {
             <Shield className="h-3.5 w-3.5 shrink-0 mt-0.5 text-primary" />
             <p>
               Your session is encrypted. By creating an account, you agree to
-              our specialized data privacy terms for {currentIntent || "users"}.
+              our specialized data privacy terms for applicants.
             </p>
           </div>
         </CardContent>

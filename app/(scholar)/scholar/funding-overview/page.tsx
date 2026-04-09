@@ -39,16 +39,16 @@ export default async function FundingOverviewPage() {
 
   const ledger = fundingRecords.map((r: any) => ({
     id: r.id,
-    date: new Date(r.disbursement_date || r.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }),
-    category: r.category,
-    amount: new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(r.amount),
+    date: new Date(r.allocation_date || r.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }),
+    category: "Scholar Allocation",
+    amount: new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(r.amount_allocated),
     reference: r.reference_number || `REF-${r.id.slice(0, 8)}`,
-    status: r.status
+    status: r.disbursement_status
   }));
 
   const totalApproved = profile?.approved_funding || 4800000;
-  const totalDisbursed = fundingRecords.reduce((acc: number, curr: any) => acc + (curr.status === 'completed' ? Number(curr.amount) : 0), 0);
-  const nextStipend = fundingRecords.find((r: any) => r.status === 'pending')?.amount || 350000;
+  const totalDisbursed = fundingRecords.reduce((acc: number, curr: any) => acc + (curr.disbursement_status === 'completed' || curr.disbursement_status === 'disbursed' ? Number(curr.amount_allocated) : 0), 0);
+  const nextStipend = fundingRecords.find((r: any) => r.disbursement_status === 'pending' || r.disbursement_status === 'allocated')?.amount_allocated || 350000;
 
   const formattedApproved = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(totalApproved);
   const formattedDisbursed = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(totalDisbursed);

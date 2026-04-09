@@ -185,13 +185,13 @@ export default async function ApplicationsManagementPage() {
                                             <Link href={`/admin/applications/review?id=${application.id}`} className="hover:underline">
                                                 <div>
                                                     <p className="font-medium text-primary">
-                                                        {application.profiles?.first_name} {application.profiles?.last_name}
+                                                        {application.students?.first_name} {application.students?.last_name}
                                                     </p>
                                                     <p className="text-xs text-muted-foreground">{application.id.slice(0, 8)}</p>
                                                 </div>
                                             </Link>
                                         </TableCell>
-                                        <TableCell>{application.profiles?.email || "No email available"}</TableCell>
+                                        <TableCell>{application.students?.email || "No email available"}</TableCell>
                                         <TableCell>
                                             <div>
                                                 <p>{getCohortLabel(application.cohort_year)}</p>

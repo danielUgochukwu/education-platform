@@ -4,7 +4,6 @@ import { SectionWrapper } from "@/components/sections/section-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-    Heart,
     ShieldCheck,
     TrendingUp,
     Users,
@@ -23,7 +22,7 @@ export default function DonatePage() {
                             For Philanthropists & Sponsors
                         </Badge>
                         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
-                            Invest in Nigeria's <br />
+                            Invest in Nigeria&apos;s <br />
                             <span className="text-primary">Human Capital</span>
                         </h1>
                         <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
@@ -32,7 +31,7 @@ export default function DonatePage() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                        <Link href="/signup?intent=donor">
+                        <Link href="/support?type=donor">
                             <Button size="lg" className="h-14 px-10 text-lg font-bold shadow-lg shadow-primary/20">
                                 Continue as Donor <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
@@ -122,7 +121,7 @@ export default function DonatePage() {
                     <p className="text-xl text-primary-foreground/80">
                         Join 200+ individual and corporate donors building the future of Nigerian excellence.
                     </p>
-                    <Link href="/signup?intent=donor">
+                    <Link href="/support?type=donor">
                         <Button size="lg" variant="secondary" className="h-16 px-12 text-xl font-bold">
                             Create Donor Account <ArrowRight className="ml-2 h-6 w-6" />
                         </Button>

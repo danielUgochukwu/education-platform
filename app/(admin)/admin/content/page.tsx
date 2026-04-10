@@ -35,7 +35,23 @@ function getContentStatusClass(status: "Draft" | "In review" | "Scheduled" | "Li
     return "bg-slate-100 text-slate-800";
 }
 
+<<<<<<< HEAD
+export default async function ContentManagementPage() {
+    const dbContent = await getAdminContent();
+    const displayItems = dbContent.length > 0
+        ? dbContent.map((c: any) => ({
+            title: c.title,
+            type: c.type,
+            audience: "Platform",
+            owner: c.author || "Admin",
+            updatedAt: new Date(c.published_date || c.created_at || new Date()).toLocaleDateString(),
+            status: (c.status ? c.status.charAt(0).toUpperCase() + c.status.slice(1) : "Draft") as any
+        }))
+        : adminContentItems;
+
+=======
 export default function ContentManagementPage() {
+>>>>>>> parent of 25e0a8f (feat: implement comprehensive admin dashboard for scholar, program, and settings management)
     return (
         <PageContainer
             title="Content Management"

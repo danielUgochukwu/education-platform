@@ -80,7 +80,7 @@ export default async function ApplicationReviewPage({
                 </Button>
             }
         >
-            <ReviewWorkspace application={application} cohorts={cohorts} />
+            <ReviewWorkspace application={application as any} cohorts={cohorts} />
         </PageContainer>
     );
 }

@@ -13,6 +13,7 @@ import {
     Calendar,
     ChevronDown,
     AlertCircle,
+    type LucideIcon,
 } from "lucide-react";
 import {
     eligibilityRequirements,
@@ -21,7 +22,7 @@ import {
     publicFAQs as mockFAQs,
 } from "@/lib/constants";
 
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, LucideIcon> = {
     FileText,
     Users,
     GraduationCap,
@@ -51,7 +52,7 @@ export default function ApplyPage() {
                         Selection is purely merit-based. If you have the talent, drive, and commitment to serve Nigeria, this platform was built for you.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                        <Link href="/signup?intent=applicant">
+                        <Link href="/signup">
                             <Button size="lg" variant="secondary" className="h-12 px-8 font-semibold">
                                 Start Application <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
@@ -176,7 +177,7 @@ export default function ApplyPage() {
                     <p className="text-lg text-primary-foreground/80">
                         The application portal is open. Begin your journey today — a nation is waiting for your contribution.
                     </p>
-                    <Link href="/signup?intent=applicant">
+                    <Link href="/signup">
                         <Button size="lg" variant="secondary" className="h-14 px-10 text-lg font-semibold">
                             Open Application Portal <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>

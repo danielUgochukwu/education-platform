@@ -45,12 +45,13 @@ interface ReviewWorkspaceApplication {
     cohort_year?: string | number | null;
     created_at: string;
     documents?: UploadedDocument[];
-    profiles?: {
+    students?: {
         first_name?: string | null;
         last_name?: string | null;
         state?: string | null;
-        state_of_origin?: string | null;
+        email?: string | null;
     } | null;
+    [key: string]: any;
 }
 
 interface ReviewWorkspaceProps {
@@ -283,7 +284,7 @@ export function ReviewWorkspace({ application, cohorts }: ReviewWorkspaceProps) 
                     <CardHeader>
                         <div className="flex flex-wrap items-center gap-3">
                             <CardTitle>
-                                {application.profiles?.first_name} {application.profiles?.last_name}
+                                {application.students?.first_name} {application.students?.last_name}
                             </CardTitle>
                             <ApplicationStatusBadge status={displayedDecision} />
                         </div>
@@ -296,7 +297,7 @@ export function ReviewWorkspace({ application, cohorts }: ReviewWorkspaceProps) 
                             <div className="rounded-xl border bg-muted/15 p-4">
                                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">State</p>
                                 <p className="mt-2 font-semibold">
-                                    {application.profiles?.state || application.profiles?.state_of_origin || "N/A"}
+                                    {application.students?.state || "N/A"}
                                 </p>
                             </div>
                             <div className="rounded-xl border bg-muted/15 p-4">

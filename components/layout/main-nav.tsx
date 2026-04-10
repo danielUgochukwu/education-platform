@@ -38,7 +38,7 @@ export function MainNav() {
               </Button>
             </Link>
             <Link href="/signup">
-              <Button className="font-semibold">Get Started</Button>
+              <Button className="font-semibold">Apply Now</Button>
             </Link>
           </div>
         </div>

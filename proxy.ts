@@ -42,8 +42,8 @@ export async function proxy(request: NextRequest) {
     if (!user && isProtectedPath(pathname)) {
         const loginUrl = new URL("/login", request.url);
         loginUrl.searchParams.set(
-          "next",
-          `${pathname}${request.nextUrl.search}`
+            "next",
+            `${pathname}${request.nextUrl.search}`
         );
         return NextResponse.redirect(loginUrl);
     }
@@ -57,7 +57,21 @@ export async function proxy(request: NextRequest) {
         return response;
     }
 
-    const role = await resolveUserRoleForSession(supabase, user);
+    let role;
+    try {
+        role = await resolveUserRoleForSession(supabase, user);
+    } catch (e: any) {
+        if (e?.message === "MissingDatabaseProfile") {
+            const loginUrl = new URL("/login", request.url);
+            loginUrl.searchParams.set("error", "database_sync_failed");
+
+            // Note: Since proxy executes on the edge/server natively we clear Next request session cookies here if passing through
+            const newRes = NextResponse.redirect(loginUrl);
+            newRes.cookies.delete("sb-" + (process.env.NEXT_PUBLIC_SUPABASE_URL || "").split("//")[1]?.split(".")[0] + "-auth-token");
+            return newRes;
+        }
+        throw e;
+    }
 
     if (isAuthRoute) {
         return NextResponse.redirect(new URL(getDefaultRedirectPath(role), request.url));

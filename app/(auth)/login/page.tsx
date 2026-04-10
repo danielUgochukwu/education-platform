@@ -61,6 +61,15 @@ export default function LoginPage() {
             router.refresh();
         } catch (error) {
             const message = error instanceof Error ? error.message : "Unable to sign you in right now.";
+
+            if (message === "MissingDatabaseProfile") {
+                await getSupabaseBrowserClient().auth.signOut();
+                const friendlyMessage = "Your account is missing required database schemas. If you just reset our database, please sign up again.";
+                setErrorMessage(friendlyMessage);
+                toast.error("Database Sync Error", { description: friendlyMessage });
+                return;
+            }
+
             setErrorMessage(message);
             toast.error("Authentication error", {
                 description: message,

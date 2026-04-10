@@ -22,8 +22,8 @@ import { redirect } from "next/navigation";
 import { AllocateFundingDialog } from "@/components/admin/allocate-funding-dialog";
 
 function getFundingStatusClass(status: string) {
-    if (status === "completed" || status === "Disbursed") return "bg-emerald-100 text-emerald-800";
-    if (status === "pending" || status === "Committed") return "bg-blue-100 text-blue-800";
+    if (status === "completed" || status === "disbursed") return "bg-emerald-100 text-emerald-800";
+    if (status === "pending" || status === "allocated") return "bg-blue-100 text-blue-800";
     return "bg-red-100 text-red-800";
 }
 
@@ -40,10 +40,18 @@ export default async function FundingManagementPage() {
     const scholars = await getAdminScholars();
     const programs = await getAdminPrograms();
 
+<<<<<<< HEAD
+    const committed = ledger.filter((l: any) => l.disbursement_status === "allocated").reduce((acc: number, l: any) => acc + Number(l.amount_allocated), 0);
+    const disbursed = ledger.filter((l: any) => l.disbursement_status === "disbursed" || l.disbursement_status === "completed").reduce((acc: number, l: any) => acc + Number(l.amount_allocated), 0);
+    const flagged = ledger.filter((l: any) => l.disbursement_status === "flagged").reduce((acc: number, l: any) => acc + Number(l.amount_allocated), 0);
+    const totalPledged = sponsors.reduce((acc: number, s: any) => acc + (Number(s.amount) || 0), 0);
+    const reserved = Math.max(0, totalPledged - (committed + disbursed + flagged));
+=======
     const committed = ledger.filter((l: any) => l.status === "pending" || l.status === "Committed").reduce((acc: number, l: any) => acc + Number(l.amount), 0);
     const disbursed = ledger.filter((l: any) => l.status === "completed" || l.status === "Disbursed").reduce((acc: number, l: any) => acc + Number(l.amount), 0);
     const flagged = ledger.filter((l: any) => l.status === "flagged" || l.status === "Flagged").reduce((acc: number, l: any) => acc + Number(l.amount), 0);
     const reserved = 640000000; // Mock or future: fetch from treasury table
+>>>>>>> parent of 25e0a8f (feat: implement comprehensive admin dashboard for scholar, program, and settings management)
 
     const fundingMetrics = [
         { title: "Committed", value: `N${(committed / 1000000000).toFixed(2)}B`, description: "Approved sponsor funding", icon: WalletCards },
@@ -53,8 +61,8 @@ export default async function FundingManagementPage() {
     ];
 
     const programDistribution = ledger.reduce((acc: any, curr: any) => {
-        const progName = curr.programs?.name || "Other";
-        acc[progName] = (acc[progName] || 0) + Number(curr.amount);
+        const progName = curr.applications?.university_programs?.program_name || "Other";
+        acc[progName] = (acc[progName] || 0) + Number(curr.amount_allocated);
         return acc;
     }, {});
 
@@ -132,7 +140,8 @@ export default async function FundingManagementPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Programme</TableHead>
-                                    <TableHead>Sponsor</TableHead>
+                                    <TableHead>Donor</TableHead>
+                                    <TableHead>Student</TableHead>
                                     <TableHead>Amount</TableHead>
                                     <TableHead>Date</TableHead>
                                     <TableHead>Status</TableHead>
@@ -141,15 +150,16 @@ export default async function FundingManagementPage() {
                             <TableBody>
                                 {ledger.map((entry: any) => (
                                     <TableRow key={entry.id}>
-                                        <TableCell>{entry.programs?.name || "—"}</TableCell>
+                                        <TableCell>{entry.applications?.university_programs?.program_name || "—"}</TableCell>
+                                        <TableCell>{entry.donations?.donor_name || "—"}</TableCell>
                                         <TableCell>
-                                            {entry.profiles?.first_name} {entry.profiles?.last_name}
+                                            {entry.students?.first_name} {entry.students?.last_name}
                                         </TableCell>
-                                        <TableCell>N{Number(entry.amount).toLocaleString()}</TableCell>
-                                        <TableCell>{new Date(entry.date).toLocaleDateString()}</TableCell>
+                                        <TableCell>N{Number(entry.amount_allocated).toLocaleString()}</TableCell>
+                                        <TableCell>{new Date(entry.allocation_date).toLocaleDateString()}</TableCell>
                                         <TableCell>
-                                            <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getFundingStatusClass(entry.status)}`}>
-                                                {entry.status}
+                                            <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getFundingStatusClass(entry.disbursement_status)}`}>
+                                                {entry.disbursement_status}
                                             </span>
                                         </TableCell>
                                     </TableRow>

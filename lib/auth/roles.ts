@@ -68,21 +68,17 @@ export async function resolveUserRoleForSession(
     supabase: SupabaseClient,
     user: Pick<User, "id" | "user_metadata" | "app_metadata">
 ): Promise<AppRole> {
-    const { data: rawProfile, error } = await supabase
-        .from("profiles")
-        .select("role, account_type")
-        .eq("id", user.id)
-        .maybeSingle();
+    const [{ data: adminProfile, error: adminErr }, { data: studentProfile, error: studentErr }] = await Promise.all([
+        supabase.from("admin_users").select("role").eq("id", user.id).maybeSingle(),
+        supabase.from("students").select("id").eq("id", user.id).maybeSingle()
+    ]);
 
-    if (error) {
-        throw new Error(`Failed to resolve user role for session: ${error.message}`);
+    if (!adminProfile && !studentProfile) {
+        throw new Error("MissingDatabaseProfile");
     }
 
-    const profile = rawProfile as ProfileRoleRow | null;
-
     return resolveRoleFromSources({
-        profileRole: profile?.role,
-        profileAccountType: profile?.account_type,
+        profileRole: adminProfile?.role,
         userMetadata: user.user_metadata,
         appMetadata: user.app_metadata,
     });

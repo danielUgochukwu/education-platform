@@ -45,8 +45,8 @@ export default async function DonorDashboardPage() {
         ? Math.round(sponsoredScholars.reduce((sum: number, scholar: any) => sum + (scholar.progress_score || 0), 0) / sponsoredScholars.length)
         : 0;
 
-    const totalFunding = fundingRecords.reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
-    const formattedTotalFunding = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(totalFunding);
+    const totalAllocated = fundingRecords.reduce((acc: number, curr: any) => acc + Number(curr.amount_allocated), 0);
+    const formattedTotalFunding = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(profile?.amount || totalAllocated);
 
     const totalImpact = impactMetrics.reduce((acc: number, curr: any) => acc + (isNaN(Number(curr.value)) ? 0 : Number(curr.value)), 0);
     const formattedImpact = totalImpact >= 1000 ? `${(totalImpact / 1000).toFixed(1)}k` : totalImpact.toString();
@@ -61,8 +61,8 @@ export default async function DonorDashboardPage() {
     ];
 
     const fundDistribution = fundingRecords.map((f: any) => ({
-        label: f.category || f.programs?.name || "Allocation",
-        value: Number(f.amount),
+        label: f.category || f.applications?.university_programs?.program_name || "Allocation",
+        value: Number(f.amount_allocated),
         color: `hsl(var(--primary) / ${0.4 + Math.random() * 0.6})`
     }));
 
@@ -94,20 +94,20 @@ export default async function DonorDashboardPage() {
                             <div className="space-y-5">
                                 <div>
                                     <div className="flex flex-wrap items-center gap-2">
-                                        <h2 className="text-2xl font-semibold tracking-tight">{profile?.name || profile?.organisation || "Donor Organization"}</h2>
+                                        <h2 className="text-2xl font-semibold tracking-tight">{profile?.donor_name || profile?.donor_email || "Donor Organization"}</h2>
                                         <Badge variant="secondary">Active Donor</Badge>
                                         <Badge variant="outline">{profile?.id?.slice(0, 8) || "DNR-Pending"}</Badge>
                                     </div>
                                     <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-                                        Focus: {profile?.investment_focus || "General national development support."}
+                                        Purpose: {profile?.purpose || "General national development support."}
                                     </p>
                                 </div>
 
                                 <div className="grid gap-3 sm:grid-cols-2">
                                     <div className="rounded-xl border bg-background/85 p-4">
                                         <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Reporting Cadence</p>
-                                        <p className="mt-2 font-semibold">{profile?.reporting_cadence || "Quarterly"}</p>
-                                        <p className="mt-1 text-sm text-muted-foreground">Next renewal: {profile?.renewal_window || "Standard cycle"}</p>
+                                        <p className="mt-2 font-semibold">Quarterly</p>
+                                        <p className="mt-1 text-sm text-muted-foreground">Next renewal: Standard cycle</p>
                                     </div>
                                     <div className="rounded-xl border bg-background/85 p-4">
                                         <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Total Commitment</p>

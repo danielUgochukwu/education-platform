@@ -15,16 +15,16 @@ export async function GET() {
 
     const { profile, fundingRecords, sponsoredScholars, impactMetrics } = await getDonorDashboardData(user.id);
 
-    const totalAllocated = fundingRecords.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+    const totalAllocated = fundingRecords.reduce((acc: number, curr: any) => acc + (Number(curr.amount_allocated) || 0), 0);
 
     const summary = [
         "Donor Allocation Summary",
-        `Organisation: ${profile.organization || profile.first_name + " " + profile.last_name}`,
-        `Donor ID: ${profile.id}`,
+        `Organisation: ${profile?.donor_name || profile?.donor_email || "N/A"}`,
+        `Donor ID: ${profile?.id}`,
         `Total Commitment: N${(totalAllocated / 1000000).toFixed(1)}M`,
         "",
         "Fund Distribution",
-        ...fundingRecords.map((r) => `- ${r.programs?.name || "Support Line"}: N${(r.amount / 1000000).toFixed(1)}M`),
+        ...fundingRecords.map((r: any) => `- ${r.applications?.university_programs?.program_name || "Support Line"}: N${(Number(r.amount_allocated) / 1000000).toFixed(1)}M`),
         "",
         "Impact Metrics",
         ...impactMetrics.map((metric: any) => `- ${metric.label}: ${metric.value} - ${metric.description}`),

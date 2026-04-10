@@ -56,7 +56,7 @@ export default async function ScholarDashboardPage() {
     const activeAnnouncements = announcements.slice(0, 3);
     const latestMentorNote = mentorSessions.length > 0 ? mentorSessions[0] : null;
 
-    const totalFunding = fundingRecords.reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
+    const totalFunding = fundingRecords.reduce((acc: number, curr: any) => acc + Number(curr.amount_allocated), 0);
     const formattedFunding = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(totalFunding);
 
     const scholarDashboardStats = [

@@ -15,8 +15,8 @@ import { getAdminSponsors } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 
 function getSponsorStatusClass(status: string) {
-    if (status === "Active") return "bg-emerald-100 text-emerald-800";
-    if (status === "Renewal due") return "bg-amber-100 text-amber-800";
+    if (status === "confirmed") return "bg-emerald-100 text-emerald-800";
+    if (status === "pending") return "bg-amber-100 text-amber-800";
     return "bg-red-100 text-red-800";
 }
 
@@ -63,11 +63,11 @@ export default async function SponsorsPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Sponsor</TableHead>
-                                    <TableHead>Category</TableHead>
-                                    <TableHead>Commitment</TableHead>
-                                    <TableHead>Focus Area</TableHead>
-                                    <TableHead>Renewal</TableHead>
+                                    <TableHead>Donor</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Purpose</TableHead>
+                                    <TableHead>Date</TableHead>
                                     <TableHead>Status</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -75,19 +75,17 @@ export default async function SponsorsPage() {
                                 {sponsors.map((sponsor: any) => (
                                     <TableRow key={sponsor.id}>
                                         <TableCell className="font-medium">
-                                            {sponsor.first_name} {sponsor.last_name}
+                                            {sponsor.donor_name}
                                         </TableCell>
-                                        <TableCell>{sponsor.donor_details?.category || "—"}</TableCell>
+                                        <TableCell>{sponsor.donor_email}</TableCell>
                                         <TableCell>
-                                            {sponsor.donor_details?.commitment
-                                                ? `N${(sponsor.donor_details.commitment / 1000000).toFixed(0)}M`
-                                                : "—"}
+                                            N{Number(sponsor.amount).toLocaleString()}
                                         </TableCell>
-                                        <TableCell>{sponsor.donor_details?.investment_focus || "—"}</TableCell>
-                                        <TableCell>{sponsor.donor_details?.renewal_window || "—"}</TableCell>
+                                        <TableCell>{sponsor.purpose || "—"}</TableCell>
+                                        <TableCell>{new Date(sponsor.donation_date).toLocaleDateString()}</TableCell>
                                         <TableCell>
-                                            <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getSponsorStatusClass(sponsor.donor_details?.status || "Active")}`}>
-                                                {sponsor.donor_details?.status || "Active"}
+                                            <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getSponsorStatusClass(sponsor.payment_status || "pending")}`}>
+                                                {sponsor.payment_status || "pending"}
                                             </span>
                                         </TableCell>
                                     </TableRow>

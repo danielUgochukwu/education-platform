@@ -40,11 +40,18 @@ export default async function FundingManagementPage() {
     const scholars = await getAdminScholars();
     const programs = await getAdminPrograms();
 
+<<<<<<< HEAD
     const committed = ledger.filter((l: any) => l.disbursement_status === "allocated").reduce((acc: number, l: any) => acc + Number(l.amount_allocated), 0);
     const disbursed = ledger.filter((l: any) => l.disbursement_status === "disbursed" || l.disbursement_status === "completed").reduce((acc: number, l: any) => acc + Number(l.amount_allocated), 0);
     const flagged = ledger.filter((l: any) => l.disbursement_status === "flagged").reduce((acc: number, l: any) => acc + Number(l.amount_allocated), 0);
     const totalPledged = sponsors.reduce((acc: number, s: any) => acc + (Number(s.amount) || 0), 0);
     const reserved = Math.max(0, totalPledged - (committed + disbursed + flagged));
+=======
+    const committed = ledger.filter((l: any) => l.status === "pending" || l.status === "Committed").reduce((acc: number, l: any) => acc + Number(l.amount), 0);
+    const disbursed = ledger.filter((l: any) => l.status === "completed" || l.status === "Disbursed").reduce((acc: number, l: any) => acc + Number(l.amount), 0);
+    const flagged = ledger.filter((l: any) => l.status === "flagged" || l.status === "Flagged").reduce((acc: number, l: any) => acc + Number(l.amount), 0);
+    const reserved = 640000000; // Mock or future: fetch from treasury table
+>>>>>>> parent of 25e0a8f (feat: implement comprehensive admin dashboard for scholar, program, and settings management)
 
     const fundingMetrics = [
         { title: "Committed", value: `N${(committed / 1000000000).toFixed(2)}B`, description: "Approved sponsor funding", icon: WalletCards },

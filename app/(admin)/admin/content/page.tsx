@@ -20,7 +20,6 @@ import {
     adminContentItems,
     contentStatusBreakdown,
 } from "@/lib/constants";
-import { getAdminContent } from "@/lib/supabase/actions";
 
 const contentMetrics = [
     { title: "Content Assets", value: "258", description: "Live, scheduled, and draft assets tracked", icon: LayoutTemplate },
@@ -36,6 +35,7 @@ function getContentStatusClass(status: "Draft" | "In review" | "Scheduled" | "Li
     return "bg-slate-100 text-slate-800";
 }
 
+<<<<<<< HEAD
 export default async function ContentManagementPage() {
     const dbContent = await getAdminContent();
     const displayItems = dbContent.length > 0
@@ -49,6 +49,9 @@ export default async function ContentManagementPage() {
         }))
         : adminContentItems;
 
+=======
+export default function ContentManagementPage() {
+>>>>>>> parent of 25e0a8f (feat: implement comprehensive admin dashboard for scholar, program, and settings management)
     return (
         <PageContainer
             title="Content Management"
@@ -117,7 +120,7 @@ export default async function ContentManagementPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {displayItems.map((item: any) => (
+                                {adminContentItems.map((item) => (
                                     <TableRow key={item.title}>
                                         <TableCell className="font-medium">{item.title}</TableCell>
                                         <TableCell>{item.type}</TableCell>

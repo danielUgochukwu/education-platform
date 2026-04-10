@@ -700,26 +700,6 @@ function formatSupabaseError(error: unknown): string {
     }
 }
 
-export async function getAdminContent() {
-    const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase.from("content_assets").select("*").order("published_date", { ascending: false });
-    if (error) {
-        console.error("Error fetching content:", error);
-        return [];
-    }
-    return data;
-}
-
-export async function getAdminImpactReports() {
-    const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase.from("impact_reports").select("*").order("published_date", { ascending: false });
-    if (error) {
-        console.error("Error fetching impact reports:", error);
-        return [];
-    }
-    return data;
-}
-
 function getDaysUntilDueDate(dueDate: string) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -912,6 +892,7 @@ export async function getAdminDashboardData() {
     const supabase = await createSupabaseServerClient();
 
     const [
+<<<<<<< HEAD
         statsRes,
         appsRes,
         programsRes
@@ -919,6 +900,21 @@ export async function getAdminDashboardData() {
         supabase.from("platform_stats").select("*").maybeSingle(),
         supabase.from("v_student_applications").select("*").order("created_at", { ascending: false }).limit(10),
         supabase.from("universities").select("*").order("name", { ascending: true })
+=======
+        scholarsCount,
+        donorsCount,
+        applications,
+        baseCohorts,
+        programsRes,
+        fundingRes
+    ] = await Promise.all([
+        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "scholar"),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "donor"),
+        fetchAdminApplicationsData(supabase),
+        getAdminCohortsData(supabase),
+        supabase.from("programs").select("*"),
+        supabase.from("donor_details").select("commitment")
+>>>>>>> parent of 25e0a8f (feat: implement comprehensive admin dashboard for scholar, program, and settings management)
     ]);
 
     const stats = statsRes.data || {};
@@ -945,19 +941,28 @@ export async function getAdminDashboardData() {
         cohort_year: 2026
     }));
 
+<<<<<<< HEAD
     const fundingDistribution = [
         { label: "Platform General Fund", value: 100, description: "All allocated donations", meta: `N${(totalFunding / 1000000).toFixed(1)}M Tracked` }
     ];
 
+=======
+>>>>>>> parent of 25e0a8f (feat: implement comprehensive admin dashboard for scholar, program, and settings management)
     return {
         counts,
         applicationCounts,
         averageReviewCompletion: stats.avg_review_score ? Math.round(stats.avg_review_score) : 0,
         totalFunding,
+<<<<<<< HEAD
         fundingDistribution,
         applications,
         cohorts: [{ year: 2026, active_scholars_count: stats.total_scholars || 0, review_completion_percentage: 100 }],
         programs: (programsRes.data || []).map(p => ({ ...p, completion_rate: 100 })),
+=======
+        applications: applications.slice(0, 10), // Show everything recent, including drafts
+        cohorts,
+        programs: sortProgramsByName(normalizeProgramsList(programsRes.data)),
+>>>>>>> parent of 25e0a8f (feat: implement comprehensive admin dashboard for scholar, program, and settings management)
     };
 }
 
@@ -1095,28 +1100,15 @@ export async function getAdminSponsors() {
 
 export async function getAdminPrograms() {
     const supabase = await createSupabaseServerClient();
-    const [programsRes, applications] = await Promise.all([
-        supabase.from("programs").select("*"),
-        fetchAdminApplicationsData(supabase),
-    ]);
+    const { data, error } = await supabase
+        .from("programs")
+        .select("*");
 
-    if (programsRes.error) {
-        console.error("Error fetching admin programs:", formatSupabaseError(programsRes.error));
+    if (error) {
+        console.error("Error fetching admin programs:", formatSupabaseError(error));
         return [];
     }
-
-    const normalizedPrograms = sortProgramsByName(normalizeProgramsList(programsRes.data));
-
-    return normalizedPrograms.map((program: any) => {
-        const programApps = (applications || []).filter(
-            (app: any) => getTrimmedString(app.program_id) === program.id
-        );
-
-        return {
-            ...program,
-            applicants_count: programApps.length,
-        };
-    });
+    return sortProgramsByName(normalizeProgramsList(data));
 }
 
 export async function getAdminCohorts() {
@@ -1950,6 +1942,7 @@ export async function getAvailableCohorts() {
         programName: `${row.universities?.name || "Unknown"} - ${row.program_name}`
     }));
 }
+<<<<<<< HEAD
 
 export async function createSponsor(data: { email: string; first_name: string; last_name: string; commitment: number; category: string; investment_focus: string }) {
     const supabaseAdmin = createSupabaseAdminClient();
@@ -2145,3 +2138,5 @@ export async function updateReportStatus(reportId: string, status: string) {
     const { error } = await supabase.from("progress_reports").update({ status }).eq("id", reportId);
     return { error: error?.message || null };
 }
+=======
+>>>>>>> parent of 25e0a8f (feat: implement comprehensive admin dashboard for scholar, program, and settings management)

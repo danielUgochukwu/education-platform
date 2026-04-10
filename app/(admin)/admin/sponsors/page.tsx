@@ -13,7 +13,6 @@ import { Plus, Download, Search, Filter } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAdminSponsors } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
-import { AddSponsorDialog } from "@/components/admin/add-sponsor-dialog";
 
 function getSponsorStatusClass(status: string) {
     if (status === "confirmed") return "bg-emerald-100 text-emerald-800";
@@ -40,7 +39,9 @@ export default async function SponsorsPage() {
                     <Button variant="outline">
                         <Download className="mr-2 h-4 w-4" /> Export
                     </Button>
-                    <AddSponsorDialog />
+                    <Button>
+                        <Plus className="mr-2 h-4 w-4" /> Add Sponsor
+                    </Button>
                 </div>
             }
         >

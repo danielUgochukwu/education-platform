@@ -182,6 +182,7 @@ export default async function ApplicationsManagementPage() {
                                 {visibleApplications.map((application: AdminApplication) => (
                                     <TableRow key={application.id}>
                                         <TableCell>
+<<<<<<< HEAD
                                             <Link href={`/admin/applications/review?id=${application.id}`} className="hover:underline">
                                                 <div>
                                                     <p className="font-medium text-primary">
@@ -190,6 +191,14 @@ export default async function ApplicationsManagementPage() {
                                                     <p className="text-xs text-muted-foreground">{application.id.slice(0, 8)}</p>
                                                 </div>
                                             </Link>
+=======
+                                            <div>
+                                                <p className="font-medium">
+                                                    {application.profiles?.first_name} {application.profiles?.last_name}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">{application.id.slice(0, 8)}</p>
+                                            </div>
+>>>>>>> parent of 25e0a8f (feat: implement comprehensive admin dashboard for scholar, program, and settings management)
                                         </TableCell>
                                         <TableCell>{application.students?.email || "No email available"}</TableCell>
                                         <TableCell>

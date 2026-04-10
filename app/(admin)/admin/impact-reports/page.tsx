@@ -17,7 +17,6 @@ import {
     adminImpactReports,
     reportCoverageBreakdown,
 } from "@/lib/constants";
-import { getAdminImpactReports } from "@/lib/supabase/actions";
 
 const impactMetrics = [
     { title: "Active Reports", value: "4", description: "In production, review, or published", icon: FileText },
@@ -33,20 +32,7 @@ function getReportStatusClass(status: "Draft" | "In review" | "Ready" | "Publish
     return "bg-slate-100 text-slate-800";
 }
 
-export default async function ImpactReportsPage() {
-    const dbReports = await getAdminImpactReports();
-    const displayReports = dbReports.length > 0
-        ? dbReports.map((r: any) => ({
-            title: r.title,
-            period: r.quarter ? `${r.quarter} ${r.year}` : r.year,
-            owner: "Admin",
-            audience: "Platform",
-            dueDate: new Date(r.published_date || r.created_at || new Date()).toLocaleDateString(),
-            confidence: "High",
-            status: (r.status?.charAt(0).toUpperCase() + r.status?.slice(1)) as any || "Draft"
-        }))
-        : adminImpactReports;
-
+export default function ImpactReportsPage() {
     return (
         <PageContainer
             title="Impact Reports"
@@ -88,7 +74,7 @@ export default async function ImpactReportsPage() {
                             <CardDescription>Current report pipeline with due dates and data readiness.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {displayReports.slice(0, 3).map((report: any) => (
+                            {adminImpactReports.map((report) => (
                                 <div key={report.title} className="rounded-xl border bg-background p-4">
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
@@ -127,7 +113,7 @@ export default async function ImpactReportsPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {displayReports.map((report: any) => (
+                                {adminImpactReports.map((report) => (
                                     <TableRow key={report.title}>
                                         <TableCell className="font-medium">{report.title}</TableCell>
                                         <TableCell>{report.period}</TableCell>

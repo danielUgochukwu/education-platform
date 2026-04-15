@@ -5,63 +5,56 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ApplicationStepper } from "@/components/forms/application-stepper";
-import {
   ArrowLeft,
   ArrowRight,
   Save,
-  Info,
   AlertCircle,
   CheckCircle2,
 } from "lucide-react";
-import { applicationSteps } from "@/constants/application";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { saveApplicationStep } from "@/lib/supabase/actions";
+import { cn } from "@/lib/utils";
 
 interface EssayFormProps {
   application: any;
+  onNext?: () => void;
+  onBack?: () => void;
 }
 
 const essayPrompts = [
   {
     id: "whyApply",
     label: "Why are you applying?",
-    prompt:
-      "Describe in detail why you are applying for the National Talent Development Initiative. What drove you to seek this opportunity, and what specific outcomes do you hope to achieve for Nigeria through this platform?",
     wordMin: 300,
     wordMax: 500,
+    prompt:
+      "Describe in detail why you are applying for the National Talent Development Initiative. What drove you to seek this opportunity, and what specific outcomes do you hope to achieve for Nigeria through this platform?",
   },
   {
     id: "nationalContribution",
     label: "Your Vision for National Contribution",
-    prompt:
-      "In your chosen discipline, describe specifically how you intend to apply your education and skills to address a measurable national challenge within 5 years of graduating. Be detailed, specific, and grounded.",
     wordMin: 300,
     wordMax: 500,
+    prompt:
+      "In your chosen discipline, describe specifically how you intend to apply your education and skills to address a measurable national challenge within 5 years of graduating. Be detailed, specific, and grounded.",
   },
   {
     id: "leadershipExample",
     label: "Demonstrated Leadership",
-    prompt:
-      "Describe a specific instance where you took initiative and led others — inside or outside a formal setting. What was the challenge, what exactly did you do, what was the result, and what did you learn about yourself as a leader?",
     wordMin: 200,
     wordMax: 400,
+    prompt:
+      "Describe a specific instance where you took initiative and led others — inside or outside a formal setting. What was the challenge, what exactly did you do, what was the result, and what did you learn about yourself as a leader?",
   },
   {
     id: "careerGoals",
     label: "Long-Term Career & Impact Goals",
-    prompt:
-      "Where do you see yourself in 10 years? Describe your career trajectory and the specific national impact you aim to have created. Why is this programme the most effective accelerant for that vision?",
     wordMin: 200,
     wordMax: 400,
+    prompt:
+      "Where do you see yourself in 10 years? Describe your career trajectory and the specific national impact you aim to have created. Why is this programme the most effective accelerant for that vision?",
   },
 ];
 
@@ -69,7 +62,7 @@ function wordCount(text: string) {
   return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
 }
 
-export function EssayForm({ application }: EssayFormProps) {
+export function EssayForm({ application, onNext, onBack }: EssayFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const essays = application?.essays || {};
@@ -84,8 +77,6 @@ export function EssayForm({ application }: EssayFormProps) {
     isNext = false
   ) => {
     e.preventDefault();
-
-    // Validate all essays are within [wordMin, wordMax] before saving
     for (const essay of essayPrompts) {
       const count = wordCount(formData[essay.id] || "");
       if (count < essay.wordMin) {
@@ -101,7 +92,6 @@ export function EssayForm({ application }: EssayFormProps) {
         return;
       }
     }
-
     setLoading(true);
     try {
       const { error } = await saveApplicationStep(3, formData, isNext);
@@ -109,9 +99,11 @@ export function EssayForm({ application }: EssayFormProps) {
         toast.error(error);
         return;
       }
-
       toast.success("Draft saved");
-      if (isNext) router.push("/application/step-4");
+      if (isNext) {
+        if (onNext) onNext();
+        else router.push("/application/step-4");
+      }
       else router.refresh();
     } catch {
       toast.error("Failed to save progress. Please try again.");
@@ -121,115 +113,136 @@ export function EssayForm({ application }: EssayFormProps) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <ApplicationStepper steps={[...applicationSteps]} currentStep={3} />
-
-      <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
-        <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-        <p>
-          Do not copy content from the internet or use AI-generated text.
-          Plagiarism is grounds for immediate disqualification.
-        </p>
+    <div className="max-w-3xl mx-auto space-y-5">
+      {/* Warning banner */}
+      <div className="flex items-center gap-2.5 px-4 py-3 bg-muted/30 border border-border/50 rounded-xl text-xs text-muted-foreground">
+        <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+        Do not copy content from the internet or use AI-generated text.
+        Plagiarism is grounds for immediate disqualification.
       </div>
 
       <form onSubmit={(e) => handleSave(e, true)}>
-        <div className="space-y-6">
+        <div className="space-y-4">
           {essayPrompts.map((essay, i) => {
             const content = formData[essay.id] || "";
             const count = wordCount(content);
             const isStarted = count > 0;
-            return (
-              <Card key={essay.id} className="border-border/50">
-                <CardHeader className="pb-3 border-b">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                          Essay {i + 1}
-                        </span>
-                        {isStarted && (
-                          <Badge className="text-[10px] h-4 bg-emerald-100 text-emerald-700 border-none">
-                            <CheckCircle2 className="h-2.5 w-2.5 mr-1" /> Draft
-                            saved
-                          </Badge>
-                        )}
-                      </div>
-                      <h3 className="font-bold text-base">{essay.label}</h3>
-                    </div>
-                    <Badge variant="secondary" className="text-xs shrink-0">
-                      {essay.wordMin}–{essay.wordMax} words
-                    </Badge>
-                  </div>
-                  <div className="mt-3 p-3 bg-muted/30 rounded-lg text-sm text-muted-foreground leading-relaxed border">
-                    {essay.prompt}
-                  </div>
-                </CardHeader>
+            const isOver = count > essay.wordMax;
+            const isUnder = count < essay.wordMin;
 
-                <CardContent className="p-5 space-y-3">
-                  <div className="space-y-2">
-                    <Label htmlFor={essay.id} className="sr-only">
-                      {essay.label}
-                    </Label>
-                    <Textarea
-                      id={essay.id}
-                      value={content}
-                      onChange={(e) =>
-                        handleTextChange(essay.id, e.target.value)
-                      }
-                      placeholder={`Begin your response here... (minimum ${essay.wordMin} words)`}
-                      className="min-h-[200px] resize-y text-sm leading-relaxed"
-                    />
+            return (
+              <div
+                key={essay.id}
+                className="border border-border/50 rounded-xl overflow-hidden"
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border/50">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                        Essay {i + 1}
+                      </span>
+                      {isStarted && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 rounded-full px-2 py-px border border-green-200/50 dark:border-green-800/30">
+                          <CheckCircle2 className="h-2.5 w-2.5" /> Draft saved
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-sm font-semibold">{essay.label}</h3>
                   </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1.5">
-                      <Info className="h-3 w-3" /> Progress is tracked
-                    </span>
+                  <span className="text-[10px] text-muted-foreground bg-muted/50 border border-border/50 rounded-md px-2 py-1 shrink-0 whitespace-nowrap">
+                    {essay.wordMin}–{essay.wordMax} words
+                  </span>
+                </div>
+
+                {/* Prompt */}
+                <div className="px-5 py-3.5 bg-muted/20 border-b border-border/50">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {essay.prompt}
+                  </p>
+                </div>
+
+                {/* Textarea */}
+                <div className="p-5 space-y-2">
+                  <Label htmlFor={essay.id} className="sr-only">
+                    {essay.label}
+                  </Label>
+                  <Textarea
+                    id={essay.id}
+                    value={content}
+                    onChange={(e) => handleTextChange(essay.id, e.target.value)}
+                    placeholder={`Begin your response here… (minimum ${essay.wordMin} words)`}
+                    className="min-h-[180px] resize-y text-sm leading-relaxed"
+                  />
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                    <span>Auto-saved as you type</span>
                     <span
-                      className={`font-medium ${
-                        count > essay.wordMax
-                          ? "text-red-600"
-                          : count < essay.wordMin
-                          ? "text-amber-600"
-                          : "text-emerald-600"
-                      }`}
+                      className={cn(
+                        "font-medium",
+                        isOver
+                          ? "text-red-500"
+                          : isUnder && isStarted
+                            ? "text-amber-500"
+                            : !isUnder
+                              ? "text-green-600 dark:text-green-400"
+                              : ""
+                      )}
                     >
                       {count} / {essay.wordMin}–{essay.wordMax} words
                     </span>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             );
           })}
         </div>
 
-        <Card className="border-border/50 mt-6">
-          <CardFooter className="flex justify-between p-5">
-            <div className="flex gap-2">
-              <Link href="/application/step-2">
-                <Button type="button" variant="outline" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" /> Back
-                </Button>
-              </Link>
+        {/* Footer */}
+        <div className="flex items-center justify-between mt-4 px-5 py-3.5 border border-border/50 rounded-xl bg-muted/20">
+          <div className="flex gap-2">
+            {onBack ? (
               <Button
                 type="button"
-                variant="ghost"
-                className="gap-2"
-                onClick={(e) => handleSave(e, false)}
-                disabled={loading}
+                variant="outline"
+                size="sm"
+                className="gap-2 rounded-md"
+                onClick={onBack}
               >
-                <Save className="h-4 w-4" /> Save Draft
+                <ArrowLeft className="h-3.5 w-3.5" /> Back
               </Button>
-            </div>
+            ) : (
+              <Link href="/application/step-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 rounded-md"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" /> Back
+                </Button>
+              </Link>
+            )}
             <Button
-              type="submit"
-              className="gap-2 font-semibold"
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="gap-2 rounded-md"
+              onClick={(e) => handleSave(e, false)}
               disabled={loading}
             >
-              {loading ? "Saving..." : "Save & Continue"}{" "}
-              <ArrowRight className="h-4 w-4" />
+              <Save className="h-3.5 w-3.5" /> Save Draft
             </Button>
-          </CardFooter>
-        </Card>
+          </div>
+          <Button
+            type="submit"
+            size="sm"
+            className="gap-2 rounded-md"
+            disabled={loading}
+          >
+            {loading ? "Saving..." : "Save & Continue"}{" "}
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </form>
     </div>
   );

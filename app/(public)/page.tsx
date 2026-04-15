@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { SectionWrapper } from "@/components/sections/section-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,18 +30,18 @@ export default async function HomePage() {
   const impactNumbers =
     impactMetrics.length > 0
       ? impactMetrics.map((m) => ({
-          value: m.value + (m.unit || ""),
-          label: m.label,
-          sub: m.description || "",
-        }))
+        value: m.value + (m.unit || ""),
+        label: m.label,
+        sub: m.description || "",
+      }))
       : [
-          {
-            value: "36",
-            label: "States Covered",
-            sub: "Across the federation",
-          },
-          { value: "100%", label: "Transparency", sub: "Fully verifiable" },
-        ];
+        {
+          value: "36",
+          label: "States Covered",
+          sub: "Across the federation",
+        },
+        { value: "100%", label: "Transparency", sub: "Fully verifiable" },
+      ];
 
   const focusAreas = [
     {
@@ -135,10 +135,10 @@ export default async function HomePage() {
               ))}
             </ul>
 
-            <Link href="/about">
-              <Button variant="outline" className="mt-2">
-                Read Our Full Mission <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+            <Link href="/about" className={buttonVariants({ variant: "secondary" })}>
+
+              Read Our Full Mission <ArrowRight className="ml-2 h-4 w-4" />
+
             </Link>
           </div>
 
@@ -445,12 +445,6 @@ export default async function HomePage() {
                 <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed flex-1">
                   {article.summary}
                 </p>
-                <Button
-                  variant="ghost"
-                  className="p-0 h-auto text-xs text-primary font-medium self-start mt-2"
-                >
-                  Read More <ArrowRight className="ml-1 h-3 w-3" />
-                </Button>
               </CardContent>
             </Card>
           ))}

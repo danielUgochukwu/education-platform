@@ -87,7 +87,7 @@ export default function Hero() {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
+      <div className="px-14 mx-auto grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
         {/* ── Text Section ── */}
         <div className="text-center md:text-left order-1">
           {/* Editorial label */}
@@ -105,7 +105,7 @@ export default function Hero() {
             <br />
             Deserves
             <br />
-            <span className="text-muted-foreground font-medium">a Chance.</span>
+            <span className="text-secondary font-medium">a Chance.</span>
           </h1>
 
           <p

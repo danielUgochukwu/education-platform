@@ -10,18 +10,15 @@ import { toast } from "sonner";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
-  Field,
-  FieldError,
   FieldGroup,
-  FieldLabel,
 } from "@/components/ui/field";
 import {
   getSafePostLoginRedirectPath,
   resolveUserRoleForSession,
 } from "@/lib/auth/roles";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { FormField } from "@/components/forms/form-field";
 
 // ── Schema ────────────────────────────────────────────────────────────────────
 const loginSchema = z.object({
@@ -172,80 +169,34 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup className="space-y-4">
-              {/* Email */}
-              <Controller
+              <FormField
                 name="email"
                 control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel
-                      htmlFor="login-email"
-                      className="text-xs font-medium"
-                    >
-                      Email address
-                    </FieldLabel>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-                      <Input
-                        {...field}
-                        id="login-email"
-                        type="email"
-                        placeholder="you@example.com"
-                        className="pl-9 h-9 text-sm"
-                        autoComplete="email"
-                        aria-invalid={fieldState.invalid}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-xs"
-                      />
-                    )}
-                  </Field>
-                )}
+                label="Email address"
+                type="email"
+                placeholder="you@example.com"
+                autoComplete="email"
+                icon={Mail}
               />
 
-              {/* Password */}
-              <Controller
+              <FormField
                 name="password"
                 control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="flex items-center justify-between">
-                      <FieldLabel
-                        htmlFor="login-password"
-                        className="text-xs font-medium"
-                      >
-                        Password
-                      </FieldLabel>
-                      <Link
-                        href="/forgot-password"
-                        className="text-xs text-primary hover:underline"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-                      <Input
-                        {...field}
-                        id="login-password"
-                        type="password"
-                        placeholder="••••••••"
-                        className="pl-9 h-9 text-sm"
-                        autoComplete="current-password"
-                        aria-invalid={fieldState.invalid}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-xs"
-                      />
-                    )}
-                  </Field>
-                )}
+                label={
+                  <div className="flex items-center justify-between w-full">
+                    <span>Password</span>
+                    <Link
+                      href="/forgot-password"
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                }
+                isPassword
+                placeholder="••••••••"
+                autoComplete="current-password"
+                icon={Lock}
               />
 
               <Button

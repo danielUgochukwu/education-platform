@@ -16,36 +16,23 @@ import {
   User,
 } from "lucide-react";
 import React, { Suspense } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { FieldGroup } from "@/components/ui/field";
+
 import {
   getDefaultRedirectPath,
   getRoleForIntent,
   isAuthIntent,
   type AuthIntent,
 } from "@/lib/auth/roles";
-import { nigerianStates } from "@/constants/nigeria";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { FormField } from "@/components/forms/form-field";
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const CONFIG: Record<
@@ -86,17 +73,23 @@ const CONFIG: Record<
 // ── Schema ────────────────────────────────────────────────────────────────────
 const signupSchema = z
   .object({
-    firstName: z.string().min(1, "First name is required."),
-    lastName: z.string().min(1, "Last name is required."),
-    email: z.string().email("Enter a valid email address."),
+    firstName: z.string().trim().min(1, "First name is required."),
+    lastName: z.string().trim().min(1, "Last name is required."),
+    email: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .email("Enter a valid email address."),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters.")
-      .regex(/[a-zA-Z]/, "Must contain at least one letter.")
-      .regex(/[0-9]/, "Must contain at least one number."),
+      .regex(/[a-z]/, "Must contain a lowercase letter.")
+      .regex(/[A-Z]/, "Must contain an uppercase letter.")
+      .regex(/[0-9]/, "Must contain a number.")
+      .regex(/[^a-zA-Z0-9]/, "Must contain a special character."),
     confirmPassword: z.string().min(1, "Please confirm your password."),
-    terms: z.boolean().refine((v) => v === true, {
-      message: "You must accept the terms to continue.",
+    terms: z.boolean().refine((val) => val === true, {
+      message: "You must accept the terms to continue."
     }),
   })
   .refine((d) => d.password === d.confirmPassword, {
@@ -191,10 +184,7 @@ function SignupPageContent() {
         "Account created. Check your email to confirm your address before signing in.";
       toast.success("Success!", { description: msg });
 
-      // Redirect to login page after showing success message
-      setTimeout(() => {
-        router.push("/login");
-      }, 1500);
+      router.replace("/login");
     } catch (err) {
       const msg =
         err instanceof Error
@@ -242,26 +232,22 @@ function SignupPageContent() {
                 <Link
                   key={key}
                   href={`/signup?intent=${key}`}
-                  className={`flex items-start gap-3 py-4 transition-opacity ${
-                    isActive ? "opacity-100" : "opacity-40 hover:opacity-60"
-                  }`}
+                  className={`flex items-start gap-3 py-4 transition-opacity ${isActive ? "opacity-100" : "opacity-40 hover:opacity-60"
+                    }`}
                 >
                   <div
-                    className={`h-7 w-7 rounded-md flex items-center justify-center shrink-0 mt-0.5 ${
-                      isActive ? "bg-primary/20" : "bg-background/5"
-                    }`}
+                    className={`h-7 w-7 rounded-md flex items-center justify-center shrink-0 mt-0.5 ${isActive ? "bg-primary/20" : "bg-background/5"
+                      }`}
                   >
                     <Icon
-                      className={`h-3.5 w-3.5 ${
-                        isActive ? "text-primary" : "text-background/60"
-                      }`}
+                      className={`h-3.5 w-3.5 ${isActive ? "text-primary" : "text-background/60"
+                        }`}
                     />
                   </div>
                   <div>
                     <p
-                      className={`text-xs font-bold capitalize mb-0.5 ${
-                        isActive ? "text-background" : "text-background/60"
-                      }`}
+                      className={`text-xs font-bold capitalize mb-0.5 ${isActive ? "text-background" : "text-background/60"
+                        }`}
                     >
                       {key}
                     </p>
@@ -312,11 +298,10 @@ function SignupPageContent() {
                 <Link
                   key={key}
                   href={`/signup?intent=${key}`}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium transition-colors capitalize border-r last:border-r-0 border-border/50 ${
-                    isActive
-                      ? "bg-foreground text-background"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-                  }`}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium transition-colors capitalize border-r last:border-r-0 border-border/50 ${isActive
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                    }`}
                 >
                   <Icon className="h-3.5 w-3.5 shrink-0" />
                   {key}
@@ -343,220 +328,89 @@ function SignupPageContent() {
 
           {/* Form */}
           <form
+            noValidate
             onSubmit={handleSubmit(onSubmit)}
-            className={`transition-opacity duration-200 ${
-              !currentIntent ? "opacity-40 pointer-events-none" : "opacity-100"
-            }`}
+            className={`transition-opacity duration-200 ${!currentIntent ? "opacity-40" : "opacity-100"
+              }`}
           >
-            <FieldGroup className="space-y-2">
-              {/* Name row */}
-              <div className="grid grid-cols-2 gap-3">
-                <Controller
-                  name="firstName"
+            <fieldset disabled={!currentIntent || false} className="min-w-0 border-0 p-0 m-0">
+              <FieldGroup className="">
+                {/* Name row */}
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField
+                    name="firstName"
+                    control={control}
+                    label="First name"
+                    placeholder="Chukwuemeka"
+                    autoComplete="given-name"
+                    icon={User}
+                  />
+
+                  <FormField
+                    name="lastName"
+                    control={control}
+                    label="Last name"
+                    placeholder="Okafor"
+                    autoComplete="family-name"
+                  />
+                </div>
+
+                {/* Email */}
+                <FormField
+                  name="email"
                   control={control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel
-                        htmlFor="signup-first-name"
-                        className="text-xs"
-                      >
-                        First name
-                      </FieldLabel>
-                      <div className="relative">
-                        <User className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-                        <Input
-                          {...field}
-                          id="signup-first-name"
-                          placeholder="Chukwuemeka"
-                          className="pl-8 h-9 text-sm"
-                          autoComplete="given-name"
-                          aria-invalid={fieldState.invalid}
-                        />
-                      </div>
-                      {fieldState.invalid && (
-                        <FieldError
-                          errors={[fieldState.error]}
-                          className="text-xs"
-                        />
-                      )}
-                    </Field>
-                  )}
+                  label="Email address"
+                  type="email"
+                  placeholder="you@email.com"
+                  autoComplete="email"
+                  icon={Mail}
                 />
-                <Controller
-                  name="lastName"
+
+                <FormField
+                  name="password"
                   control={control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel
-                        htmlFor="signup-last-name"
-                        className="text-xs"
-                      >
-                        Last name
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        id="signup-last-name"
-                        placeholder="Okafor"
-                        className="h-9 text-sm"
-                        autoComplete="family-name"
-                        aria-invalid={fieldState.invalid}
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          errors={[fieldState.error]}
-                          className="text-xs"
-                        />
-                      )}
-                    </Field>
-                  )}
+                  isPassword
+                  label="Password"
+                  placeholder="Minimum 8 characters"
+                  autoComplete="new-password"
+                  icon={Lock}
                 />
-              </div>
 
-              {/* Email */}
-              <Controller
-                name="email"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="signup-email" className="text-xs">
-                      Email address
-                    </FieldLabel>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-                      <Input
-                        {...field}
-                        id="signup-email"
-                        type="email"
-                        placeholder="you@email.com"
-                        className="pl-8 h-9 text-sm"
-                        autoComplete="email"
-                        aria-invalid={fieldState.invalid}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-xs"
-                      />
-                    )}
-                  </Field>
-                )}
-              />
+                {/* Confirm password */}
+                <FormField
+                  name="confirmPassword"
+                  control={control}
+                  isPassword
+                  label="Confirm password"
+                  placeholder="Repeat your password"
+                  autoComplete="new-password"
+                  icon={Shield}
+                />
 
-              {/* Password */}
-              <Controller
-                name="password"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="signup-password" className="text-xs">
-                      Password
-                    </FieldLabel>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-                      <Input
-                        {...field}
-                        id="signup-password"
-                        type="password"
-                        placeholder="Minimum 8 characters"
-                        className="pl-8 h-9 text-sm"
-                        autoComplete="new-password"
-                        aria-invalid={fieldState.invalid}
-                      />
-                    </div>
-                    <FieldDescription className="text-[10px] pl-1">
-                      Use 8+ characters with a mix of letters and numbers.
-                    </FieldDescription>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-xs"
-                      />
-                    )}
-                  </Field>
-                )}
-              />
-
-              {/* Confirm password */}
-              <Controller
-                name="confirmPassword"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel
-                      htmlFor="signup-confirm-password"
-                      className="text-xs"
-                    >
-                      Confirm password
-                    </FieldLabel>
-                    <div className="relative">
-                      <Shield className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-                      <Input
-                        {...field}
-                        id="signup-confirm-password"
-                        type="password"
-                        placeholder="Repeat your password"
-                        className="pl-8 h-9 text-sm"
-                        autoComplete="new-password"
-                        aria-invalid={fieldState.invalid}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-xs"
-                      />
-                    )}
-                  </Field>
-                )}
-              />
-
-              {/* Terms */}
-              <Controller
-                name="terms"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="flex items-start gap-4 pt-0.5">
-                      <input
-                        type="checkbox"
-                        id="signup-terms"
-                        className="mt-1 accent-primary bg-red-500"
-                        checked={field.value}
-                        onChange={field.onChange}
-                      />
-                      <label
-                        htmlFor="signup-terms"
-                        className="text-[11px] text-muted-foreground leading-relaxed cursor-pointer"
-                      >
-                        I confirm that all information I provide will be
+                {/* Terms */}
+                <FormField
+                  name="terms"
+                  control={control}
+                  type="checkbox"
+                  label="I confirm that all information I provide will be
                         truthful. I understand that NTDI reserves the right to
-                        verify all submissions for security and compliance.
-                      </label>
-                      {fieldState.invalid && (
-                        <FieldError
-                          errors={[fieldState.error]}
-                          className="text-xs mt-1"
-                        />
-                      )}
-                    </div>
-                  </Field>
-                )}
-              />
+                        verify all submissions for security and compliance."
+                />
 
-              <Button
-                type="submit"
-                className="w-full h-9 text-sm rounded-md gap-2"
-                disabled={!currentIntent || isSubmitting}
-              >
-                {isSubmitting
-                  ? "Creating account..."
-                  : currentIntent
-                  ? CONFIG[currentIntent].cta
-                  : "Create Account"}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </FieldGroup>
+                <Button
+                  type="submit"
+                  className="w-full h-9 text-sm rounded-md gap-2"
+                  disabled={!currentIntent || isSubmitting}
+                >
+                  {isSubmitting
+                    ? "Creating account..."
+                    : currentIntent
+                      ? CONFIG[currentIntent].cta
+                      : "Create Account"}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Button>
+              </FieldGroup>
+            </fieldset>
           </form>
 
           {/* Security note */}

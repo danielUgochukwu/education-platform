@@ -9,7 +9,6 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ApplicationStepper } from "@/components/forms/application-stepper";
 import {
   ArrowLeft,
   ArrowRight,
@@ -22,7 +21,6 @@ import {
   Info,
   AlertCircle,
 } from "lucide-react";
-import { applicationSteps } from "@/constants/application";
 import type {
   DocumentStatus,
   DocumentType,
@@ -42,6 +40,8 @@ import {
 
 interface DocumentUploadFormProps {
   documents: UploadedDocument[];
+  onNext?: () => void;
+  onBack?: () => void;
 }
 
 interface RequiredDocument {
@@ -110,16 +110,16 @@ const requiredDocuments: RequiredDocument[] = [
 ];
 
 const requiredDocumentTypeCounts = requiredDocuments.reduce<Record<DocumentType, number>>((counts, document) => {
-    counts[document.type] = (counts[document.type] || 0) + 1;
-    return counts;
+  counts[document.type] = (counts[document.type] || 0) + 1;
+  return counts;
 }, {
-    transcript: 0,
-    id: 0,
-    reference_letter: 0,
-    essay: 0,
-    jamb_result: 0,
-    award_letter: 0,
-    other: 0,
+  transcript: 0,
+  id: 0,
+  reference_letter: 0,
+  essay: 0,
+  jamb_result: 0,
+  award_letter: 0,
+  other: 0,
 });
 
 const statusIcon: Record<DocumentStatus, React.ReactNode> = {
@@ -230,7 +230,7 @@ function getDocumentForRequirement(
   );
 }
 
-export function DocumentUploadForm({ documents }: DocumentUploadFormProps) {
+export function DocumentUploadForm({ documents, onNext, onBack }: DocumentUploadFormProps) {
   const router = useRouter();
   const [busyKey, setBusyKey] = useState<string | null>(null);
 
@@ -309,18 +309,14 @@ export function DocumentUploadForm({ documents }: DocumentUploadFormProps) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <ApplicationStepper steps={[...applicationSteps]} currentStep={4} />
-
-      <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
-        <Info className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-        <div>
-          <p className="font-semibold mb-0.5">Document Requirements</p>
-          <p>
-            Accepted formats: PDF, JPG, PNG. Maximum file size: 5MB per
-            document.
-          </p>
-        </div>
+    <div className="max-w-3xl mx-auto space-y-5">
+      {/* Info banner */}
+      <div className="flex items-center gap-2.5 px-4 py-3 bg-muted/30 border border-border/50 rounded-xl">
+        <Info className="h-3.5 w-3.5 text-primary shrink-0" />
+        <p className="text-xs text-muted-foreground">
+          <span className="font-semibold text-foreground">Accepted formats:</span>{" "}
+          PDF, JPG, PNG. Maximum file size: 5MB per document.
+        </p>
       </div>
 
       <div className="space-y-4">
@@ -330,211 +326,145 @@ export function DocumentUploadForm({ documents }: DocumentUploadFormProps) {
           const isDeletingThisRequirement = busyKey === uploaded?.id;
 
           return (
-            <Card
-              key={requirement.slot}
-              className={`border ${
-                uploaded ? "border-emerald-200/60" : "border-border/50"
-              }`}
+            <div key={requirement.slot}
+              className={`border rounded-xl overflow-hidden ${uploaded ? "border-green-200/60 dark:border-green-800/30" : "border-border/50"}`}
             >
-              <CardHeader className="pb-3 border-b">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-sm">
-                        {requirement.label}
-                      </h3>
-                      {requirement.required ? (
-                        <Badge
-                          variant="destructive"
-                          className="text-[9px] h-4 px-1.5"
-                        >
-                          Required
-                        </Badge>
-                      ) : (
-                        <Badge
-                          variant="secondary"
-                          className="text-[9px] h-4 px-1.5"
-                        >
-                          Optional
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {requirement.description}
-                    </p>
+              {/* Header */}
+              <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border/50">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-sm font-semibold">{requirement.label}</h3>
+                    {requirement.required ? (
+                      <span className="text-[9px] font-bold bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-800/30 rounded px-1.5 py-px">Required</span>
+                    ) : (
+                      <span className="text-[9px] font-bold bg-muted text-muted-foreground border border-border/50 rounded px-1.5 py-px">Optional</span>
+                    )}
                   </div>
-                  {uploaded && (
-                    <div className="flex items-center gap-1.5 text-xs font-medium shrink-0">
-                      {statusIcon[uploaded.status] || (
-                        <Clock className="h-4 w-4" />
-                      )}
-                      <span
-                        className={
-                          uploaded.status === "verified"
-                            ? "text-emerald-600"
-                            : uploaded.status === "pending"
-                            ? "text-amber-600"
-                            : "text-red-600"
-                        }
-                      >
-                        {statusLabel[uploaded.status] || uploaded.status}
-                      </span>
-                    </div>
-                  )}
+                  <p className="text-xs text-muted-foreground">{requirement.description}</p>
                 </div>
-              </CardHeader>
+                {uploaded && (
+                  <div className="flex items-center gap-1.5 text-xs font-medium shrink-0">
+                    {statusIcon[uploaded.status] || <Clock className="h-4 w-4" />}
+                    <span className={
+                      uploaded.status === "verified" ? "text-green-600 dark:text-green-400" :
+                        uploaded.status === "pending" ? "text-amber-600" : "text-red-600"
+                    }>
+                      {statusLabel[uploaded.status] || uploaded.status}
+                    </span>
+                  </div>
+                )}
+              </div>
 
-              <CardContent className="p-4">
+              {/* Content */}
+              <div className="p-4">
                 {uploaded ? (
-                  <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border">
-                    <FileText className="h-8 w-8 text-primary/60 shrink-0" />
+                  <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50">
+                    <FileText className="h-7 w-7 text-primary/50 shrink-0" />
                     <div className="flex-1 min-w-0">
                       {uploaded.url ? (
-                        <a
-                          href={uploaded.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-sm font-medium truncate block hover:text-primary transition-colors"
-                        >
+                        <a href={uploaded.url} target="_blank" rel="noreferrer"
+                          className="text-sm font-medium truncate block hover:text-primary transition-colors">
                           {uploaded.name}
                         </a>
                       ) : (
-                        <p className="text-sm font-medium truncate">
-                          {uploaded.name}
-                        </p>
+                        <p className="text-sm font-medium truncate">{uploaded.name}</p>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        Uploaded on{" "}
-                        {new Date(uploaded.uploadedAt).toLocaleDateString()}
+                        Uploaded {new Date(uploaded.uploadedAt).toLocaleDateString()}
                       </p>
                       {uploaded.status === "rejected" && (
                         <p className="text-xs text-red-600 font-medium mt-1 flex items-center gap-1">
-                          <AlertCircle className="h-3 w-3" /> Document rejected
-                          - please re-upload
+                          <AlertCircle className="h-3 w-3" /> Rejected — please re-upload
                         </p>
                       )}
                     </div>
-                    <Button
+                    <button
                       onClick={() => handleDelete(uploaded.id)}
-                      className="text-muted-foreground hover:text-destructive transition-colors"
                       disabled={isBusy}
+                      className="text-muted-foreground hover:text-destructive transition-colors p-1 rounded-md hover:bg-destructive/10 disabled:opacity-40"
                     >
                       {isDeletingThisRequirement ? (
-                        "Deleting..."
+                        <span className="text-xs">Deleting…</span>
                       ) : (
                         <Trash2 className="h-4 w-4" />
                       )}
-                    </Button>
+                    </button>
                   </div>
                 ) : (
                   <CldUploadWidget
                     signatureEndpoint="/api/cloudinary/sign"
-                    options={{
-                      clientAllowedFormats: ["pdf", "jpg", "jpeg", "png"],
-                      maxFileSize: MAX_FILE_SIZE,
-                      maxFiles: 1,
-                      multiple: false,
-                      resourceType: "auto",
-                      sources: ["local"],
-                    }}
-                    onError={() => {
-                      toast.error("Upload failed. Please try again.");
-                    }}
-                    onSuccess={(result) => {
-                      void handleUploadSuccess(requirement, result);
-                    }}
+                    options={{ clientAllowedFormats: ["pdf", "jpg", "jpeg", "png"], maxFileSize: MAX_FILE_SIZE, maxFiles: 1, multiple: false, resourceType: "auto", sources: ["local"] }}
+                    onError={() => toast.error("Upload failed. Please try again.")}
+                    onSuccess={(result) => void handleUploadSuccess(requirement, result)}
                   >
                     {({ open }) => (
                       <div
-                        onClick={() => {
-                          if (isBusy) return;
-                          open();
-                        }}
-                        className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors group ${
-                          isBusy
-                            ? "border-muted-foreground/10 cursor-not-allowed opacity-60"
-                            : "border-muted-foreground/20 hover:border-primary/40 cursor-pointer"
-                        }`}
+                        onClick={() => { if (isBusy) return; open(); }}
+                        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors group ${isBusy ? "border-border/20 cursor-not-allowed opacity-50" : "border-border/40 hover:border-primary/40 cursor-pointer"
+                          }`}
                       >
                         <div className="flex flex-col items-center gap-3">
-                          <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                            <Upload className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors" />
+                          <div className="h-10 w-10 rounded-full bg-muted/50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                            <Upload className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                           </div>
                           <div>
-                            <p className="text-sm font-medium">
-                              Select a file to upload
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              Upload opens in a secure file picker
-                            </p>
+                            <p className="text-sm font-medium">Select a file to upload</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">Secure file picker</p>
                           </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-xs"
-                            disabled={isBusy}
-                            onClick={(event) => {
-                              event.preventDefault();
-                              event.stopPropagation();
-                              if (isBusy) return;
-                              open();
-                            }}
-                          >
-                            {isSavingThisRequirement
-                              ? "Saving..."
-                              : "Browse Files"}
+                          <Button variant="outline" size="sm" className="text-xs rounded-md" disabled={isBusy}
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (!isBusy) open(); }}>
+                            {isSavingThisRequirement ? "Saving…" : "Browse Files"}
                           </Button>
-                          <p className="text-xs text-muted-foreground/70">
-                            PDF, JPG, PNG - Max 5MB
-                          </p>
+                          <p className="text-[11px] text-muted-foreground/60">PDF, JPG, PNG — max 5MB</p>
                         </div>
                       </div>
                     )}
                   </CldUploadWidget>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           );
         })}
       </div>
 
-      <Card className="border-border/50 bg-muted/20">
-        <CardContent className="p-5">
-          <div className="flex flex-wrap gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-              <span>
-                {documents.filter((document) => document.status === "verified")
-                  .length}{" "}
-                Verified
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-amber-500" />
-              <span>
-                {documents.filter((document) => document.status === "pending")
-                  .length}{" "}
-                Under Review
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Status summary */}
+      <div className="flex items-center gap-5 px-5 py-3.5 border border-border/50 rounded-xl bg-muted/20">
+        <div className="flex items-center gap-2 text-xs">
+          <CheckCircle2 className="h-4 w-4 text-green-500" />
+          <span>{documents.filter((d) => d.status === "verified").length} Verified</span>
+        </div>
+        <div className="flex items-center gap-2 text-xs">
+          <Clock className="h-4 w-4 text-amber-500" />
+          <span>{documents.filter((d) => d.status === "pending").length} Under Review</span>
+        </div>
+      </div>
 
-      <Card className="border-border/50">
-        <CardFooter className="flex justify-between p-5">
+      {/* Footer */}
+      <div className="flex items-center justify-between px-5 py-3.5 border border-border/50 rounded-xl bg-muted/20">
+        {onBack ? (
+          <Button variant="outline" size="sm" className="gap-2 rounded-md" onClick={onBack}>
+            <ArrowLeft className="h-3.5 w-3.5" /> Back
+          </Button>
+        ) : (
           <Link href="/application/step-3">
-            <Button variant="outline" className="gap-2">
-              <ArrowLeft className="h-4 w-4" /> Back
+            <Button variant="outline" size="sm" className="gap-2 rounded-md">
+              <ArrowLeft className="h-3.5 w-3.5" /> Back
             </Button>
           </Link>
+        )}
+        {onNext ? (
+          <Button size="sm" className="gap-2 rounded-md" onClick={onNext}>
+            Continue <ArrowRight className="h-3.5 w-3.5" />
+          </Button>
+        ) : (
           <Link href="/application/step-5">
-            <Button className="gap-2 font-semibold">
-              Continue <ArrowRight className="h-4 w-4" />
+            <Button size="sm" className="gap-2 rounded-md">
+              Continue <ArrowRight className="h-3.5 w-3.5" />
             </Button>
           </Link>
-        </CardFooter>
-      </Card>
+        )}
+      </div>
     </div>
   );
 }
+

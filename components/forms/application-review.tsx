@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ApplicationStepper } from "@/components/forms/application-stepper";
 import {
   ArrowLeft,
   AlertCircle,
@@ -17,7 +16,6 @@ import {
   Send,
   type LucideIcon,
 } from "lucide-react";
-import { applicationSteps } from "@/constants/application";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -52,50 +50,59 @@ interface ApplicationReviewProps {
   profile: ReviewProfile | null;
   application: ReviewApplication | null;
   documents: UploadedDocument[];
+  onBack?: () => void;
+  onEdit?: (step: number) => void;
 }
 
 function ReviewSection({
   title,
   icon: Icon,
-  editHref,
+  editStep,
+  onEdit,
   children,
 }: {
   title: string;
   icon: LucideIcon;
-  editHref: string;
+  editStep?: number;
+  onEdit?: (step: number) => void;
   children: React.ReactNode;
 }) {
   return (
-    <Card className="border-border/50">
-      <CardHeader className="pb-3 flex flex-row items-center justify-between gap-3 border-b bg-muted/10">
+    <div className="border border-border/50 rounded-xl overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/50 bg-muted/20">
         <div className="flex items-center gap-2">
-          <Icon className="h-4 w-4 text-primary" />
-          <CardTitle className="text-sm font-semibold">{title}</CardTitle>
+          <Icon className="h-3.5 w-3.5 text-primary" />
+          <span className="text-xs font-semibold">{title}</span>
         </div>
-        <Link href={editHref}>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs h-7 gap-1.5 text-primary"
+        {editStep && onEdit ? (
+          <button
+            onClick={() => onEdit(editStep)}
+            className="text-xs font-medium text-primary flex items-center gap-1 hover:underline"
           >
             <Edit className="h-3 w-3" /> Edit
-          </Button>
-        </Link>
-      </CardHeader>
-      <CardContent className="p-5">{children}</CardContent>
-    </Card>
+          </button>
+        ) : editStep ? (
+          <Link href={`/application/step-${editStep}`}>
+            <button className="text-xs font-medium text-primary flex items-center gap-1 hover:underline">
+              <Edit className="h-3 w-3" /> Edit
+            </button>
+          </Link>
+        ) : null}
+      </div>
+      <div className="p-5">{children}</div>
+    </div>
   );
 }
 
 function InfoRow({ label, value }: { label: string; value?: string }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:gap-4">
-      <span className="text-xs text-muted-foreground min-w-[180px] shrink-0">
+    <div className="flex flex-col sm:flex-row sm:gap-6 py-2 border-b border-border/50 last:border-0">
+      <span className="text-[11px] text-muted-foreground min-w-[180px] shrink-0 pt-px">
         {label}
       </span>
       <span className="text-sm font-medium">
         {value || (
-          <span className="text-muted-foreground/50 text-xs italic">
+          <span className="text-muted-foreground/40 text-xs italic">
             Not provided
           </span>
         )}
@@ -112,6 +119,8 @@ export function ApplicationReview({
   profile,
   application,
   documents,
+  onBack,
+  onEdit,
 }: ApplicationReviewProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -146,8 +155,6 @@ export function ApplicationReview({
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <ApplicationStepper steps={[...applicationSteps]} currentStep={5} />
-
       <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
         <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
         <div>
@@ -165,7 +172,8 @@ export function ApplicationReview({
       <ReviewSection
         title="Personal Information"
         icon={FileText}
-        editHref="/application/step-1"
+        editStep={1}
+        onEdit={onEdit}
       >
         <div className="space-y-3">
           <InfoRow
@@ -205,7 +213,8 @@ export function ApplicationReview({
       <ReviewSection
         title="Academic Background"
         icon={GraduationCap}
-        editHref="/application/step-2"
+        editStep={2}
+        onEdit={onEdit}
       >
         <div className="space-y-3">
           <InfoRow
@@ -241,7 +250,8 @@ export function ApplicationReview({
       <ReviewSection
         title="Essays"
         icon={ScrollText}
-        editHref="/application/step-3"
+        editStep={3}
+        onEdit={onEdit}
       >
         <div className="space-y-4">
           {[
@@ -279,7 +289,8 @@ export function ApplicationReview({
       <ReviewSection
         title="Documents"
         icon={Upload}
-        editHref="/application/step-4"
+        editStep={4}
+        onEdit={onEdit}
       >
         <div className="space-y-2">
           {documents.length > 0 ? (
@@ -293,10 +304,10 @@ export function ApplicationReview({
                 <Badge
                   variant="outline"
                   className={`text-[10px] capitalize shrink-0 ${doc.status === "verified"
-                      ? "border-emerald-300 text-emerald-700 bg-emerald-50"
-                      : doc.status === "pending"
-                        ? "border-amber-300 text-amber-700 bg-amber-50"
-                        : "border-red-300 text-red-700 bg-red-50"
+                    ? "border-emerald-300 text-emerald-700 bg-emerald-50"
+                    : doc.status === "pending"
+                      ? "border-amber-300 text-amber-700 bg-amber-50"
+                      : "border-red-300 text-red-700 bg-red-50"
                     }`}
                 >
                   {doc.status}
@@ -344,11 +355,17 @@ export function ApplicationReview({
       </Card>
 
       <div className="flex flex-col sm:flex-row justify-between gap-4 pb-8">
-        <Link href="/application/step-4">
-          <Button variant="outline" className="gap-2 w-full sm:w-auto">
+        {onBack ? (
+          <Button variant="outline" className="gap-2 w-full sm:w-auto" onClick={onBack}>
             <ArrowLeft className="h-4 w-4" /> Back to Documents
           </Button>
-        </Link>
+        ) : (
+          <Link href="/application/step-4">
+            <Button variant="outline" className="gap-2 w-full sm:w-auto">
+              <ArrowLeft className="h-4 w-4" /> Back to Documents
+            </Button>
+          </Link>
+        )}
         <Button
           onClick={handleSubmit}
           className="gap-2 font-semibold h-12 px-8 w-full sm:w-auto"

@@ -1,15 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   CircleAlert,
   CircleCheck,
   GraduationCap,
-  Handshake,
-  Heart,
   Lock,
   Mail,
   Shield,
@@ -25,50 +22,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 
-import {
-  getDefaultRedirectPath,
-  getRoleForIntent,
-  isAuthIntent,
-  type AuthIntent,
-} from "@/lib/auth/roles";
+import { getDefaultRedirectPath, getRoleForIntent } from "@/lib/auth/roles";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { FormField } from "@/components/forms/form-field";
-
-// ── Config ────────────────────────────────────────────────────────────────────
-const CONFIG: Record<
-  AuthIntent,
-  {
-    title: string;
-    subtitle: string;
-    cta: string;
-    icon: LucideIcon;
-    description: string;
-  }
-> = {
-  applicant: {
-    title: "Continue as Applicant",
-    subtitle:
-      "Start your application for education support and national impact.",
-    cta: "Continue as Applicant",
-    icon: GraduationCap,
-    description: "Apply for scholarship funding and university placement.",
-  },
-  donor: {
-    title: "Continue as Donor",
-    subtitle: "Track donations, sponsorships, and real-time impact metrics.",
-    cta: "Continue as Donor",
-    icon: Heart,
-    description: "Fund scholars and track your real-time impact.",
-  },
-  partner: {
-    title: "Continue as Partner",
-    subtitle:
-      "Begin institutional collaboration with the national talent engine.",
-    cta: "Continue as Partner",
-    icon: Handshake,
-    description: "Collaborate as an institution or employer.",
-  },
-};
 
 // ── Schema ────────────────────────────────────────────────────────────────────
 const signupSchema = z
@@ -102,9 +58,6 @@ type SignupValues = z.infer<typeof signupSchema>;
 // ── Inner component ───────────────────────────────────────────────────────────
 function SignupPageContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const rawIntent = searchParams.get("intent");
-  const currentIntent = isAuthIntent(rawIntent) ? rawIntent : null;
 
   const [successMessage, setSuccessMessage] = React.useState<string | null>(
     null
@@ -129,17 +82,10 @@ function SignupPageContent() {
   });
 
   const onSubmit = async (values: SignupValues) => {
-    if (!currentIntent) {
-      setError("root", {
-        message: "Choose an account type before creating an account.",
-      });
-      return;
-    }
-
     setSuccessMessage(null);
 
     try {
-      const role = getRoleForIntent(currentIntent);
+      const role = getRoleForIntent("applicant");
       const supabase = getSupabaseBrowserClient();
 
       const { data, error } = await supabase.auth.signUp({
@@ -151,7 +97,7 @@ function SignupPageContent() {
             last_name: values.lastName,
             full_name: `${values.firstName} ${values.lastName}`.trim(),
             role,
-            account_type: currentIntent,
+            account_type: "applicant",
           },
         },
       });
@@ -217,47 +163,27 @@ function SignupPageContent() {
               Join the Initiative
             </p>
             <h2 className="text-2xl font-bold leading-snug tracking-tight text-background mb-2">
-              Choose how you want to{" "}
+              Start your application{" "}
               <span className="text-background/40 font-medium">
-                make an impact.
+                and make an impact.
               </span>
             </h2>
           </div>
 
-          <div className="flex flex-col divide-y divide-background/10 border-t border-background/10">
-            {(Object.keys(CONFIG) as AuthIntent[]).map((key) => {
-              const Icon = CONFIG[key].icon;
-              const isActive = currentIntent === key;
-              return (
-                <Link
-                  key={key}
-                  href={`/signup?intent=${key}`}
-                  className={`flex items-start gap-3 py-4 transition-opacity ${isActive ? "opacity-100" : "opacity-40 hover:opacity-60"
-                    }`}
-                >
-                  <div
-                    className={`h-7 w-7 rounded-md flex items-center justify-center shrink-0 mt-0.5 ${isActive ? "bg-primary/20" : "bg-background/5"
-                      }`}
-                  >
-                    <Icon
-                      className={`h-3.5 w-3.5 ${isActive ? "text-primary" : "text-background/60"
-                        }`}
-                    />
-                  </div>
-                  <div>
-                    <p
-                      className={`text-xs font-bold capitalize mb-0.5 ${isActive ? "text-background" : "text-background/60"
-                        }`}
-                    >
-                      {key}
-                    </p>
-                    <p className="text-xs text-background/40 leading-relaxed">
-                      {CONFIG[key].description}
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
+          <div className="flex flex-col border-t border-background/10">
+            <div className="flex items-start gap-3 py-4 opacity-100">
+              <div className="h-7 w-7 rounded-md flex items-center justify-center shrink-0 mt-0.5 bg-primary/20">
+                <GraduationCap className="h-3.5 w-3.5 text-primary" />
+              </div>
+              <div>
+                <p className="text-xs font-bold capitalize mb-0.5 text-background">
+                  Applicant
+                </p>
+                <p className="text-xs text-background/40 leading-relaxed">
+                  Apply for scholarship funding and university placement.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -280,34 +206,11 @@ function SignupPageContent() {
               Create your account
             </p>
             <h1 className="text-xl font-bold tracking-tight">
-              {currentIntent ? CONFIG[currentIntent].title : "Get started"}
+              Continue as Applicant
             </h1>
-            {currentIntent && (
-              <p className="text-xs text-muted-foreground mt-1">
-                {CONFIG[currentIntent].subtitle}
-              </p>
-            )}
-          </div>
-
-          {/* Intent tabs */}
-          <div className="flex border border-border/50 rounded-lg overflow-hidden">
-            {(Object.keys(CONFIG) as AuthIntent[]).map((key) => {
-              const Icon = CONFIG[key].icon;
-              const isActive = currentIntent === key;
-              return (
-                <Link
-                  key={key}
-                  href={`/signup?intent=${key}`}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium transition-colors capitalize border-r last:border-r-0 border-border/50 ${isActive
-                    ? "bg-foreground text-background"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-                    }`}
-                >
-                  <Icon className="h-3.5 w-3.5 shrink-0" />
-                  {key}
-                </Link>
-              );
-            })}
+            <p className="text-xs text-muted-foreground mt-1">
+              Start your application for education support and national impact.
+            </p>
           </div>
 
           {/* Alerts */}
@@ -330,10 +233,9 @@ function SignupPageContent() {
           <form
             noValidate
             onSubmit={handleSubmit(onSubmit)}
-            className={`transition-opacity duration-200 ${!currentIntent ? "opacity-40" : "opacity-100"
-              }`}
+            className="transition-opacity duration-200 opacity-100"
           >
-            <fieldset disabled={!currentIntent || false} className="min-w-0 border-0 p-0 m-0">
+            <fieldset className="min-w-0 border-0 p-0 m-0">
               <FieldGroup className="">
                 {/* Name row */}
                 <div className="grid grid-cols-2 gap-3">
@@ -400,13 +302,9 @@ function SignupPageContent() {
                 <Button
                   type="submit"
                   className="w-full h-9 text-sm rounded-md gap-2"
-                  disabled={!currentIntent || isSubmitting}
+                  disabled={isSubmitting}
                 >
-                  {isSubmitting
-                    ? "Creating account..."
-                    : currentIntent
-                      ? CONFIG[currentIntent].cta
-                      : "Create Account"}
+                  {isSubmitting ? "Creating account..." : "Continue as Applicant"}
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               </FieldGroup>
@@ -418,7 +316,7 @@ function SignupPageContent() {
             <Shield className="h-3.5 w-3.5 shrink-0 mt-0.5 text-primary" />
             <p className="text-[11px] text-muted-foreground leading-relaxed">
               Your session is encrypted. By creating an account, you agree to
-              our data privacy terms for {currentIntent ?? "users"}.
+              our data privacy terms for applicants.
             </p>
           </div>
 

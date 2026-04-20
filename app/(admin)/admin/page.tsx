@@ -32,6 +32,11 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { resolveUserRoleForSession } from "@/lib/auth/roles";
 import { redirect } from "next/navigation";
 
+type AdminDashboardData = Awaited<ReturnType<typeof getAdminDashboardData>>;
+type AdminDashboardApplication = AdminDashboardData["applications"][number];
+type AdminDashboardCohort = AdminDashboardData["cohorts"][number];
+type AdminDashboardProgram = AdminDashboardData["programs"][number];
+
 const dashboardIcons = [
     Users,
     ClipboardList,
@@ -39,6 +44,14 @@ const dashboardIcons = [
     Flag,
     Banknote,
     BarChart3,
+];
+
+const dashboardChartColors = [
+    "var(--chart-1)",
+    "var(--chart-2)",
+    "var(--chart-3)",
+    "var(--chart-4)",
+    "var(--chart-5)",
 ];
 
 export default async function AdminDashboardPage() {
@@ -64,7 +77,10 @@ export default async function AdminDashboardPage() {
         programs,
     } = await getAdminDashboardData();
 
-    const totalCohortPopulation = cohorts.reduce((sum: number, cohort: any) => sum + (cohort.active_scholars_count || 0), 0);
+    const totalCohortPopulation = cohorts.reduce(
+        (sum: number, cohort: AdminDashboardCohort) => sum + (cohort.active_scholars_count || 0),
+        0
+    );
 
     const formatCurrency = (amount: number) => {
         if (amount >= 1e9) return `₦${(amount / 1e9).toFixed(2)}B`;
@@ -81,16 +97,16 @@ export default async function AdminDashboardPage() {
         { title: "Total Applications", value: (applicationCounts.total || 0).toLocaleString(), description: "Incoming and active records", trend: { value: 0, isPositive: true } },
     ];
 
-    const adminCohortDistribution = cohorts.map((c: any) => ({
+    const adminCohortDistribution = cohorts.map((c: AdminDashboardCohort, index: number) => ({
         label: `Cohort ${c.year}`,
         value: c.active_scholars_count || 0,
-        color: `hsl(var(--primary) / ${0.5 + Math.random() * 0.5})`
+        color: dashboardChartColors[index % dashboardChartColors.length],
     }));
 
-    const adminProgramPerformance = programs.slice(0, 5).map((p: any) => ({
+    const adminProgramPerformance = programs.slice(0, 5).map((p: AdminDashboardProgram) => ({
         label: p.name,
         value: p.completion_rate || 0,
-        color: "var(--primary)"
+        color: "var(--primary)",
     }));
 
     return (
@@ -117,7 +133,7 @@ export default async function AdminDashboardPage() {
                                             Operations healthy
                                         </span>
                                         <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">
-                                            {(cohorts[0] as any)?.year || "2026"} intake cycle
+                                            {cohorts[0]?.year || "2026"} intake cycle
                                         </span>
                                     </div>
                                     <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
@@ -236,7 +252,7 @@ export default async function AdminDashboardPage() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {applications.slice(0, 4).map((application: any) => {
+                                    {applications.slice(0, 4).map((application: AdminDashboardApplication) => {
                                         const firstName = typeof application.profiles?.first_name === "string"
                                             ? application.profiles.first_name.trim()
                                             : "";

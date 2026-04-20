@@ -7,6 +7,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Button, buttonVariants } from "../ui/button";
 import { ThemeToggle } from "./theme-toggle";
+import { navLinks } from "@/constants";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -49,30 +50,25 @@ export default function Navbar() {
     { dependencies: [open] }
   );
 
-  const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Apply", href: "/apply" },
-    { name: "Donate", href: "/donate" },
-    { name: "Transparency", href: "/transparency" },
-  ];
 
   return (
     <>
       <nav className="w-full border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50 px-4 sm:px-8">
         <div className="mx-auto flex items-center justify-between py-3 gap-4">
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
+            <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center shadow-sm shadow-primary/20">
               <span className="text-primary-foreground font-bold text-sm">
                 N
               </span>
             </div>
-            <span className="font-bold text-sm sm:inline-block tracking-tight">
-              National Talent Initiative
-            </span>
+            <div className="leading-none">
+              <span className="font-bold text-sm tracking-tight">NIDC</span>
+              <span className="hidden sm:block text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.2em]">
+                System Builders
+              </span>
+            </div>
           </Link>
 
-          {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
@@ -85,17 +81,15 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Desktop Right */}
           <div className="hidden md:flex items-center gap-6">
             <ThemeToggle />
             <Button asChild size="sm" className="rounded-md gap-2 text-sm">
               <Link href="/apply">
-                Apply Now
+                Join the First Cohort
               </Link>
             </Button>
           </div>
 
-          {/* Mobile Right */}
           <div className="flex md:hidden items-center gap-6">
             <ThemeToggle />
             <Button
@@ -125,7 +119,6 @@ export default function Navbar() {
         className="fixed top-0 right-0 h-full w-full bg-background border-l border-border/50 z-50 flex flex-col md:hidden"
         style={{ transform: "translateX(100%)" }}
       >
-        {/* Menu Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
           <Link
             href="/"
@@ -137,9 +130,12 @@ export default function Navbar() {
                 N
               </span>
             </div>
-            <span className="font-bold text-sm tracking-tight">
-              National Talent Initiative
-            </span>
+            <div className="leading-none">
+              <span className="font-bold text-sm tracking-tight">NIDC</span>
+              <span className="block text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.2em]">
+                System Builders
+              </span>
+            </div>
           </Link>
           <Button
             variant="ghost"
@@ -152,7 +148,6 @@ export default function Navbar() {
           </Button>
         </div>
 
-        {/* Menu Links */}
         <div className="flex flex-col px-4 py-6 gap-1 flex-1">
           {navLinks.map((link, i) => (
             <Link
@@ -169,11 +164,10 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Menu Footer CTA */}
         <div className="px-4 pb-8 pt-4 border-t border-border/50 flex flex-col gap-3">
           <Button asChild className="w-full rounded-md gap-2">
             <Link href="/apply" onClick={() => setOpen(false)}>
-              Apply for Scholarship
+              Join the First Cohort
               <ArrowRight className="w-4 h-4" />
             </Link>
           </Button>
@@ -184,7 +178,7 @@ export default function Navbar() {
               buttonVariants({ variant: "outline" }) + " w-full rounded-md"
             }
           >
-            Support a Student
+            Support the System
           </Link>
         </div>
       </div>

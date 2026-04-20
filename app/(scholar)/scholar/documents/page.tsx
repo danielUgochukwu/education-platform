@@ -1,12 +1,5 @@
 import { PageContainer } from "@/components/layout/page-container";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import {
   Table,
@@ -23,107 +16,88 @@ import { redirect } from "next/navigation";
 
 export default async function DocumentsPage() {
   const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
   const scholarDocuments = await getScholarDocuments(user.id);
+
+  const DocCard = ({
+    title,
+    icon: Icon,
+    type,
+  }: {
+    title: string;
+    icon: any;
+    type: string;
+  }) => {
+    const docs = scholarDocuments.filter(
+      (d: any) =>
+        d.type === type || (type === "Identity" && d.type === "Compliance")
+    );
+    return (
+      <div className="border border-border/50 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/50 bg-muted/20">
+          <p className="text-xs font-semibold">{title}</p>
+          <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+        </div>
+        <div className="p-4 space-y-2">
+          {docs.map((doc: any) => (
+            <div
+              key={doc.id}
+              className="flex items-center justify-between p-3 border border-border/50 rounded-lg bg-muted/20"
+            >
+              <div className="flex items-center gap-2.5">
+                <FileText className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span className="text-xs font-medium">{doc.name}</span>
+              </div>
+              <StatusBadge status={doc.status} />
+            </div>
+          ))}
+          {docs.length === 0 && (
+            <p className="text-xs text-muted-foreground italic py-2">
+              No {title.toLowerCase()} found.
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <PageContainer
       title="Documents & Compliance"
+      section="Scholar Portal"
       description="Manage your scholarship records, identity verification, and programme compliance documents."
       action={
-        <Button className="gap-2">
-          <Upload className="h-4 w-4" />
-          Upload Document
+        <Button size="sm" className="gap-2 rounded-md">
+          <Upload className="h-3.5 w-3.5" /> Upload Document
         </Button>
       }
     >
-      <div className="space-y-6">
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card className="border-border/60">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <div className="space-y-1.5">
-                <CardTitle className="text-base">Identity & Profile</CardTitle>
-                <CardDescription>
-                  Verified records for account standing.
-                </CardDescription>
-              </div>
-              <Shield className="h-5 w-5 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-3">
-                {scholarDocuments
-                  .filter((doc: any) => doc.type === "Identity" || doc.type === "Compliance")
-                  .map((doc: any) => (
-                    <div
-                      key={doc.id}
-                      className="flex items-center justify-between rounded-xl border bg-muted/20 p-3"
-                    >
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-medium">{doc.name}</span>
-                      </div>
-                      <StatusBadge status={doc.status} />
-                    </div>
-                  ))}
-                {scholarDocuments.filter((doc: any) => doc.type === "Identity" || doc.type === "Compliance").length === 0 && (
-                  <p className="text-sm text-muted-foreground italic">No identity documents found.</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/60">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <div className="space-y-1.5">
-                <CardTitle className="text-base">Academic Records</CardTitle>
-                <CardDescription>Official transcripts and enrollment proofs.</CardDescription>
-              </div>
-              <FileText className="h-5 w-5 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-3">
-                {scholarDocuments
-                  .filter((doc: any) => doc.type === "Academic")
-                  .map((doc: any) => (
-                    <div
-                      key={doc.id}
-                      className="flex items-center justify-between rounded-xl border bg-muted/20 p-3"
-                    >
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-medium">{doc.name}</span>
-                      </div>
-                      <StatusBadge status={doc.status} />
-                    </div>
-                  ))}
-                {scholarDocuments.filter((doc: any) => doc.type === "Academic").length === 0 && (
-                  <p className="text-sm text-muted-foreground italic">No academic records found.</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+      <div className="space-y-5">
+        <div className="grid gap-5 md:grid-cols-2">
+          <DocCard title="Identity & Profile" icon={Shield} type="Identity" />
+          <DocCard title="Academic Records" icon={FileText} type="Academic" />
         </div>
 
-        <Card className="border-border/60">
-          <CardHeader>
-            <CardTitle>Document Ledger</CardTitle>
-            <CardDescription>
+        {/* Ledger */}
+        <div className="border border-border/50 rounded-xl overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-border/50 bg-muted/20">
+            <p className="text-xs font-semibold">Document Ledger</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
               Full register of all uploaded files and verification status.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+            </p>
+          </div>
+          <div className="p-0">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Document Name</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead>Updated On</TableHead>
-                  <TableHead>Expires On</TableHead>
+                  <TableHead>Updated</TableHead>
+                  <TableHead>Expires</TableHead>
                   <TableHead>Owner</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -131,11 +105,19 @@ export default async function DocumentsPage() {
               <TableBody>
                 {scholarDocuments.map((doc: any) => (
                   <TableRow key={doc.id}>
-                    <TableCell className="font-medium">{doc.name}</TableCell>
-                    <TableCell>{doc.type}</TableCell>
-                    <TableCell>{new Date(doc.updated_on).toLocaleDateString()}</TableCell>
-                    <TableCell>{doc.expires_on ? new Date(doc.expires_on).toLocaleDateString() : "—"}</TableCell>
-                    <TableCell>{doc.owner}</TableCell>
+                    <TableCell className="font-medium text-sm">
+                      {doc.name}
+                    </TableCell>
+                    <TableCell className="text-sm">{doc.type}</TableCell>
+                    <TableCell className="text-sm">
+                      {new Date(doc.updated_on).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {doc.expires_on
+                        ? new Date(doc.expires_on).toLocaleDateString()
+                        : "—"}
+                    </TableCell>
+                    <TableCell className="text-sm">{doc.owner}</TableCell>
                     <TableCell>
                       <StatusBadge status={doc.status} />
                     </TableCell>
@@ -143,15 +125,18 @@ export default async function DocumentsPage() {
                 ))}
                 {scholarDocuments.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-6 text-muted-foreground text-sm">
+                    <TableCell
+                      colSpan={6}
+                      className="text-center py-8 text-xs text-muted-foreground"
+                    >
                       No documents recorded in the ledger.
                     </TableCell>
                   </TableRow>
                 )}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </PageContainer>
   );

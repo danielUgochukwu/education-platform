@@ -1,500 +1,375 @@
 import Link from "next/link";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { ArrowRight, BookOpen, Briefcase, Building2, Cog, Factory, Monitor, ShieldCheck, Target, Users, Zap } from "lucide-react";
 import { SectionWrapper } from "@/components/sections/section-wrapper";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  ArrowRight,
-  BookOpen,
-  GraduationCap,
-  Building2,
-  Users,
-  Target,
-  CheckCircle2,
-  Globe,
-  TrendingUp,
-  Zap,
-  HeartPulse,
-  Leaf,
-  Cog,
-  Calendar,
-  Briefcase,
-} from "lucide-react";
-import { getPublicHomeData } from "@/lib/supabase/actions";
-import Hero from "@/components/sections/hero";
-import { cn } from "@/lib/utils";
+import { CTABlock } from "@/components/sections/cta-block";
+import { Button } from "@/components/ui/button";
 
-export default async function HomePage() {
-  const { impactMetrics, news, partners } = await getPublicHomeData();
+const systemSteps = [
+  {
+    label: "Step 1",
+    title: "Selection",
+    description:
+      "We identify a limited number of individuals who demonstrate seriousness, discipline, and willingness to grow.",
+    icon: Target,
+  },
+  {
+    label: "Step 2",
+    title: "Development",
+    description:
+      "Participants go through a structured process focused on building real skills, direction, and accountability.",
+    icon: BookOpen,
+  },
+  {
+    label: "Step 3",
+    title: "Growth & Opportunities",
+    description:
+      "As individuals develop, they gain access to aligned opportunities, including learning pathways, exposure, and support.",
+    icon: Briefcase,
+  },
+  {
+    label: "Step 4",
+    title: "Contribution",
+    description:
+      "Participants apply their capabilities within real systems, supporting projects, others, and a growing network.",
+    icon: Building2,
+  },
+];
 
-  const impactNumbers =
-    impactMetrics.length > 0
-      ? impactMetrics.map((m) => ({
-        value: m.value + (m.unit || ""),
-        label: m.label,
-        sub: m.description || "",
-      }))
-      : [
-        {
-          value: "36",
-          label: "States Covered",
-          sub: "Across the federation",
-        },
-        { value: "100%", label: "Transparency", sub: "Fully verifiable" },
-      ];
+const hubAreas = [
+  {
+    title: "Energy Systems",
+    description:
+      "Focused on the development and deployment of scalable energy solutions.",
+    icon: Zap,
+  },
+  {
+    title: "Manufacturing & Industrial Systems",
+    description:
+      "Environments where ideas translate into physical output through applied engineering and production.",
+    icon: Factory,
+  },
+  {
+    title: "Digital Infrastructure",
+    description:
+      "Systems that enable coordination, data, and technology development across the ecosystem.",
+    icon: Monitor,
+  },
+  {
+    title: "Advanced Materials",
+    description:
+      "Exploratory environments focused on next-generation industrial capabilities.",
+    icon: Cog,
+  },
+];
 
-  const focusAreas = [
-    {
-      title: "Clean Energy",
-      icon: Zap,
-      desc: "Powering Nigeria's industrial future with sustainable solar and grid innovations.",
-    },
-    {
-      title: "Public Health",
-      icon: HeartPulse,
-      desc: "Building resilient health systems through bio-medical engineering and data.",
-    },
-    {
-      title: "Agriculture",
-      icon: Leaf,
-      desc: "Scaling food security with climate-smart tech and supply chain optimizations.",
-    },
-    {
-      title: "Manufacturing",
-      icon: Cog,
-      desc: "Driving the next era of local production and advanced robotics.",
-    },
-  ];
+const focusAreas = [
+  "Industrialization",
+  "Digitalization",
+  "Energy Reform",
+  "Security Systems",
+];
 
-  const spotlightScholars = [
-    {
-      name: "Amara Okafor",
-      state: "Anambra",
-      discipline: "Data Science for Public Systems",
-      quote:
-        "The Initiative gave me the infrastructure to compete globally, while keeping my roots firmly Nigerian.",
-    },
-    {
-      name: "Chukwuemeka Okoro",
-      state: "Enugu",
-      discipline: "Bio-Medical Engineering",
-      quote:
-        "From a public secondary school in Enugu to the National Health Institute — this program builds bridges others don't even see.",
-    },
-    {
-      name: "Zainab Yusuf",
-      state: "Kaduna",
-      discipline: "Cybersecurity & Digital Trust",
-      quote:
-        "I applied not knowing if I stood a chance. The selection process was the most rigorous and fair process I have ever experienced.",
-    },
-  ];
-
+export default function HomePage() {
   return (
     <div className="flex flex-col w-full">
-      <Hero />
+      <section className="relative overflow-hidden border-b nidc-hero-backdrop">
+        <div className="absolute inset-0 nidc-grid opacity-45" />
+        <div className="container mx-auto px-4 py-18 md:py-24 relative">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="space-y-7">
+              <p className="nidc-eyebrow">
+                <span className="h-px w-8 bg-primary/70" />
+                Building Real Capability
+              </p>
+              <div className="space-y-5 max-w-3xl">
+                <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+                  Building Nigeria&apos;s Next Generation of System Builders
+                </h1>
+                <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
+                  A structured system for identifying, developing, and deploying individuals committed to building real systems across engineering, technology, and infrastructure.
+                </p>
+                <p className="max-w-xl text-base leading-relaxed text-foreground/80">
+                  This goes beyond scholarships. It is a long-term system for building real capability and real-world impact.
+                </p>
+              </div>
 
-      {/* ── Mission Statement ──────────────────────────────────────────── */}
-      <SectionWrapper className="bg-background border-b border-border/50">
-        <div className="grid md:grid-cols-2 gap-16 items-start">
-          {/* Left: Mission Text */}
-          <div className="space-y-6">
-            <p className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-3">
-              <span className="inline-block w-7 h-px bg-primary" />
-              Our Mission
-            </p>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button asChild size="lg" className="h-12 px-7">
+                  <Link href="/apply">
+                    Join the First Cohort
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="h-12 px-7">
+                  <Link href="/how-it-works">Learn How It Works</Link>
+                </Button>
+              </div>
 
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-snug">
-              Every exceptional Nigerian student deserves access to world-class
-              education —{" "}
-              <span className="text-muted-foreground font-medium">
-                regardless of where they were born.
-              </span>
-            </h2>
-
-            <p className="text-base text-muted-foreground leading-relaxed">
-              We systematically identify and support the nation&apos;s brightest
-              minds across all 36 states, providing full scholarships,
-              mentorship, and guaranteed career pathways in critical national
-              sectors.
-            </p>
-
-            <ul className="divide-y divide-border/50 border-y border-border/50">
-              {[
-                "Merit-based selection across all 36 states + FCT",
-                "Full scholarships — tuition, housing, and monthly stipend",
-                "Guaranteed post-graduation career deployment",
-                "Continuous leadership and national impact training",
-              ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3 py-3">
-                  <span className="mt-1.5 h-1.5 w-1.5 rounded-sm bg-primary shrink-0" />
-                  <span className="text-sm font-medium text-foreground leading-relaxed">
+              <div className="grid gap-3 sm:grid-cols-3 max-w-3xl">
+                {[
+                  "Structured development path",
+                  "Aligned opportunities over time",
+                  "Contribution tied to real systems",
+                ].map((item) => (
+                  <div key={item} className="nidc-surface px-4 py-4 text-sm font-medium text-foreground/85">
                     {item}
-                  </span>
-                </li>
-              ))}
-            </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-            <Link href="/about" className={buttonVariants({ variant: "secondary" })}>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+              <div className="nidc-surface p-6 sm:col-span-2 lg:col-span-1">
+                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">
+                  Core Premise
+                </p>
+                <p className="mt-3 text-2xl font-semibold leading-snug tracking-tight">
+                  Potential becomes valuable only when it is developed, directed, and applied.
+                </p>
+              </div>
+              <div className="nidc-surface-muted p-5">
+                <Users className="h-5 w-5 text-primary mb-3" />
+                <h2 className="text-sm font-semibold">Selective by design</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  A limited cohort built around seriousness, discipline, and long-term commitment.
+                </p>
+              </div>
+              <div className="nidc-surface-muted p-5">
+                <ShieldCheck className="h-5 w-5 text-primary mb-3" />
+                <h2 className="text-sm font-semibold">Built for continuity</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  Structured with governance, accountability, and measurable long-term outcomes in mind.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              Read Our Full Mission <ArrowRight className="ml-2 h-4 w-4" />
-
-            </Link>
+      <SectionWrapper
+        className="border-b bg-background"
+        title="The Problem"
+        description="Nigeria has talent. But no system."
+      >
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+          <div className="space-y-5 text-base leading-8 text-muted-foreground">
+            <p>
+              Across the country, capable individuals emerge every year, yet many are unable to translate their ability into meaningful contribution.
+            </p>
+            <p>
+              Not because they lack potential, but because there is no clear structure connecting talent to real-world systems.
+            </p>
+            <p className="text-foreground font-medium">
+              Talent is scattered. Opportunity is disconnected.
+            </p>
+            <p>
+              The result is a country rich in potential, yet limited in coordinated capacity and output.
+            </p>
           </div>
 
-          {/* Right: Stats — editorial typographic grid */}
-          <div className="grid grid-cols-2 divide-x divide-border/50">
-            {impactNumbers.slice(0, 4).map((stat, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "px-6 py-8 border-t-2 border-primary",
-                  i < 2 ? "border-b border-border/50" : "",
-                  i % 2 === 0 ? "pl-0" : "",
-                  i % 2 === 1 ? "pr-0" : ""
-                )}
-              >
-                <div className="text-5xl md:text-6xl font-bold tracking-tight text-foreground leading-none mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-sm font-semibold text-foreground mb-1">
-                  {stat.label}
-                </div>
-                <div className="text-xs text-muted-foreground">{stat.sub}</div>
+          <div className="grid gap-4">
+            {[
+              {
+                title: "Talent is emerging",
+                body: "Capable individuals continue to surface across the country every year.",
+              },
+              {
+                title: "The bridge is missing",
+                body: "Development, opportunity, and contribution remain disconnected from one another.",
+              },
+              {
+                title: "National capacity suffers",
+                body: "Potential remains underdeveloped instead of strengthening real systems at scale.",
+              },
+            ].map((item) => (
+              <div key={item.title} className="nidc-surface p-5">
+                <p className="text-sm font-semibold">{item.title}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </SectionWrapper>
 
-      {/* ── National Problem Overview ──────────────────────────────────── */}
       <SectionWrapper
-        className="bg-muted/30"
-        title="The Challenge We Are Solving"
-        description="Nigeria is home to an abundance of raw talent that lacks the infrastructure to thrive globally. The costs of inaction are compounding."
+        className="border-b bg-muted/30"
+        title="The Solution"
+        description="A system for turning potential into capability."
       >
-        <div className="mt-8 border border-border/50 rounded-xl overflow-hidden grid sm:grid-cols-2 lg:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border/50">
-          {[
-            {
-              icon: Users,
-              title: "The Access Gap",
-              step: "01",
-              desc: "Over 1.9 million qualified students are unable to access tertiary education annually due to financial constraints, independent of academic excellence.",
-            },
-            {
-              icon: TrendingUp,
-              title: "Economic Leakage",
-              step: "02",
-              desc: "Without structured talent pipelines, Nigeria loses billions annually to brain drain — top talent educated abroad who do not return to drive national growth.",
-            },
-            {
-              icon: Building2,
-              title: "Institutional Deficit",
-              step: "03",
-              desc: "Top-tier organisations face sustained challenges sourcing globally competitive local talent, slowing innovation and national productivity growth.",
-            },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="p-7 hover:bg-background transition-colors group"
-            >
-              <div className="flex items-center justify-between mb-5">
-                <item.icon className="h-5 w-5 text-primary" />
-                <span className="text-xs text-muted-foreground font-bold tabular-nums">
-                  {item.step}
-                </span>
-              </div>
-              <h3 className="text-base font-bold mb-2">{item.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {item.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      </SectionWrapper>
-
-      {/* ── How the Initiative Works ───────────────────────────────────── */}
-      <SectionWrapper
-        title="How The Initiative Works"
-        description="A structured four-phase ecosystem designed to systematically elevate and deploy national talent."
-        className="bg-background"
-      >
-        <div className="mt-8 grid md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-border/50 border-t border-border/50">
-          {[
-            {
-              step: "01",
-              title: "Identify",
-              icon: Target,
-              desc: "Rigorous nationwide assessments designed to surface exceptional talent regardless of economic background.",
-            },
-            {
-              step: "02",
-              title: "Fund",
-              icon: Globe,
-              desc: "Comprehensive financial support via transparent endowments — tuition, housing, and monthly stipends, fully covered.",
-            },
-            {
-              step: "03",
-              title: "Nurture",
-              icon: GraduationCap,
-              desc: "World-class education complemented with intensive mentorship, leadership development, and policy training.",
-            },
-            {
-              step: "04",
-              title: "Deploy",
-              icon: Briefcase,
-              desc: "Strategic placement into key national economic sectors to drive immediate, measurable impact.",
-            },
-          ].map((item, i) => (
-            <div key={i} className="pt-7 pb-4 md:pr-6 last:pr-0 group">
-              <div className="flex items-start justify-between mb-5">
-                <item.icon className="h-5 w-5 text-primary mt-0.5" />
-                <span className="text-4xl text-muted-foreground font-bold tabular-nums leading-none tracking-tight group-hover:text-primary/15 transition-colors">
-                  {item.step}
-                </span>
-              </div>
-              <h3 className="text-base font-bold mb-2">{item.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {item.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-10 text-center">
-          <Link href="/how-it-works">
-            <Button variant="outline" size="lg">
-              Read Full Process Details
-            </Button>
-          </Link>
-        </div>
-      </SectionWrapper>
-
-      {/* ── Focus Areas ────────────────────────────────────────────────── */}
-      <SectionWrapper
-        className="bg-foreground text-background"
-        title="Strategic Focus Areas"
-        description="Our educational pathways are directly mapped to Nigeria's most critical national development needs."
-      >
-        <div className="mt-8 border border-background/10 rounded-xl overflow-hidden grid sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-background/10">
-          {focusAreas.map((item, i) => (
-            <div
-              key={i}
-              className="p-6 hover:bg-background/5 transition-colors"
-            >
-              <item.icon className="h-5 w-5 mb-4 text-primary" />{" "}
-              {/* ← primary green on dark = great contrast */}
-              <h3 className="text-sm font-bold mb-2">{item.title}</h3>
-              <p className="text-xs text-background leading-relaxed">
-                {item.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-10 text-center">
-          <Link href="/programs">
-            <Button variant="secondary" size="lg">
-              Explore All Programs
-            </Button>
-          </Link>
-        </div>
-      </SectionWrapper>
-
-      {/* ── Impact Metrics ─────────────────────────────────────────────── */}
-      <SectionWrapper className="bg-background" title="Our Verifiable Impact">
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 divide-x divide-border/50 border-y border-border/50">
-          {impactNumbers.map((metric, i) => (
-            <div key={i} className="px-6 py-8 border-t-2 border-primary">
-              <div className="text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-none mb-2">
-                {metric.value}
-              </div>
-              <div className="text-sm font-semibold mb-1">{metric.label}</div>
-              <div className="text-xs text-muted-foreground">{metric.sub}</div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-10 text-center">
-          <Link href="/impact">
-            <Button variant="outline" size="lg">
-              View Full Transparency Dashboard
-            </Button>
-          </Link>
-        </div>
-      </SectionWrapper>
-
-      {/* ── Scholar Spotlights ─────────────────────────────────────────── */}
-      <SectionWrapper
-        className="bg-muted/20 border-t"
-        title="Scholar Stories"
-        description="Real scholars. Real outcomes. Real national impact."
-      >
-        <div className="grid md:grid-cols-3 gap-6 mt-8">
-          {spotlightScholars.map((scholar, i) => (
-            <Card key={i} className="border-border/50 flex flex-col">
-              <CardContent className="pt-8 flex-1 space-y-4">
-                <div className="text-4xl text-muted-foreground/20 font-black leading-none">
-                  "
-                </div>
-                <p className="text-base text-foreground/90 leading-relaxed italic">
-                  {scholar.quote}
-                </p>
-              </CardContent>
-              <CardContent className="pb-6 pt-0">
-                <div className="flex items-center gap-3 mt-4 pt-4 border-t">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
-                    {scholar.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm">{scholar.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {scholar.discipline} · {scholar.state} State
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <div className="mt-10 text-center">
-          <Link href="/scholars">
-            <Button variant="outline" size="lg">
-              View All Scholars
-            </Button>
-          </Link>
-        </div>
-      </SectionWrapper>
-
-      {/* ── Partner Institutions ───────────────────────────────────────── */}
-      <SectionWrapper
-        className="bg-background border-t"
-        title="Institutional Partners"
-        description="Our programs are backed by leading universities, government agencies, and Nigeria's most impactful corporations."
-      >
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-8">
-          {partners.length > 0 ? (
-            partners.map((partner) => (
-              <div
-                key={partner.id}
-                className="flex flex-col items-center justify-center text-center p-4 rounded-xl border border-border/50 hover:border-primary/40 transition-colors min-h-[90px]"
-              >
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center mb-2">
-                  <Building2 className="h-4 w-4 text-primary" />
-                </div>
-                <p className="text-xs font-medium leading-tight">
-                  {partner.first_name} {partner.last_name}
-                </p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">
-                  {partner.role}
-                </p>
-              </div>
-            ))
-          ) : (
-            <p className="col-span-full text-center text-sm text-muted-foreground py-8">
-              No partners listed yet.
+        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="nidc-surface p-6 md:p-8">
+            <p className="text-lg leading-8 text-muted-foreground">
+              NIDC is designed as a long-term system for developing and deploying talent into areas that matter.
             </p>
-          )}
-        </div>
-        <div className="mt-10 text-center">
-          <Link href="/partners">
-            <Button variant="outline" size="lg">
-              View All Partners
-            </Button>
-          </Link>
-        </div>
-      </SectionWrapper>
-
-      {/* ── Latest Updates ─────────────────────────────────────────────── */}
-      <SectionWrapper
-        className="bg-muted/20 border-t"
-        title="Latest News & Updates"
-        action={
-          <Link href="/news">
-            <Button variant="ghost" className="text-primary">
-              View All <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
-          </Link>
-        }
-      >
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          {news.map((article) => (
-            <Card
-              key={article.id}
-              className="border-border/50 hover:border-primary/40 transition-colors overflow-hidden flex flex-col"
-            >
-              <div className="aspect-video bg-muted/50 relative flex items-center justify-center">
-                <div className="text-muted-foreground/15 text-8xl font-black">
-                  {article.priority[0]}
-                </div>
-                <Badge
-                  variant="secondary"
-                  className="absolute top-3 left-3 text-xs"
-                >
-                  {article.priority} Priority
-                </Badge>
-              </div>
-              <CardContent className="pt-4 flex-1 flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Calendar className="h-3 w-3" />
-                  {new Date(article.created_at).toLocaleDateString()}
-                </div>
-                <h3 className="font-bold text-sm leading-snug line-clamp-2">
-                  {article.title}
-                </h3>
-                <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed flex-1">
-                  {article.summary}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-          {news.length === 0 && (
-            <p className="col-span-full text-center text-sm text-muted-foreground py-8">
-              No news updates yet.
+            <p className="mt-4 text-lg leading-8 text-muted-foreground">
+              We do not simply provide access or support. We build a structured pathway that connects growth to real-world contribution.
             </p>
-          )}
-        </div>
-      </SectionWrapper>
+            <p className="mt-4 text-lg font-medium leading-8 text-foreground">
+              This is not about participation. It is about becoming capable, and applying that capability where it creates impact.
+            </p>
+          </div>
 
-      {/* ── Call to Apply ──────────────────────────────────────────────── */}
-      <section className="py-24 bg-primary text-primary-foreground relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[80%] rounded-full bg-white blur-[100px]" />
-        </div>
-        <div className="container mx-auto px-4 text-center max-w-3xl relative z-10 space-y-6">
-          <Badge className="bg-primary-foreground/20 text-primary-foreground border-none hover:bg-primary-foreground/20">
-            Applications Close April 30, 2026
-          </Badge>
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-            Are you the next NTDI Scholar?
-          </h2>
-          <p className="text-xl text-primary-foreground/80 leading-relaxed">
-            Selection is entirely merit-based. Academic excellence + national
-            commitment + character = your candidacy. The nation is watching for
-            its next leaders.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 pt-2">
-            <Link href="/apply">
-              <Button
-                size="lg"
-                variant="secondary"
-                className="h-14 px-10 text-lg font-semibold"
-              >
-                Begin Application
-              </Button>
-            </Link>
-            <Link href="/programs">
-              <Button
-                size="lg"
-                variant="outline"
-                className="h-14 px-10 text-lg border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
-              >
-                Review Eligibility
-              </Button>
-            </Link>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              {
+                icon: Target,
+                title: "Structured growth",
+                body: "Development is intentional, tracked, and tied to clear standards.",
+              },
+              {
+                icon: BookOpen,
+                title: "Capability first",
+                body: "The focus is on building people who can do real work, not just complete a program.",
+              },
+              {
+                icon: Briefcase,
+                title: "Aligned opportunities",
+                body: "Growth opens access to learning pathways, exposure, and support that fit the system.",
+              },
+              {
+                icon: Building2,
+                title: "Real-world contribution",
+                body: "Participants are positioned to apply what they build within functioning systems.",
+              },
+            ].map((item) => (
+              <div key={item.title} className="nidc-surface-muted p-5">
+                <item.icon className="h-5 w-5 text-primary mb-3" />
+                <h3 className="text-base font-semibold">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
+      </SectionWrapper>
+
+      <SectionWrapper
+        className="border-b bg-background"
+        title="How the System Works"
+        description="This is a system designed to connect individual growth to real-world impact."
+      >
+        <div className="grid gap-5 lg:grid-cols-4">
+          {systemSteps.map((step) => (
+            <div key={step.title} className="nidc-surface p-6">
+              <div className="flex items-start justify-between gap-4">
+                <step.icon className="h-5 w-5 text-primary" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-muted-foreground">
+                  {step.label}
+                </span>
+              </div>
+              <h3 className="mt-6 text-lg font-semibold">{step.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                {step.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </SectionWrapper>
+
+      <SectionWrapper
+        className="border-b bg-muted/30"
+        title="From Talent to Real-World Systems"
+        description="NIDC operates as an interconnected system where talent is not only developed, but supported, integrated, and deployed into environments where real work happens."
+      >
+        <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="space-y-5">
+            <div className="nidc-surface p-6">
+              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">
+                Applied Development Hubs
+              </p>
+              <p className="mt-4 text-base leading-8 text-muted-foreground">
+                We are building structured environments that bridge the gap between learning and real-world contribution.
+              </p>
+              <p className="mt-4 text-base leading-8 text-muted-foreground">
+                Each hub enables individuals to move beyond theory and engage directly with systems that drive development.
+              </p>
+            </div>
+            <div className="nidc-surface-muted p-6">
+              <p className="text-sm leading-7 text-foreground/85">
+                These hubs operate as part of a coordinated system where talent, infrastructure, and real-world challenges intersect.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {hubAreas.map((hub) => (
+              <div key={hub.title} className="nidc-surface p-5">
+                <hub.icon className="h-5 w-5 text-primary mb-4" />
+                <h3 className="text-base font-semibold">{hub.title}</h3>
+                <p className="mt-2 text-sm leading-7 text-muted-foreground">
+                  {hub.description}
+                </p>
+                {hub.title === "Advanced Materials" ? (
+                  <p className="mt-3 text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">
+                    Future Expansion
+                  </p>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </div>
+      </SectionWrapper>
+
+      <SectionWrapper
+        className="border-b bg-foreground text-background"
+        title="Strategic Focus Areas"
+        description="The system is oriented toward the sectors where coordinated capability can create long-term national impact."
+      >
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {focusAreas.map((area) => (
+            <div key={area} className="rounded-[calc(var(--radius)+0.35rem)] border border-background/10 bg-background/5 p-6">
+              <div className="mb-4 h-12 w-12 rounded-2xl bg-primary/20 flex items-center justify-center">
+                <ArrowRight className="h-5 w-5 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold">{area}</h3>
+            </div>
+          ))}
+        </div>
+      </SectionWrapper>
+
+      <SectionWrapper
+        className="border-b bg-background"
+        title="Why It Matters"
+        description="Building the people who will build Nigeria."
+      >
+        <div className="grid gap-5 lg:grid-cols-2">
+          <div className="nidc-surface p-6 md:p-8">
+            <p className="text-base leading-8 text-muted-foreground">
+              Long-term development requires more than resources. It requires coordinated human capacity.
+            </p>
+            <p className="mt-4 text-base leading-8 text-muted-foreground">
+              This system exists to ensure that individuals are not just trained, but positioned where their skills can create real impact.
+            </p>
+            <p className="mt-4 text-base font-medium leading-8 text-foreground">
+              The goal is not just personal success, but meaningful contribution at scale.
+            </p>
+          </div>
+
+          <div className="nidc-surface-muted p-6 md:p-8">
+            <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">
+              Built for Transparency and Long-Term Impact
+            </p>
+            <p className="mt-4 text-base leading-8 text-muted-foreground">
+              NIDC is being established as a Company Limited by Guarantee, ensuring strong governance, accountability, and sustainability.
+            </p>
+            <p className="mt-4 text-base leading-8 text-muted-foreground">
+              The system is designed to operate with clarity, measurable outcomes, and long-term institutional integrity.
+            </p>
+          </div>
+        </div>
+      </SectionWrapper>
+
+      <CTABlock
+        title="Be Part of What We're Building"
+        description="If you are serious about developing yourself and contributing to something meaningful, there is a place for you in this system."
+        primaryActionLabel="Join the First Cohort"
+        primaryActionHref="/apply"
+        secondaryActionLabel="Learn How It Works"
+        secondaryActionHref="/how-it-works"
+      />
     </div>
   );
 }

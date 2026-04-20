@@ -186,6 +186,34 @@
   }
 }
 
+@layer components {
+  .nidc-hero-backdrop {
+    background-image:
+      radial-gradient(circle at top left, color-mix(in oklab, var(--color-primary) 18%, transparent), transparent 32%),
+      radial-gradient(circle at bottom right, color-mix(in oklab, var(--color-secondary) 28%, transparent), transparent 28%),
+      linear-gradient(180deg, color-mix(in oklab, var(--color-background) 92%, var(--color-primary) 8%) 0%, var(--color-background) 100%);
+  }
+
+  .nidc-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px);
+    background-size: 42px 42px;
+  }
+
+  .nidc-surface {
+    @apply rounded-[calc(var(--radius)+0.5rem)] border border-border/60 bg-background/80 shadow-sm backdrop-blur-sm;
+  }
+
+  .nidc-surface-muted {
+    @apply rounded-[calc(var(--radius)+0.5rem)] border border-border/60 bg-muted/60 shadow-sm;
+  }
+
+  .nidc-eyebrow {
+    @apply inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground;
+  }
+}
+
 @utility flex-center {
   @apply flex items-center justify-center;
 }

@@ -1,8 +1,5 @@
-import { MetricCard } from "@/components/cards/metric-card";
 import { PageContainer } from "@/components/layout/page-container";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/ui/status-badge";
 import {
@@ -13,115 +10,152 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Banknote, Briefcase, Landmark, Wallet } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getScholarDashboardData } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 
 const fundingBreakdownArr = [
-  { label: "Tuition & academic fees", note: "Covers core fees, lab access, and project supervision.", allocated: "₦2.9M", used: "₦2.2M", utilisation: 76 },
-  { label: "Living stipend", note: "Monthly stipends are on schedule with one pending cycle.", allocated: "₦1.1M", used: "₦800k", utilisation: 73 },
-  { label: "Research support", note: "Includes dataset access and field transport.", allocated: "₦500k", used: "₦280k", utilisation: 56 },
+  {
+    label: "Tuition & academic fees",
+    note: "Covers core fees, lab access, and project supervision.",
+    allocated: "₦2.9M",
+    used: "₦2.2M",
+    utilisation: 76,
+  },
+  {
+    label: "Living stipend",
+    note: "Monthly stipends are on schedule with one pending cycle.",
+    allocated: "₦1.1M",
+    used: "₦800k",
+    utilisation: 73,
+  },
+  {
+    label: "Research support",
+    note: "Includes dataset access and field transport.",
+    allocated: "₦500k",
+    used: "₦280k",
+    utilisation: 56,
+  },
 ];
 
 export default async function FundingOverviewPage() {
   const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
   const {
-    profile,
-    fundingRecords
-  } = await getScholarDashboardData(user.id);
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { profile, fundingRecords } = await getScholarDashboardData(user.id);
+
+  const fmt = (n: number) =>
+    new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      maximumFractionDigits: 0,
+    }).format(n);
+  const totalApproved = profile?.approved_funding || 4800000;
+  const totalDisbursed = fundingRecords.reduce(
+    (acc: number, r: any) =>
+      acc + (r.status === "completed" ? Number(r.amount) : 0),
+    0
+  );
+  const nextStipend =
+    fundingRecords.find((r: any) => r.status === "pending")?.amount || 350000;
 
   const ledger = fundingRecords.map((r: any) => ({
     id: r.id,
-    date: new Date(r.disbursement_date || r.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }),
+    date: new Date(r.disbursement_date || r.created_at).toLocaleDateString(
+      "en-US",
+      { year: "numeric", month: "long", day: "numeric" }
+    ),
     category: r.category,
-    amount: new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(r.amount),
+    amount: fmt(r.amount),
     reference: r.reference_number || `REF-${r.id.slice(0, 8)}`,
-    status: r.status
+    status: r.status,
   }));
 
-  const totalApproved = profile?.approved_funding || 4800000;
-  const totalDisbursed = fundingRecords.reduce((acc: number, curr: any) => acc + (curr.status === 'completed' ? Number(curr.amount) : 0), 0);
-  const nextStipend = fundingRecords.find((r: any) => r.status === 'pending')?.amount || 350000;
-
-  const formattedApproved = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(totalApproved);
-  const formattedDisbursed = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(totalDisbursed);
-  const formattedNext = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(nextStipend);
+  const metrics = [
+    {
+      label: "Approved Support",
+      value: fmt(totalApproved),
+      sub: "Full scholarship commitment",
+    },
+    { label: "Disbursed", value: fmt(totalDisbursed), sub: "Released to date" },
+    {
+      label: "Next Stipend",
+      value: fmt(nextStipend),
+      sub: nextStipend > 0 ? "Upcoming release" : "No pending stipends",
+    },
+  ];
 
   return (
     <PageContainer
       title="Funding Overview"
+      section="Scholar Portal"
       description="See scholarship disbursements, support categories, and the current funding runway."
-      action={<Button>Download Funding Statement</Button>}
+      action={
+        <Button size="sm" className="rounded-md">
+          Download Funding Statement
+        </Button>
+      }
     >
-      <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <MetricCard
-            title="Approved Support"
-            value={formattedApproved}
-            description="Full scholarship commitment"
-            icon={Landmark}
-          />
-          <MetricCard
-            title="Disbursed"
-            value={formattedDisbursed}
-            description="Released to date"
-            icon={Banknote}
-          />
-          <MetricCard
-            title="Next Stipend"
-            value={formattedNext}
-            description={nextStipend > 0 ? "Upcoming release" : "No pending stipends"}
-            icon={Wallet}
-          />
+      <div className="space-y-5">
+        {/* Metric row */}
+        <div className="grid md:grid-cols-3 border border-border/50 rounded-xl overflow-hidden divide-x divide-border/50">
+          {metrics.map((m, i) => (
+            <div key={i} className="border-t-2 border-foreground px-5 py-5">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5">
+                {m.label}
+              </p>
+              <p className="text-2xl font-semibold tracking-tight leading-none mb-1">
+                {m.value}
+              </p>
+              <p className="text-[11px] text-muted-foreground">{m.sub}</p>
+            </div>
+          ))}
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
-          <Card className="border-border/60">
-            <CardHeader>
-              <CardTitle>Funding Breakdown</CardTitle>
-              <CardDescription>
-                How approved support is allocated across the scholar
-                experience.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-5">
+        <div className="grid gap-5 xl:grid-cols-2">
+          {/* Funding Breakdown */}
+          <div className="border border-border/50 rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-border/50 bg-muted/20">
+              <p className="text-xs font-semibold">Funding Breakdown</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                How approved support is allocated across the scholar experience.
+              </p>
+            </div>
+            <div className="p-5 space-y-5">
               {fundingBreakdownArr.map((line) => (
                 <div key={line.label} className="space-y-2">
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="font-medium">{line.label}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs font-medium">{line.label}</p>
+                      <p className="text-[11px] text-muted-foreground">
                         {line.note}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold">{line.used}</p>
-                      <p className="text-xs text-muted-foreground">
+                    <div className="text-right shrink-0">
+                      <p className="text-xs font-semibold">{line.used}</p>
+                      <p className="text-[11px] text-muted-foreground">
                         of {line.allocated}
                       </p>
                     </div>
                   </div>
-                  <Progress value={line.utilisation} className="h-2" />
+                  <Progress value={line.utilisation} className="h-1.5" />
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="border-border/60">
-            <CardHeader>
-              <CardTitle>Funding Health</CardTitle>
-              <CardDescription>
+          {/* Funding Health */}
+          <div className="border border-border/50 rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-border/50 bg-muted/20">
+              <p className="text-xs font-semibold">Funding Health</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 Compliance and release signals for the current cycle.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </p>
+            </div>
+            <div className="p-5 space-y-3">
               {[
                 "Tuition obligations are current and institution invoices are reconciled.",
                 "Living stipend releases are on schedule with one pending payout cycle.",
@@ -130,56 +164,55 @@ export default async function FundingOverviewPage() {
               ].map((item) => (
                 <div
                   key={item}
-                  className="rounded-xl border bg-muted/20 p-4 text-sm text-muted-foreground"
+                  className="border border-border/50 rounded-lg p-3.5 bg-muted/20 text-xs text-muted-foreground leading-relaxed"
                 >
                   {item}
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
-        <Card className="border-border/60">
-          <CardHeader>
-            <CardTitle>Disbursement Ledger</CardTitle>
-            <CardDescription>
+        {/* Ledger */}
+        <div className="border border-border/50 rounded-xl overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-border/50 bg-muted/20">
+            <p className="text-xs font-semibold">Disbursement Ledger</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
               Chronological record of approved funding support.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Reference</TableHead>
-                  <TableHead>Status</TableHead>
+            </p>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Reference</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {ledger.map((d: any) => (
+                <TableRow key={d.id}>
+                  <TableCell className="font-medium text-sm">
+                    {d.date}
+                  </TableCell>
+                  <TableCell className="text-sm">{d.category}</TableCell>
+                  <TableCell className="text-sm">{d.amount}</TableCell>
+                  <TableCell className="text-sm">{d.reference}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={d.status} />
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {ledger.map((disbursement: any) => (
-                  <TableRow key={disbursement.id}>
-                    <TableCell className="font-medium">
-                      {disbursement.date}
-                    </TableCell>
-                    <TableCell>{disbursement.category}</TableCell>
-                    <TableCell>{disbursement.amount}</TableCell>
-                    <TableCell>{disbursement.reference}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={disbursement.status} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            {ledger.length === 0 && (
-              <div className="text-sm text-muted-foreground text-center py-12 border border-dashed rounded-xl mt-4">
-                No disbursement records found.
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              ))}
+            </TableBody>
+          </Table>
+          {ledger.length === 0 && (
+            <div className="text-xs text-muted-foreground text-center py-10 border-t border-dashed border-border/50">
+              No disbursement records found.
+            </div>
+          )}
+        </div>
       </div>
     </PageContainer>
   );

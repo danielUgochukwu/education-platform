@@ -11,9 +11,9 @@ import { cn } from "@/lib/utils";
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  title: "National Talent Development Initiative",
+  title: "NIDC",
   description:
-    "Platform helping talented young Nigerians access education while ensuring transparent funding and measurable national impact.",
+    "A structured system for identifying, developing, and deploying individuals committed to building real systems across engineering, technology, and infrastructure.",
 };
 
 

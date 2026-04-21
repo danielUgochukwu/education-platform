@@ -5,13 +5,9 @@ import { useState } from "react";
 import {
   ArrowRight,
   Banknote,
-  Briefcase,
   Building2,
   Factory,
-  HandCoins,
   Landmark,
-  Layers3,
-  Repeat,
   ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,7 +23,7 @@ const amountPresets: Record<SupportFrequency, number[]> = {
   monthly: [5000, 10000, 25000, 50000],
 };
 
-const supportFocuses = [
+const allocationModel = [
   {
     id: "programs",
     title: "Programs",
@@ -58,94 +54,41 @@ const supportFocuses = [
   },
 ];
 
-const trustSignals = [
+const supportOutcomes = [
   {
-    value: "3",
-    label: "Primary funding channels",
-    description: "Individual support, institutional partnerships, and operational revenue.",
-  },
-  {
-    value: "4",
-    label: "Allocation layers",
-    description: "Programs, infrastructure, operations, and long-term reserves.",
-  },
-  {
-    value: "40-50%",
-    label: "Directed to programs",
-    description: "Focused on talent development, training, and capacity building.",
-  },
-  {
-    value: "5-10%",
-    label: "Held in reserves",
-    description: "Supports stability, resilience, and long-term continuity.",
-  },
-];
-
-const systemFlow = [
-  {
-    title: "Receive",
-    description: "The Foundation receives support through individual contributions, institutional partnerships, and operational revenue.",
-    icon: HandCoins,
-  },
-  {
-    title: "Allocate",
-    description: "All contributions are distributed through a defined model to balance impact, operations, infrastructure, and continuity.",
-    icon: Layers3,
-  },
-  {
-    title: "Deploy",
-    description: "Funding moves into talent training, industrial and energy pilot projects, and infrastructure development through NIDC hubs.",
+    title: "Development of energy and manufacturing hubs",
     icon: Factory,
   },
   {
-    title: "Reintegrate",
-    description: "Projects within the system are designed to generate value that can be reinvested, enabling continuity beyond donations alone.",
-    icon: Repeat,
-  },
-];
-
-const deploymentAreas = [
-  {
-    title: "Energy and Manufacturing Hubs",
-    description: "Development of physical environments where industrial work and experimentation can happen.",
-    icon: Factory,
-  },
-  {
-    title: "Skilled Talent Training",
-    description: "Training, reintegration, and long-range development of people prepared for high-impact sectors.",
+    title: "Training and reintegration of skilled talent",
     icon: Building2,
   },
   {
-    title: "Industrial and Innovation Projects",
-    description: "Execution of practical projects that strengthen capacity in energy, manufacturing, and digital infrastructure.",
-    icon: Briefcase,
+    title: "Execution of industrial and innovation projects",
+    icon: Landmark,
   },
   {
-    title: "National Capacity Infrastructure",
-    description: "Expansion of the systems, hubs, and support structures required for sustained national development.",
-    icon: Landmark,
+    title: "Expansion of national capacity infrastructure",
+    icon: ShieldCheck,
   },
 ];
 
 const contributionChannels = [
   {
-    step: "01",
     title: "Bank Transfer",
-    description: "You can support directly via bank transfer.",
+    description: "You can support directly via bank transfer:",
     detail: "Account details will be provided upon full incorporation.",
     icon: Banknote,
   },
   {
-    step: "02",
     title: "Online Contribution",
     description: "Secure online payments will be available via our payment platform.",
     detail: "Coming soon.",
     icon: ShieldCheck,
   },
   {
-    step: "03",
     title: "Institutional Support",
-    description: "For partnerships, grants, and structured funding conversations.",
+    description: "For partnerships, grants, and structured funding:",
     detail: "partnerships@nidcfoundation.org",
     href: "mailto:partnerships@nidcfoundation.org",
     icon: Building2,
@@ -166,7 +109,7 @@ export default function DonatePage() {
   const [frequency, setFrequency] = useState<SupportFrequency>("once");
   const [selectedAmount, setSelectedAmount] = useState<number>(amountPresets.once[1]);
   const [customAmount, setCustomAmount] = useState("");
-  const [selectedFocusId, setSelectedFocusId] = useState<string>(supportFocuses[0].id);
+  const [selectedFocusId, setSelectedFocusId] = useState<string>(allocationModel[0].id);
 
   const parsedCustomAmount = Number(customAmount);
   const activeAmount = customAmount.trim()
@@ -175,14 +118,7 @@ export default function DonatePage() {
       : 0
     : selectedAmount;
 
-  const selectedFocus = supportFocuses.find((item) => item.id === selectedFocusId) ?? supportFocuses[0];
-  const supportLabel = activeAmount > 0
-    ? frequency === "monthly"
-      ? `Support ${formatAmount(activeAmount)} Monthly`
-      : `Support ${formatAmount(activeAmount)} Once`
-    : frequency === "monthly"
-      ? "Choose Monthly Support"
-      : "Choose One-Time Support";
+  const selectedFocus = allocationModel.find((item) => item.id === selectedFocusId) ?? allocationModel[0];
 
   const handleFrequencyChange = (next: SupportFrequency) => {
     setFrequency(next);
@@ -191,11 +127,11 @@ export default function DonatePage() {
   };
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex w-full flex-col">
       <section className="relative overflow-hidden border-b nidc-hero-backdrop">
         <div className="absolute inset-0 nidc-grid opacity-35" />
         <div className="container relative mx-auto px-4 py-18 md:py-24">
-          <div className="grid gap-10 lg:grid-cols-[1.04fr_0.96fr] lg:items-start">
+          <div className="grid gap-10 lg:grid-cols-[1.02fr_0.98fr] lg:items-start">
             <div className="max-w-3xl space-y-6">
               <p className="nidc-eyebrow">
                 <span className="h-px w-8 bg-primary/70" />
@@ -207,10 +143,6 @@ export default function DonatePage() {
               <p className="max-w-2xl text-lg leading-8 text-muted-foreground">
                 Your support enables the development of talent, infrastructure, and systems required for Nigeria&apos;s long-term industrial growth.
               </p>
-              <p className="max-w-2xl text-base leading-8 text-muted-foreground">
-                This is not charity. It is capacity building designed for transparency, sustainability, and long-term national impact.
-              </p>
-
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button asChild className="h-11 rounded-xl px-6">
                   <Link href="#support-flow">
@@ -221,18 +153,6 @@ export default function DonatePage() {
                 <Button asChild variant="outline" className="h-11 rounded-xl px-6">
                   <Link href="/partners">Partner With Us</Link>
                 </Button>
-              </div>
-
-              <div className="flex flex-wrap gap-2 pt-2">
-                <span className="rounded-full border border-border/70 bg-background/80 px-3 py-1 text-xs font-medium text-foreground/80">
-                  Bank transfer available
-                </span>
-                <span className="rounded-full border border-border/70 bg-background/80 px-3 py-1 text-xs font-medium text-foreground/80">
-                  Online payments coming soon
-                </span>
-                <span className="rounded-full border border-border/70 bg-background/80 px-3 py-1 text-xs font-medium text-foreground/80">
-                  Institutional partnerships welcome
-                </span>
               </div>
             </div>
 
@@ -257,10 +177,10 @@ export default function DonatePage() {
                     ))}
                   </div>
                   <h2 className="mt-4 text-2xl font-semibold tracking-tight">
-                    Choose your support
+                    Support NIDC
                   </h2>
                   <p className="mt-2 text-sm leading-7 text-muted-foreground">
-                    Select an amount and support focus, then continue to your preferred contribution path.
+                    Select an amount and area of focus, then continue to your preferred support method.
                   </p>
                 </div>
 
@@ -287,7 +207,7 @@ export default function DonatePage() {
                         >
                           <span className="block text-base font-semibold">{formatAmount(amount)}</span>
                           <span className="mt-1 block text-xs text-muted-foreground">
-                            {frequency === "monthly" ? "Monthly support" : "One-time support"}
+                            {itemLabel(frequency)}
                           </span>
                         </button>
                       ))}
@@ -317,10 +237,10 @@ export default function DonatePage() {
 
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-muted-foreground">
-                      Choose a focus
+                      Support focus
                     </p>
                     <div className="mt-3 space-y-2">
-                      {supportFocuses.map((item) => (
+                      {allocationModel.map((item) => (
                         <button
                           key={item.id}
                           type="button"
@@ -354,28 +274,17 @@ export default function DonatePage() {
                     <p className="mt-2 text-sm leading-7 text-background/70">
                       {selectedFocus.description}
                     </p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <span className="rounded-full border border-background/10 bg-background/10 px-3 py-1 text-xs text-background/80">
-                        Structured allocation
-                      </span>
-                      <span className="rounded-full border border-background/10 bg-background/10 px-3 py-1 text-xs text-background/80">
-                        Transparent deployment
-                      </span>
-                      <span className="rounded-full border border-background/10 bg-background/10 px-3 py-1 text-xs text-background/80">
-                        Long-term continuity
-                      </span>
-                    </div>
                   </div>
 
                   <div className="flex flex-col gap-3">
                     <Button asChild className="h-12 rounded-xl">
                       <Link href="#ways-to-contribute">
-                        {supportLabel}
+                        Support Now
                         <ArrowRight className="h-4 w-4" />
                       </Link>
                     </Button>
                     <Button asChild variant="outline" className="h-12 rounded-xl">
-                      <Link href="/governance">View Funding Model</Link>
+                      <Link href="/partners">Partner With Us</Link>
                     </Button>
                   </div>
 
@@ -393,30 +302,16 @@ export default function DonatePage() {
         </div>
       </section>
 
-      <section className="border-b bg-background py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {trustSignals.map((item) => (
-              <div key={item.label} className="nidc-surface p-5">
-                <p className="text-2xl font-semibold tracking-tight">{item.value}</p>
-                <p className="mt-2 text-sm font-semibold">{item.label}</p>
-                <p className="mt-2 text-sm leading-7 text-muted-foreground">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <SectionWrapper
-        className="border-b bg-background"
-        title="This Is Not Charity. It Is Capacity Building."
-        description="The NIDC Foundation is not designed as a short-term intervention."
-      >
+      <SectionWrapper className="border-b bg-background" title="Why Support NIDC">
         <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="nidc-surface p-6 md:p-8">
-            <p className="text-base leading-8 text-muted-foreground">
+            <h2 className="font-serif text-3xl font-semibold tracking-tight md:text-4xl">
+              This Is Not Charity. It Is Capacity Building.
+            </h2>
+            <p className="mt-5 text-base leading-8 text-muted-foreground">
+              The NIDC Foundation is not designed as a short-term intervention.
+            </p>
+            <p className="mt-4 text-base leading-8 text-muted-foreground">
               It is a structured system focused on developing and deploying high-impact talent into critical sectors such as energy, manufacturing, and digital infrastructure.
             </p>
             <p className="mt-4 text-base leading-8 text-muted-foreground">
@@ -425,45 +320,32 @@ export default function DonatePage() {
           </div>
           <div className="nidc-surface-muted p-6 md:p-8">
             <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">
-              Why It Matters
+              Capacity Focus
             </p>
             <p className="mt-4 text-base leading-8 text-muted-foreground">
-              NIDC is designed for continuity, with support flowing into systems that can keep developing talent, infrastructure, and execution capacity over time.
+              Support flows into a system built to strengthen talent, infrastructure, and long-term national development capacity.
             </p>
           </div>
         </div>
       </SectionWrapper>
 
-      <SectionWrapper
-        className="border-b bg-muted/30"
-        title="How Support Moves Through the System"
-        description="This is a structured flow for receiving, allocating, and deploying capital into national development."
-      >
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {systemFlow.map((item) => (
-            <div key={item.title} className="nidc-surface p-5">
-              <item.icon className="mb-4 h-5 w-5 text-primary" />
-              <h2 className="text-base font-semibold">{item.title}</h2>
-              <p className="mt-2 text-sm leading-7 text-muted-foreground">
-                {item.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </SectionWrapper>
-
-      <SectionWrapper
-        className="border-b bg-background"
-        title="A Structured Allocation Model"
-        description="All contributions are allocated through a defined internal framework to ensure impact, efficiency, and sustainability."
-      >
+      <SectionWrapper className="border-b bg-muted/30" title="How Your Support Is Used">
         <div className="grid gap-5 lg:grid-cols-[1.08fr_0.92fr]">
           <div className="space-y-4">
-            {supportFocuses.map((item) => (
+            <div className="nidc-surface p-6 md:p-8">
+              <h2 className="font-serif text-3xl font-semibold tracking-tight md:text-4xl">
+                A Structured Allocation Model
+              </h2>
+              <p className="mt-5 text-base leading-8 text-muted-foreground">
+                All contributions are allocated through a defined internal framework to ensure impact, efficiency, and sustainability.
+              </p>
+            </div>
+
+            {allocationModel.map((item) => (
               <div key={item.id} className="nidc-surface p-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold">{item.title}</h2>
+                    <h3 className="text-lg font-semibold">{item.title}</h3>
                     <p className="mt-2 text-sm leading-7 text-muted-foreground">
                       {item.description}
                     </p>
@@ -481,69 +363,66 @@ export default function DonatePage() {
 
           <div className="nidc-surface-muted p-6 md:p-8">
             <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">
-              Allocation Logic
+              Breakdown
             </p>
             <p className="mt-4 text-base leading-8 text-muted-foreground">
-              The balance is intentional. Programs receive the largest share because talent development is central to the mission, while infrastructure, operations, and reserves ensure the system remains usable, governable, and sustainable.
+              Programs receive 40-50%, infrastructure 20-30%, operations 20-30%, and reserves 5-10%.
             </p>
             <p className="mt-4 text-base leading-8 text-muted-foreground">
-              This structure supports impact today without compromising continuity tomorrow.
+              The model is designed to balance immediate impact with organizational continuity and long-term sustainability.
             </p>
           </div>
         </div>
       </SectionWrapper>
 
-      <SectionWrapper
-        className="border-b bg-muted/30"
-        title="Where It Goes"
-        description="Your support is deployed into real systems and projects that strengthen national development capacity."
-      >
-        <div className="grid gap-4 md:grid-cols-2">
-          {deploymentAreas.map((item) => (
-            <div key={item.title} className="nidc-surface p-5">
-              <item.icon className="mb-4 h-5 w-5 text-primary" />
-              <h2 className="text-base font-semibold">{item.title}</h2>
-              <p className="mt-2 text-sm leading-7 text-muted-foreground">
-                {item.description}
-              </p>
-            </div>
-          ))}
+      <SectionWrapper className="border-b bg-background" title="What Your Support Enables">
+        <div className="space-y-6">
+          <div className="nidc-surface p-6 md:p-8">
+            <h2 className="font-serif text-3xl font-semibold tracking-tight md:text-4xl">
+              Where It Goes
+            </h2>
+            <p className="mt-5 text-base leading-8 text-muted-foreground">
+              Your support is deployed into real systems and projects, including:
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {supportOutcomes.map((item) => (
+              <div key={item.title} className="nidc-surface p-5">
+                <item.icon className="mb-4 h-5 w-5 text-primary" />
+                <p className="text-base font-semibold leading-7">{item.title}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </SectionWrapper>
 
-      <section id="ways-to-contribute" className="border-b bg-background py-14 md:py-20">
+      <section id="ways-to-contribute" className="border-b bg-muted/30 py-14 md:py-20">
         <div className="container mx-auto px-4">
-          <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-2xl space-y-1.5">
-              <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                <span className="inline-block h-px w-4 bg-muted-foreground" />
-                Ways to Contribute
-              </p>
-              <p className="text-base leading-relaxed text-muted-foreground max-w-xl">
-                Choose the contribution path that fits the type of support you want to provide.
-              </p>
-            </div>
+          <div className="mb-10 max-w-3xl">
+            <p className="nidc-eyebrow">
+              <span className="h-px w-8 bg-primary/70" />
+              How to Support
+            </p>
+            <h2 className="mt-4 font-serif text-3xl font-semibold tracking-tight md:text-4xl">
+              Ways to Contribute
+            </h2>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
             {contributionChannels.map((item) => (
               <div key={item.title} className="nidc-surface p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <item.icon className="h-5 w-5 text-primary" />
-                  <span className="rounded-full bg-muted px-3 py-1 text-[10px] font-bold tracking-[0.24em] text-muted-foreground">
-                    {item.step}
-                  </span>
-                </div>
-                <h2 className="mt-5 text-lg font-semibold">{item.title}</h2>
+                <item.icon className="mb-4 h-5 w-5 text-primary" />
+                <h3 className="text-lg font-semibold">{item.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-muted-foreground">
                   {item.description}
                 </p>
                 {item.href ? (
-                  <Link href={item.href} className="mt-5 inline-flex text-sm font-medium text-primary transition-colors hover:text-primary/80">
+                  <Link href={item.href} className="mt-4 inline-flex text-sm font-medium text-primary transition-colors hover:text-primary/80">
                     {item.detail}
                   </Link>
                 ) : (
-                  <p className="mt-5 text-sm font-medium text-foreground/80">{item.detail}</p>
+                  <p className="mt-4 text-sm font-medium text-foreground/80">{item.detail}</p>
                 )}
               </div>
             ))}
@@ -551,21 +430,26 @@ export default function DonatePage() {
         </div>
       </section>
 
-      <SectionWrapper
-        className="bg-muted/30"
-        title="Built for Trust"
-        description="The NIDC Foundation operates under a structured governance framework and is registered as a Company Limited by Guarantee."
-      >
+      <SectionWrapper className="bg-background" title="Transparency & Accountability">
         <div className="grid gap-5 lg:grid-cols-[1fr_1fr]">
           <div className="nidc-surface p-6 md:p-8">
-            <p className="text-base leading-8 text-muted-foreground">
-              All funds are used solely to advance the objectives of the Foundation. Financial activities are recorded and managed in alignment with institutional standards.
+            <h2 className="font-serif text-3xl font-semibold tracking-tight md:text-4xl">
+              Built for Trust
+            </h2>
+            <p className="mt-5 text-base leading-8 text-muted-foreground">
+              The NIDC Foundation operates under a structured governance framework and is registered as a Company Limited by Guarantee.
+            </p>
+            <p className="mt-4 text-base leading-8 text-muted-foreground">
+              All funds are used solely to advance the objectives of the Foundation.
+            </p>
+            <p className="mt-4 text-base leading-8 text-muted-foreground">
+              Financial activities are recorded and managed in alignment with institutional standards.
             </p>
           </div>
           <div className="nidc-surface-muted p-6 md:p-8">
             <ShieldCheck className="mb-4 h-5 w-5 text-primary" />
             <p className="text-base leading-8 text-muted-foreground">
-              The governance structure is designed to support transparency, accountability, and long-term continuity across the full system.
+              Responsible financial management and structured governance are central to how the Foundation operates and builds trust over time.
             </p>
           </div>
         </div>
@@ -581,4 +465,8 @@ export default function DonatePage() {
       />
     </div>
   );
+}
+
+function itemLabel(frequency: SupportFrequency) {
+  return frequency === "monthly" ? "Monthly support" : "One-time support";
 }

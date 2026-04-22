@@ -12,7 +12,7 @@ import { ApplicationReview } from "@/components/forms/application-review";
 import { applicationSteps } from "@/constants/application";
 import { PersonalInfoForm } from "@/components/forms/personal-info-form";
 
-export function ApplicationWizard({ application, profile, documents }: any) {
+export function ApplicationWizard({ application, profile, documents }: { application: Record<string, unknown>; profile: Record<string, unknown>; documents: Record<string, unknown>[] }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [direction, setDirection] = useState<"forward" | "back">("forward");
 

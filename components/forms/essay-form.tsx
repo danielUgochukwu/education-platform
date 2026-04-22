@@ -18,7 +18,7 @@ import { saveApplicationStep } from "@/lib/supabase/actions";
 import { cn } from "@/lib/utils";
 
 interface EssayFormProps {
-  application: any;
+  application: Record<string, unknown>;
   onNext?: () => void;
   onBack?: () => void;
 }
@@ -69,7 +69,7 @@ export function EssayForm({ application, onNext, onBack }: EssayFormProps) {
   const [formData, setFormData] = useState(essays);
 
   const handleTextChange = (id: string, value: string) => {
-    setFormData((prev: any) => ({ ...prev, [id]: value }));
+    setFormData((prev: Record<string, string>) => ({ ...prev, [id]: value }));
   };
 
   const handleSave = async (

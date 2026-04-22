@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ClipboardCheck, Clock3, FileCheck2, Users } from "lucide-react";
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAdminApplications } from "@/lib/supabase/actions";
 import { resolveUserRoleForSession } from "@/lib/auth/roles";

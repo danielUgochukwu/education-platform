@@ -21,6 +21,35 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getScholarDashboardData } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 
+type MilestoneEntry = {
+  id: string;
+  category: string;
+  title: string;
+  status: string;
+  impact_description?: string | null;
+};
+
+type AnnouncementEntry = {
+  id: string;
+  title: string;
+  summary: string;
+  priority: string;
+  created_at: string;
+};
+
+type ImpactMetricEntry = {
+  id: string;
+  label: string;
+  description: string;
+  value: number | string;
+  unit?: string | null;
+};
+
+type FundingRecord = {
+  amount?: number | string | null;
+};
+
+
 const widgetIcons = [GraduationCap, Target, TrendingUp, Banknote, Flag];
 
 export default async function ScholarDashboardPage() {
@@ -51,12 +80,12 @@ export default async function ScholarDashboardPage() {
     const mentorName = mentorSessions[0]?.mentor_name || "Assigned Mentor";
     const mentorTitle = mentorSessions[0]?.mentor_title || "Program Mentor";
 
-    const completedMilestones = milestones.filter((m: any) => m.status === "completed").length;
+    const completedMilestones = milestones.filter((m: MilestoneEntry) => m.status === "completed").length;
     const totalMilestones = milestones.length;
     const activeAnnouncements = announcements.slice(0, 3);
     const latestMentorNote = mentorSessions.length > 0 ? mentorSessions[0] : null;
 
-    const totalFunding = fundingRecords.reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
+    const totalFunding = fundingRecords.reduce((acc: number, curr: FundingRecord) => acc + Number(curr.amount), 0);
     const formattedFunding = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(totalFunding);
 
     const scholarDashboardStats = [
@@ -226,7 +255,7 @@ export default async function ScholarDashboardPage() {
                             <CardDescription>Partner matching, interviews, and deployment readiness.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {milestones.filter((m: any) => m.category === 'internships' || m.category === 'industry placements').map((stage: any, index: number, arr: any[]) => (
+                            {milestones.filter((m: MilestoneEntry) => m.category === 'internships' || m.category === 'industry placements').map((stage: MilestoneEntry, index: number, arr: MilestoneEntry[]) => (
                                 <div key={stage.id} className="flex gap-3">
                                     <div className="mt-1 flex flex-col items-center">
                                         <div className={`h-3 w-3 rounded-full ${stage.status === "completed" ? "bg-primary" : stage.status === "active" ? "bg-amber-500" : "bg-muted-foreground/30"}`} />
@@ -243,7 +272,7 @@ export default async function ScholarDashboardPage() {
                                     </div>
                                 </div>
                             ))}
-                            {milestones.filter((m: any) => m.category === 'internships' || m.category === 'industry placements').length === 0 && (
+                            {milestones.filter((m: MilestoneEntry) => m.category === 'internships' || m.category === 'industry placements').length === 0 && (
                                 <p className="text-sm text-muted-foreground">No placement milestones scheduled.</p>
                             )}
                         </CardContent>
@@ -258,7 +287,7 @@ export default async function ScholarDashboardPage() {
                             <CardDescription>Outputs that show public value beyond classroom performance.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {impactMetrics.map((item: any, indexValue: number) => (
+                            {impactMetrics.map((item: ImpactMetricEntry, indexValue: number) => (
                                 <div key={item.id}>
                                     <div className="flex items-center justify-between gap-4">
                                         <div>
@@ -292,7 +321,7 @@ export default async function ScholarDashboardPage() {
                             </Button>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {activeAnnouncements.map((announcement: any, indexVal: number) => (
+                            {activeAnnouncements.map((announcement: AnnouncementEntry, indexVal: number) => (
                                 <div key={announcement.id}>
                                     <div className="flex flex-wrap items-center gap-2">
                                         <Badge className={announcement.priority === "High" ? "bg-amber-100 text-amber-800 hover:bg-amber-100" : "bg-slate-100 text-slate-700 hover:bg-slate-100"}>

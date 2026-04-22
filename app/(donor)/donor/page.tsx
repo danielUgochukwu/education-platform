@@ -17,6 +17,30 @@ import { getDonorDashboardData } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 import { programGrowth, sectorPlacementBreakdown } from "@/lib/constants";
 
+type SponsoredScholar = {
+    id: string;
+    first_name?: string | null;
+    last_name?: string | null;
+    program?: string | null;
+    status?: string | null;
+    progress_score?: number | null;
+    cohort?: string | null;
+    institution?: string | null;
+    bio?: string | null;
+};
+
+type FundingRecord = {
+    amount?: number;
+    programs?: { name: string } | null;
+    category?: string | null;
+};
+
+type ImpactMetric = {
+    id: string;
+    value: string | number;
+};
+
+
 const dashboardIcons = [
     Users,
     Banknote,
@@ -42,13 +66,13 @@ export default async function DonorDashboardPage() {
     } = await getDonorDashboardData(user.id);
 
     const averageProgress = sponsoredScholars.length > 0
-        ? Math.round(sponsoredScholars.reduce((sum: number, scholar: any) => sum + (scholar.progress_score || 0), 0) / sponsoredScholars.length)
+        ? Math.round(sponsoredScholars.reduce((sum: number, scholar: SponsoredScholar) => sum + (scholar.progress_score || 0), 0) / sponsoredScholars.length)
         : 0;
 
-    const totalFunding = fundingRecords.reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
+    const totalFunding = fundingRecords.reduce((acc: number, curr: FundingRecord) => acc + Number(curr.amount), 0);
     const formattedTotalFunding = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(totalFunding);
 
-    const totalImpact = impactMetrics.reduce((acc: number, curr: any) => acc + (isNaN(Number(curr.value)) ? 0 : Number(curr.value)), 0);
+    const totalImpact = impactMetrics.reduce((acc: number, curr: ImpactMetric) => acc + (isNaN(Number(curr.value)) ? 0 : Number(curr.value)), 0);
     const formattedImpact = totalImpact >= 1000 ? `${(totalImpact / 1000).toFixed(1)}k` : totalImpact.toString();
 
     const donorDashboardMetrics = [
@@ -60,16 +84,16 @@ export default async function DonorDashboardPage() {
         { title: "Active Programs", value: "4", description: "Strategic focus areas" },
     ];
 
-    const fundDistribution = fundingRecords.map((f: any) => ({
+    const fundDistribution = fundingRecords.map((f: FundingRecord, index: number) => ({
         label: f.category || f.programs?.name || "Allocation",
         value: Number(f.amount),
-        color: `hsl(var(--primary) / ${0.4 + Math.random() * 0.6})`
+        color: ["hsl(var(--primary))", "hsl(var(--primary) / 0.8)", "hsl(var(--primary) / 0.6)", "hsl(var(--primary) / 0.4)"][index % 4]
     }));
 
     const scholarOutcomeBreakdown = [
-        { label: "High Performance", value: sponsoredScholars.filter((s: any) => (s.progress_score || 0) >= 80).length, color: "var(--primary)" },
-        { label: "On Track", value: sponsoredScholars.filter((s: any) => (s.progress_score || 0) >= 60 && (s.progress_score || 0) < 80).length, color: "#f59e0b" },
-        { label: "Support Needed", value: sponsoredScholars.filter((s: any) => (s.progress_score || 0) < 60).length, color: "#ef4444" },
+        { label: "High Performance", value: sponsoredScholars.filter((s: SponsoredScholar) => (s.progress_score || 0) >= 80).length, color: "var(--primary)" },
+        { label: "On Track", value: sponsoredScholars.filter((s: SponsoredScholar) => (s.progress_score || 0) >= 60 && (s.progress_score || 0) < 80).length, color: "#f59e0b" },
+        { label: "Support Needed", value: sponsoredScholars.filter((s: SponsoredScholar) => (s.progress_score || 0) < 60).length, color: "#ef4444" },
     ].map(item => ({
         ...item,
         value: sponsoredScholars.length > 0 ? Math.round((item.value / sponsoredScholars.length) * 100) : 0
@@ -223,7 +247,7 @@ export default async function DonorDashboardPage() {
                         </Button>
                     </CardHeader>
                     <CardContent className="grid gap-4 lg:grid-cols-2">
-                        {sponsoredScholars.map((scholar: any) => {
+                        {sponsoredScholars.map((scholar: SponsoredScholar) => {
                             const firstName = scholar.first_name?.trim() || "";
                             const lastName = scholar.last_name?.trim() || "";
                             const scholarInitials = `${firstName.charAt(0)}${lastName.charAt(0)}`.trim() || "?";

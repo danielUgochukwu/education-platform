@@ -20,6 +20,23 @@ import { redirect } from "next/navigation";
 import { sectorPlacementBreakdown } from "@/lib/constants";
 import { DownloadButton } from "@/components/donor/download-button";
 
+type SponsoredScholar = {
+    id: string;
+    first_name?: string | null;
+    last_name?: string | null;
+    program?: string | null;
+    status?: string | null;
+    progress_score?: number | null;
+};
+
+type ImpactMetric = {
+    id: string;
+    label: string;
+    value: string | number;
+    description: string;
+};
+
+
 export default async function FundingAllocationPage() {
     const supabase = await createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -28,7 +45,7 @@ export default async function FundingAllocationPage() {
         redirect("/login");
     }
 
-    const { profile, fundingRecords, sponsoredScholars, impactMetrics } = await getDonorDashboardData(user.id);
+    const { fundingRecords, sponsoredScholars, impactMetrics } = await getDonorDashboardData(user.id);
 
     const totalAllocated = fundingRecords.reduce((acc, curr) => acc + (curr.amount || 0), 0);
 
@@ -104,7 +121,7 @@ export default async function FundingAllocationPage() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {sponsoredScholars.map((scholar: any) => (
+                                    {sponsoredScholars.map((scholar: SponsoredScholar) => (
                                         <TableRow key={scholar.id}>
                                             <TableCell className="font-medium">{scholar.first_name} {scholar.last_name}</TableCell>
                                             <TableCell>{scholar.program || "Tech Track"}</TableCell>
@@ -132,7 +149,7 @@ export default async function FundingAllocationPage() {
                             <CardDescription>Key performance and development outcomes tied to the funding portfolio.</CardDescription>
                         </CardHeader>
                         <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                            {impactMetrics.map((metric: any) => (
+                            {impactMetrics.map((metric: ImpactMetric) => (
                                 <div key={metric.id} className="rounded-xl border bg-muted/20 p-4">
                                     <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{metric.label}</p>
                                     <p className="mt-2 text-2xl font-bold tracking-tight">{metric.value}</p>

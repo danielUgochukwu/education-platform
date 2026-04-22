@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PageContainer } from "@/components/layout/page-container";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { getAdminApplications, getAdminApplicationById, getAvailableCohorts } from "@/lib/supabase/actions";
 import { ReviewWorkspace } from "@/components/admin/review-workspace";
 import { redirect } from "next/navigation";

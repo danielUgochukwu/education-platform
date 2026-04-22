@@ -18,8 +18,8 @@ import { useRouter } from "next/navigation";
 import { saveApplicationStep } from "@/lib/supabase/actions";
 
 interface PersonalInfoFormProps {
-  application: any;
-  profile: any;
+  application: Record<string, unknown>;
+  profile: Record<string, unknown>;
   onNext?: () => void;
 }
 

@@ -35,7 +35,16 @@ import {
 import { CldUploadWidget } from "next-cloudinary";
 
 interface ProfileFormProps {
-  profile: any;
+  profile: {
+    id: string;
+    first_name?: string | null;
+    last_name?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    state_of_origin?: string | null;
+    avatar_url?: string | null;
+    role?: string | null;
+  };
 }
 
 const NOTIFICATION_PREFS = [
@@ -158,7 +167,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         toast.success("Profile updated successfully");
         window.dispatchEvent(new Event("profileUpdated"));
       }
-    } catch (err) {
+    } catch {
       toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -173,6 +182,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           <div className="flex items-center gap-4">
             <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary relative group overflow-hidden shrink-0">
               {avatarUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={avatarUrl}
                   alt="Avatar"

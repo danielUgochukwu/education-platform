@@ -1,16 +1,29 @@
 import { PageContainer } from "@/components/layout/page-container";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
-  BookOpen,
   Briefcase,
-  GraduationCap,
-  Target,
-  TrendingUp,
 } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getScholarAcademicJourney } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
+
+type TermEntry = {
+  id: string;
+  term: string;
+  gpa: string | number;
+  highlight: string;
+  focus: string;
+};
+
+type CourseEntry = {
+  id: string;
+  title: string;
+  credits: number;
+  note: string;
+  status: string;
+  score?: string | number | null;
+};
+
 
 const capabilityGrowth = [
   {
@@ -98,7 +111,7 @@ export default async function AcademicJourneyPage() {
               </p>
             </div>
             <div className="p-5 space-y-5">
-              {terms.map((term: any, index: number) => (
+              {terms.map((term: TermEntry, index: number) => (
                 <div key={term.id} className="flex gap-4">
                   <div className="mt-1 flex flex-col items-center">
                     <div className="h-3 w-3 rounded-full bg-foreground" />
@@ -139,7 +152,7 @@ export default async function AcademicJourneyPage() {
               </p>
             </div>
             <div className="divide-y divide-border/50">
-              {courses.map((course: any) => (
+              {courses.map((course: CourseEntry) => (
                 <div
                   key={course.id}
                   className="flex items-center justify-between gap-3 px-5 py-3.5"

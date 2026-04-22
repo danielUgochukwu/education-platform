@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { PageContainer } from "@/components/layout/page-container";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";

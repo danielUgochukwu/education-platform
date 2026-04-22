@@ -21,6 +21,19 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getScholarProgressReports } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 
+type ProgressReport = {
+  id: string;
+  period: string;
+  status: string;
+  reviewer?: string | null;
+  score?: number | string | null;
+  summary?: string | null;
+  submitted_on?: string | null;
+  priorities?: string[] | null;
+  signals?: string[] | null;
+};
+
+
 export default async function ProgressReportsPage() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -32,7 +45,7 @@ export default async function ProgressReportsPage() {
   const progressReports = await getScholarProgressReports(user.id);
 
   const latestReport = progressReports.find(
-    (report: any) => report.status === "active"
+    (report: ProgressReport) => report.status === "active"
   ) || progressReports[0];
 
   if (!latestReport) {
@@ -113,7 +126,7 @@ export default async function ProgressReportsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {progressReports.map((report: any) => (
+                  {progressReports.map((report: ProgressReport) => (
                     <TableRow key={report.id}>
                       <TableCell className="font-medium">
                         {report.period}

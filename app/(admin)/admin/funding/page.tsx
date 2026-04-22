@@ -21,6 +21,16 @@ import { getAdminFundingLedger, getAdminPrograms, getAdminScholars, getAdminSpon
 import { redirect } from "next/navigation";
 import { AllocateFundingDialog } from "@/components/admin/allocate-funding-dialog";
 
+type LedgerEntry = {
+    id: string;
+    amount: number | string;
+    status: string;
+    date: string;
+    programs?: { name: string } | null;
+    profiles?: { first_name: string; last_name: string } | null;
+};
+
+
 function getFundingStatusClass(status: string) {
     if (status === "completed" || status === "Disbursed") return "bg-emerald-100 text-emerald-800";
     if (status === "pending" || status === "Committed") return "bg-blue-100 text-blue-800";
@@ -40,9 +50,9 @@ export default async function FundingManagementPage() {
     const scholars = await getAdminScholars();
     const programs = await getAdminPrograms();
 
-    const committed = ledger.filter((l: any) => l.status === "pending" || l.status === "Committed").reduce((acc: number, l: any) => acc + Number(l.amount), 0);
-    const disbursed = ledger.filter((l: any) => l.status === "completed" || l.status === "Disbursed").reduce((acc: number, l: any) => acc + Number(l.amount), 0);
-    const flagged = ledger.filter((l: any) => l.status === "flagged" || l.status === "Flagged").reduce((acc: number, l: any) => acc + Number(l.amount), 0);
+    const committed = ledger.filter((l: LedgerEntry) => l.status === "pending" || l.status === "Committed").reduce((acc: number, l: LedgerEntry) => acc + Number(l.amount), 0);
+    const disbursed = ledger.filter((l: LedgerEntry) => l.status === "completed" || l.status === "Disbursed").reduce((acc: number, l: LedgerEntry) => acc + Number(l.amount), 0);
+    const flagged = ledger.filter((l: LedgerEntry) => l.status === "flagged" || l.status === "Flagged").reduce((acc: number, l: LedgerEntry) => acc + Number(l.amount), 0);
     const reserved = 640000000; // Mock or future: fetch from treasury table
 
     const fundingMetrics = [
@@ -52,13 +62,13 @@ export default async function FundingManagementPage() {
         { title: "Flagged", value: `N${(flagged / 1000000).toFixed(0)}M`, description: "Needs compliance follow-up", icon: AlertCircle },
     ];
 
-    const programDistribution = ledger.reduce((acc: any, curr: any) => {
+    const programDistribution = ledger.reduce((acc: Record<string, number>, curr: LedgerEntry) => {
         const progName = curr.programs?.name || "Other";
         acc[progName] = (acc[progName] || 0) + Number(curr.amount);
         return acc;
     }, {});
 
-    const distributionItems = Object.entries(programDistribution).map(([label, value]: [string, any], index) => ({
+    const distributionItems = Object.entries(programDistribution).map(([label, value]: [string, number], index) => ({
         label,
         value: Number(value),
         color: ["#0f766e", "#0284c7", "#d97706", "#dc2626", "#475569"][index % 5],
@@ -139,7 +149,7 @@ export default async function FundingManagementPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {ledger.map((entry: any) => (
+                                {ledger.map((entry: LedgerEntry) => (
                                     <TableRow key={entry.id}>
                                         <TableCell>{entry.programs?.name || "—"}</TableCell>
                                         <TableCell>

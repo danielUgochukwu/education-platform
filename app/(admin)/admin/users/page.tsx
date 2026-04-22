@@ -17,6 +17,17 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAdminUsers } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 
+type UserEntry = {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    role: string;
+    status: string;
+    created_at: string;
+};
+
+
 function getUserStatusClass(status: string) {
     if (status === "active") return "bg-emerald-100 text-emerald-800";
     if (status === "pending") return "bg-amber-100 text-amber-800";
@@ -33,7 +44,7 @@ export default async function UserManagementPage() {
 
     const allUsers = await getAdminUsers();
 
-    const roleCounts = allUsers.reduce((acc: any, curr: any) => {
+    const roleCounts = allUsers.reduce((acc: Record<string, number>, curr: UserEntry) => {
         const role = curr.role || "applicant";
         acc[role] = (acc[role] || 0) + 1;
         return acc;
@@ -46,8 +57,8 @@ export default async function UserManagementPage() {
         { label: "Admins", value: roleCounts.admin || 0, color: "#dc2626" },
     ];
 
-    const privilegedUsers = allUsers.filter((u: any) => ["admin", "reviewer", "partner"].includes(u.role));
-    const pendingUsers = allUsers.filter((u: any) => u.status === "pending");
+    const privilegedUsers = allUsers.filter((u: UserEntry) => ["admin", "reviewer", "partner"].includes(u.role));
+    const pendingUsers = allUsers.filter((u: UserEntry) => u.status === "pending");
 
     const userMetrics = [
         { title: "Total Users", value: allUsers.length.toString(), description: "All registered accounts", icon: Users },
@@ -99,7 +110,7 @@ export default async function UserManagementPage() {
                             <CardDescription>Role, account type, and current state for core operating accounts.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {displayUsers.map((u: any) => (
+                            {displayUsers.map((u: UserEntry) => (
                                 <div key={u.id} className="rounded-xl border bg-background p-4">
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
@@ -136,7 +147,7 @@ export default async function UserManagementPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {displayUsers.map((u: any) => (
+                                {displayUsers.map((u: UserEntry) => (
                                     <TableRow key={u.id}>
                                         <TableCell className="font-medium">{u.first_name} {u.last_name}</TableCell>
                                         <TableCell className="capitalize">{u.role}</TableCell>

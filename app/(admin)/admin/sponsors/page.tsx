@@ -14,6 +14,20 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAdminSponsors } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 
+type SponsorEntry = {
+    id: string;
+    first_name: string;
+    last_name: string;
+    donor_details?: {
+        category?: string;
+        commitment?: number;
+        investment_focus?: string;
+        renewal_window?: string;
+        status?: string;
+    } | null;
+};
+
+
 function getSponsorStatusClass(status: string) {
     if (status === "Active") return "bg-emerald-100 text-emerald-800";
     if (status === "Renewal due") return "bg-amber-100 text-amber-800";
@@ -72,7 +86,7 @@ export default async function SponsorsPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {sponsors.map((sponsor: any) => (
+                                {sponsors.map((sponsor: SponsorEntry) => (
                                     <TableRow key={sponsor.id}>
                                         <TableCell className="font-medium">
                                             {sponsor.first_name} {sponsor.last_name}

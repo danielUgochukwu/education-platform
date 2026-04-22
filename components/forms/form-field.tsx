@@ -10,6 +10,7 @@ import { Eye, EyeOff } from "lucide-react";
 
 type BaseProps = {
   name: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: any;
   label?: React.ReactNode;
   icon?: LucideIcon;

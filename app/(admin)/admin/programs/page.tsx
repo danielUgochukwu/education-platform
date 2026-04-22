@@ -17,6 +17,18 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAdminPrograms } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 
+type ProgramEntry = {
+    id: string;
+    name: string;
+    total_budget?: number;
+    placement_rate?: number;
+    completion_rate?: number;
+    program_lead?: string | null;
+    campuses?: string[];
+    status?: string;
+};
+
+
 export default async function ProgramsManagementPage() {
     const supabase = await createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -27,10 +39,10 @@ export default async function ProgramsManagementPage() {
 
     const programs = await getAdminPrograms();
 
-    const totalBudget = programs.reduce((acc: number, p: any) => acc + (p.total_budget || 0), 0);
+    const totalBudget = programs.reduce((acc: number, p: ProgramEntry) => acc + (p.total_budget || 0), 0);
     const totalApplicants = 1482; // Future: fetch from summary table/aggregate
     const avgPlacement = programs.length > 0
-        ? (programs.reduce((acc: number, p: any) => acc + (p.placement_rate || 0), 0) / programs.length).toFixed(0)
+        ? (programs.reduce((acc: number, p: ProgramEntry) => acc + (p.placement_rate || 0), 0) / programs.length).toFixed(0)
         : "0";
 
     const programMetrics = [
@@ -40,7 +52,7 @@ export default async function ProgramsManagementPage() {
         { title: "Budget Coverage", value: `N${(totalBudget / 1000000000).toFixed(2)}B`, description: "Tracked across programme portfolios", icon: Wallet },
     ];
 
-    const performanceItems = programs.map((p: any) => ({
+    const performanceItems = programs.map((p: ProgramEntry) => ({
         label: p.name,
         value: p.placement_rate || 0,
         color: p.placement_rate > 90 ? "#0f766e" : p.placement_rate > 85 ? "#0284c7" : "#d97706",
@@ -87,7 +99,7 @@ export default async function ProgramsManagementPage() {
                             <CardDescription>Each programme’s capacity, lead, demand, and operating footprint.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {programs.map((program: any) => (
+                            {programs.map((program: ProgramEntry) => (
                                 <div key={program.id} className="rounded-xl border bg-background p-4">
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
@@ -131,7 +143,7 @@ export default async function ProgramsManagementPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {programs.map((program: any) => (
+                                {programs.map((program: ProgramEntry) => (
                                     <TableRow key={program.id}>
                                         <TableCell>
                                             <div>

@@ -14,6 +14,17 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getScholarDashboardData } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 
+type FundingRecord = {
+  id: string;
+  status: string;
+  amount: number | string;
+  category: string;
+  disbursement_date?: string | null;
+  created_at: string;
+  reference_number?: string | null;
+};
+
+
 const fundingBreakdownArr = [
   {
     label: "Tuition & academic fees",
@@ -55,14 +66,14 @@ export default async function FundingOverviewPage() {
     }).format(n);
   const totalApproved = profile?.approved_funding || 4800000;
   const totalDisbursed = fundingRecords.reduce(
-    (acc: number, r: any) =>
+    (acc: number, r: FundingRecord) =>
       acc + (r.status === "completed" ? Number(r.amount) : 0),
     0
   );
   const nextStipend =
-    fundingRecords.find((r: any) => r.status === "pending")?.amount || 350000;
+    fundingRecords.find((r: FundingRecord) => r.status === "pending")?.amount || 350000;
 
-  const ledger = fundingRecords.map((r: any) => ({
+  const ledger = fundingRecords.map((r: FundingRecord) => ({
     id: r.id,
     date: new Date(r.disbursement_date || r.created_at).toLocaleDateString(
       "en-US",
@@ -192,7 +203,7 @@ export default async function FundingOverviewPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {ledger.map((d: any) => (
+              {ledger.map((d: { id: string, date: string, category: string, amount: string, reference: string, status: string }) => (
                 <TableRow key={d.id}>
                   <TableCell className="font-medium text-sm">
                     {d.date}

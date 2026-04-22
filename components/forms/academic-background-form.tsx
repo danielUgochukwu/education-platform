@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import { saveApplicationStep } from "@/lib/supabase/actions";
 
 interface AcademicBackgroundFormProps {
-  application: any;
+  application: Record<string, unknown>;
   onNext?: () => void;
   onBack?: () => void;
 }

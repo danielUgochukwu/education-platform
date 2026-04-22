@@ -14,7 +14,7 @@ export function SectionWrapper({
   children, className, title, description, action, containerClassName,
 }: SectionWrapperProps) {
   return (
-    <section className={cn("py-14 md:py-20", className)}>
+    <section className={cn("py-24 md:py-32", className)}>
       <div className={cn("container mx-auto px-4", containerClassName)}>
         {(title || description || action) && (
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">

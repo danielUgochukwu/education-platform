@@ -73,8 +73,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col w-full">
       <section className="relative overflow-hidden border-b nidc-hero-backdrop">
-        <div className="absolute inset-0 nidc-grid opacity-45" />
-        <div className="container mx-auto px-4 py-18 md:py-24 relative">
+        <div className="container mx-auto px-4 py-18 md:py-32 relative">
           <div className="grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="space-y-7">
               <p className="nidc-eyebrow">
@@ -82,7 +81,7 @@ export default function HomePage() {
                 Building Real Capability
               </p>
               <div className="space-y-5 max-w-3xl">
-                <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+                <h1 className="font-serif text-5xl font-bold leading-[1.1] tracking-tighter sm:text-6xl lg:text-7xl">
                   Building Nigeria&apos;s Next Generation of System Builders
                 </h1>
                 <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
@@ -94,13 +93,13 @@ export default function HomePage() {
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row">
-                <Button asChild size="lg" className="h-12 px-7">
+                <Button asChild size="lg" className="h-14 px-8 rounded-full">
                   <Link href="/apply">
                     Join the First Cohort
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="h-12 px-7">
+                <Button asChild size="lg" variant="outline" className="h-14 px-8 rounded-full">
                   <Link href="/how-it-works">Learn How It Works</Link>
                 </Button>
               </div>

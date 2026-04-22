@@ -1,22 +1,23 @@
 import { v2 as cloudinary } from "cloudinary";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME as string;
-const API_KEY = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY as string;
-const API_SECRET = process.env.CLOUDINARY_API_SECRET as string;
-
-if (!CLOUD_NAME || !API_KEY || !API_SECRET) {
-    throw new Error("Missing required Cloudinary environment variables");
-}
-
-cloudinary.config({
-    cloud_name: CLOUD_NAME,
-    api_key: API_KEY,
-    api_secret: API_SECRET,
-});
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const API_KEY = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
+const API_SECRET = process.env.CLOUDINARY_API_SECRET;
 
 export async function POST(request: Request) {
     try {
+        if (!CLOUD_NAME || !API_KEY || !API_SECRET) {
+            console.error("Missing required Cloudinary environment variables");
+            return Response.json({ error: "Server configuration error" }, { status: 500 });
+        }
+
+        cloudinary.config({
+            cloud_name: CLOUD_NAME,
+            api_key: API_KEY,
+            api_secret: API_SECRET,
+        });
+
         const supabase = await createSupabaseServerClient();
         const { data: { user } } = await supabase.auth.getUser();
 

@@ -40,7 +40,7 @@
   --font-sans: Outfit, system-ui, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: JetBrains Mono, monospace;
-  --radius: 1.25rem;
+  --radius: 2.5rem;
   --shadow-x: 0px;
   --shadow-y: 10px;
   --shadow-blur: 30px;
@@ -95,7 +95,7 @@
   --font-sans: Outfit, system-ui, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: JetBrains Mono, monospace;
-  --radius: 1.25rem;
+  --radius: 2.5rem;
   --shadow-x: 0px;
   --shadow-y: 25px;
   --shadow-blur: 50px;
@@ -202,15 +202,15 @@
   }
 
   .nidc-surface {
-    @apply rounded-[calc(var(--radius)+0.5rem)] border border-border/60 bg-background/80 shadow-sm backdrop-blur-sm;
+    @apply rounded-[3rem] border border-border/40 bg-background/60 shadow-lg shadow-black/5 backdrop-blur-2xl;
   }
 
   .nidc-surface-muted {
-    @apply rounded-[calc(var(--radius)+0.5rem)] border border-border/60 bg-muted/60 shadow-sm;
+    @apply rounded-[3rem] border border-border/40 bg-muted/40 shadow-md shadow-black/5 backdrop-blur-xl;
   }
 
   .nidc-eyebrow {
-    @apply inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground;
+    @apply inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.24em] text-primary;
   }
 }
 

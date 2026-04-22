@@ -1,0 +1,104 @@
+app/(donor)/donor/page.tsx(69,22): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+app/(donor)/donor/page.tsx(69,47): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(callbackfn: (previousValue: Record<string, unknown>, currentValue: Record<string, unknown>, currentIndex: number, array: Record<string, unknown>[]) => Record<string, unknown>, initialValue: Record<...>): Record<...>', gave the following error.
+    Argument of type '(sum: number, scholar: SponsoredScholar) => number' is not assignable to parameter of type '(previousValue: Record<string, unknown>, currentValue: Record<string, unknown>, currentIndex: number, array: Record<string, unknown>[]) => Record<string, unknown>'.
+      Types of parameters 'sum' and 'previousValue' are incompatible.
+        Type 'Record<string, unknown>' is not assignable to type 'number'.
+  Overload 2 of 3, '(callbackfn: (previousValue: number, currentValue: Record<string, unknown>, currentIndex: number, array: Record<string, unknown>[]) => number, initialValue: number): number', gave the following error.
+    Argument of type '(sum: number, scholar: SponsoredScholar) => number' is not assignable to parameter of type '(previousValue: number, currentValue: Record<string, unknown>, currentIndex: number, array: Record<string, unknown>[]) => number'.
+      Types of parameters 'scholar' and 'currentValue' are incompatible.
+        Property 'id' is missing in type 'Record<string, unknown>' but required in type 'SponsoredScholar'.
+app/(donor)/donor/page.tsx(94,70): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(predicate: (value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => value is Record<string, unknown>, thisArg?: any): Record<string, unknown>[]', gave the following error.
+    Argument of type '(s: SponsoredScholar) => boolean' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => value is Record<string, unknown>'.
+      Types of parameters 's' and 'value' are incompatible.
+        Property 'id' is missing in type 'Record<string, unknown>' but required in type 'SponsoredScholar'.
+  Overload 2 of 2, '(predicate: (value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => unknown, thisArg?: any): Record<string, unknown>[]', gave the following error.
+    Argument of type '(s: SponsoredScholar) => boolean' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => unknown'.
+      Types of parameters 's' and 'value' are incompatible.
+        Property 'id' is missing in type 'Record<string, unknown>' but required in type 'SponsoredScholar'.
+app/(donor)/donor/page.tsx(95,62): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(predicate: (value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => value is Record<string, unknown>, thisArg?: any): Record<string, unknown>[]', gave the following error.
+    Argument of type '(s: SponsoredScholar) => boolean' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => value is Record<string, unknown>'.
+      Types of parameters 's' and 'value' are incompatible.
+        Property 'id' is missing in type 'Record<string, unknown>' but required in type 'SponsoredScholar'.
+  Overload 2 of 2, '(predicate: (value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => unknown, thisArg?: any): Record<string, unknown>[]', gave the following error.
+    Argument of type '(s: SponsoredScholar) => boolean' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => unknown'.
+      Types of parameters 's' and 'value' are incompatible.
+        Property 'id' is missing in type 'Record<string, unknown>' but required in type 'SponsoredScholar'.
+app/(donor)/donor/page.tsx(96,68): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(predicate: (value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => value is Record<string, unknown>, thisArg?: any): Record<string, unknown>[]', gave the following error.
+    Argument of type '(s: SponsoredScholar) => boolean' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => value is Record<string, unknown>'.
+      Types of parameters 's' and 'value' are incompatible.
+        Property 'id' is missing in type 'Record<string, unknown>' but required in type 'SponsoredScholar'.
+  Overload 2 of 2, '(predicate: (value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => unknown, thisArg?: any): Record<string, unknown>[]', gave the following error.
+    Argument of type '(s: SponsoredScholar) => boolean' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => unknown'.
+      Types of parameters 's' and 'value' are incompatible.
+        Property 'id' is missing in type 'Record<string, unknown>' but required in type 'SponsoredScholar'.
+app/(donor)/donor/page.tsx(250,48): error TS2345: Argument of type '(scholar: SponsoredScholar) => JSX.Element' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => Element'.
+  Types of parameters 'scholar' and 'value' are incompatible.
+    Property 'id' is missing in type 'Record<string, unknown>' but required in type 'SponsoredScholar'.
+app/(donor)/donor/page.tsx(271,46): error TS18049: 'scholar.progress_score' is possibly 'null' or 'undefined'.
+app/(donor)/donor/page.tsx(271,91): error TS18049: 'scholar.progress_score' is possibly 'null' or 'undefined'.
+app/(donor)/donor/sponsored-scholars/page.tsx(38,22): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+app/(donor)/donor/sponsored-scholars/page.tsx(38,47): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(callbackfn: (previousValue: Record<string, unknown>, currentValue: Record<string, unknown>, currentIndex: number, array: Record<string, unknown>[]) => Record<string, unknown>, initialValue: Record<...>): Record<...>', gave the following error.
+    Argument of type '(sum: number, scholar: SponsoredScholar) => number' is not assignable to parameter of type '(previousValue: Record<string, unknown>, currentValue: Record<string, unknown>, currentIndex: number, array: Record<string, unknown>[]) => Record<string, unknown>'.
+      Types of parameters 'sum' and 'previousValue' are incompatible.
+        Type 'Record<string, unknown>' is not assignable to type 'number'.
+  Overload 2 of 3, '(callbackfn: (previousValue: number, currentValue: Record<string, unknown>, currentIndex: number, array: Record<string, unknown>[]) => number, initialValue: number): number', gave the following error.
+    Argument of type '(sum: number, scholar: SponsoredScholar) => number' is not assignable to parameter of type '(previousValue: number, currentValue: Record<string, unknown>, currentIndex: number, array: Record<string, unknown>[]) => number'.
+      Types of parameters 'scholar' and 'currentValue' are incompatible.
+        Property 'id' is missing in type 'Record<string, unknown>' but required in type 'SponsoredScholar'.
+app/(donor)/donor/sponsored-scholars/page.tsx(41,55): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(predicate: (value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => value is Record<string, unknown>, thisArg?: any): Record<string, unknown>[]', gave the following error.
+    Argument of type '(scholar: SponsoredScholar) => boolean' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => value is Record<string, unknown>'.
+      Types of parameters 'scholar' and 'value' are incompatible.
+        Property 'id' is missing in type 'Record<string, unknown>' but required in type 'SponsoredScholar'.
+  Overload 2 of 2, '(predicate: (value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => unknown, thisArg?: any): Record<string, unknown>[]', gave the following error.
+    Argument of type '(scholar: SponsoredScholar) => boolean' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => unknown'.
+      Types of parameters 'scholar' and 'value' are incompatible.
+        Property 'id' is missing in type 'Record<string, unknown>' but required in type 'SponsoredScholar'.
+app/(donor)/donor/sponsored-scholars/page.tsx(57,44): error TS2345: Argument of type '(scholar: SponsoredScholar) => JSX.Element' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => Element'.
+  Types of parameters 'scholar' and 'value' are incompatible.
+    Property 'id' is missing in type 'Record<string, unknown>' but required in type 'SponsoredScholar'.
+app/(portal)/application/page.tsx(71,11): error TS2322: Type 'UploadedDocument[]' is not assignable to type 'Record<string, unknown>[]'.
+  Type 'UploadedDocument' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'UploadedDocument'.
+app/(scholar)/scholar/documents/page.tsx(58,26): error TS2322: Type 'string' is not assignable to type 'BadgeStatus'.
+app/(scholar)/scholar/documents/page.tsx(134,36): error TS2322: Type 'string' is not assignable to type 'BadgeStatus'.
+app/(scholar)/scholar/funding-overview/page.tsx(83,17): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'number'.
+  Type 'string' is not assignable to type 'number'.
+app/(scholar)/scholar/funding-overview/page.tsx(215,34): error TS2322: Type 'string' is not assignable to type 'BadgeStatus'.
+app/(scholar)/scholar/milestones/page.tsx(143,34): error TS2322: Type 'string' is not assignable to type 'BadgeStatus'.
+app/(scholar)/scholar/opportunities/page.tsx(124,36): error TS2322: Type 'string' is not assignable to type 'BadgeStatus'.
+app/(scholar)/scholar/progress-reports/page.tsx(138,38): error TS2322: Type 'string' is not assignable to type 'BadgeStatus'.
+app/api/donor/allocation-summary/route.ts(43,13): error TS2345: Argument of type '(scholar: Scholar) => string' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => string'.
+  Types of parameters 'scholar' and 'value' are incompatible.
+    Type 'Record<string, unknown>' is missing the following properties from type 'Scholar': first_name, last_name
+components/forms/application-wizard.tsx(88,13): error TS2322: Type 'Record<string, unknown>[]' is not assignable to type 'UploadedDocument[]'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'UploadedDocument': id, type, name, size, and 2 more.
+components/forms/application-wizard.tsx(98,13): error TS2322: Type 'Record<string, unknown>[]' is not assignable to type 'UploadedDocument[]'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'UploadedDocument': id, type, name, size, and 2 more.
+components/forms/essay-form.tsx(81,31): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+components/forms/essay-form.tsx(97,54): error TS2345: Argument of type '{}' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type '{}'.
+components/forms/essay-form.tsx(127,29): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+components/forms/personal-info-form.tsx(57,19): error TS2339: Property 'email' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(116,38): error TS2339: Property 'firstName' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(128,38): error TS2339: Property 'middleName' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(139,38): error TS2339: Property 'lastName' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(162,38): error TS2339: Property 'email' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(175,38): error TS2339: Property 'phone' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(199,38): error TS2339: Property 'dateOfBirth' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(207,58): error TS2339: Property 'gender' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(226,38): error TS2339: Property 'nationalId' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(249,38): error TS2339: Property 'stateOfOrigin' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(271,38): error TS2339: Property 'lgaOfOrigin' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(295,38): error TS2339: Property 'address' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(309,40): error TS2339: Property 'city' does not exist on type '{}'.
+components/forms/personal-info-form.tsx(318,62): error TS2339: Property 'resState' does not exist on type '{}'.
+components/settings/profile-form.tsx(283,19): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | number | readonly string[] | undefined'.
+  Type 'null' is not assignable to type 'string | number | readonly string[] | undefined'.

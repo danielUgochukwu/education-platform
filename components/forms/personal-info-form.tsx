@@ -31,7 +31,7 @@ export function PersonalInfoForm({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const pi = application?.personal_info || {};
+  const pi = (application?.personal_info as Record<string, any>) || {};
 
   const handleSave = async (
     e: React.FormEvent | React.MouseEvent<HTMLButtonElement>,

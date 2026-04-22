@@ -65,7 +65,7 @@ function wordCount(text: string) {
 export function EssayForm({ application, onNext, onBack }: EssayFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const essays = application?.essays || {};
+  const essays = (application?.essays as Record<string, any>) || {};
   const [formData, setFormData] = useState(essays);
 
   const handleTextChange = (id: string, value: string) => {
@@ -79,6 +79,12 @@ export function EssayForm({ application, onNext, onBack }: EssayFormProps) {
     e.preventDefault();
     for (const essay of essayPrompts) {
       const count = wordCount(formData[essay.id] || "");
+      if (Object.keys(essays as Record<string, any>).length === 0 && !formData.essay_motivation) {
+        toast.error(
+          `"${essay.label}" needs at least ${essay.wordMin} words (${count} written).`
+        );
+        return;
+      }
       if (count < essay.wordMin) {
         toast.error(
           `"${essay.label}" needs at least ${essay.wordMin} words (${count} written).`

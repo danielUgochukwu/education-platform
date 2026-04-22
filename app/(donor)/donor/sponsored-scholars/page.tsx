@@ -35,10 +35,10 @@ export default async function SponsoredScholarsPage() {
     const { sponsoredScholars } = await getDonorDashboardData(user.id);
 
     const averageProgress = sponsoredScholars.length > 0
-        ? Math.round(sponsoredScholars.reduce((sum: number, scholar: SponsoredScholar) => sum + (scholar.progress_score || 0), 0) / sponsoredScholars.length)
+        ? Math.round((sponsoredScholars as SponsoredScholar[]).reduce((sum: number, scholar: SponsoredScholar) => sum + (scholar.progress_score || 0), 0) / sponsoredScholars.length)
         : 0;
 
-    const strongPerformers = sponsoredScholars.filter((scholar: SponsoredScholar) => (scholar.progress_score || 0) >= 80).length;
+    const strongPerformers = (sponsoredScholars as SponsoredScholar[]).filter((scholar: SponsoredScholar) => (scholar.progress_score || 0) >= 80).length;
 
     return (
         <PageContainer
@@ -54,7 +54,7 @@ export default async function SponsoredScholarsPage() {
                 </div>
 
                 <div className="grid gap-4 xl:grid-cols-2">
-                    {sponsoredScholars.map((scholar: SponsoredScholar) => (
+                    {(sponsoredScholars as SponsoredScholar[]).map((scholar: SponsoredScholar) => (
                         <Card key={scholar.id} className="border-border/60">
                             <CardContent className="p-5">
                                 <div className="flex items-start gap-4">

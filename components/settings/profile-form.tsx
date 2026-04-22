@@ -280,7 +280,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                 <Input
                   id="email"
                   type="email"
-                  defaultValue={profile.email}
+                  defaultValue={profile.bio || ""}
                   disabled
                 />
                 <p className="text-xs text-muted-foreground">

@@ -39,7 +39,7 @@ export async function GET() {
         ...impactMetrics.map((metric: Metric) => `- ${metric.label}: ${metric.value} - ${metric.description}`),
         "",
         "Sponsored Scholars",
-        ...sponsoredScholars.map(
+        ...(sponsoredScholars as Scholar[]).map(
             (scholar: Scholar) =>
                 `- ${scholar.first_name} ${scholar.last_name}: ${scholar.program || "Tech Track"}, progress ${scholar.progress_score || 0}%`
         ),

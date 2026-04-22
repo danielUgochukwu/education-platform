@@ -66,9 +66,9 @@ export default async function FundingManagementPage() {
         const progName = curr.programs?.name || "Other";
         acc[progName] = (acc[progName] || 0) + Number(curr.amount);
         return acc;
-    }, {});
+    }, {} as Record<string, number>);
 
-    const distributionItems = Object.entries(programDistribution).map(([label, value]: [string, number], index) => ({
+    const distributionItems = Object.entries(programDistribution).map(([label, value], index) => ({
         label,
         value: Number(value),
         color: ["#0f766e", "#0284c7", "#d97706", "#dc2626", "#475569"][index % 5],

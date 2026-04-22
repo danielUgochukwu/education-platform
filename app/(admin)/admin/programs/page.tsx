@@ -117,7 +117,7 @@ export default async function ProgramsManagementPage() {
                                         </div>
                                         <div className="rounded-lg bg-muted/20 p-3">
                                             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Budget</p>
-                                            <p className="mt-2 font-semibold">N{(program.total_budget / 1000000).toFixed(0)}M</p>
+                                            <p className="mt-2 font-semibold">N{((program.total_budget || 0) / 1000000).toFixed(0)}M</p>
                                         </div>
                                     </div>
                                 </div>
@@ -154,7 +154,7 @@ export default async function ProgramsManagementPage() {
                                         <TableCell>{program.program_lead || "—"}</TableCell>
                                         <TableCell>{program.completion_rate || 0}%</TableCell>
                                         <TableCell>{program.placement_rate || 0}%</TableCell>
-                                        <TableCell>N{(program.total_budget / 1000000).toFixed(0)}M</TableCell>
+                                        <TableCell>N{((program.total_budget || 0) / 1000000).toFixed(0)}M</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

@@ -55,7 +55,7 @@ export default async function ProgramsManagementPage() {
     const performanceItems = programs.map((p: ProgramEntry) => ({
         label: p.name,
         value: p.placement_rate || 0,
-        color: p.placement_rate > 90 ? "#0f766e" : p.placement_rate > 85 ? "#0284c7" : "#d97706",
+        color: (p.placement_rate || 0) > 90 ? "#0f766e" : (p.placement_rate || 0) > 85 ? "#0284c7" : "#d97706",
     }));
 
     return (

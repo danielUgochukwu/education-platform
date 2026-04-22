@@ -32,7 +32,7 @@ export function AcademicBackgroundForm({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const ab = application?.academic_background || {};
+  const ab = (application?.academic_background as Record<string, any>) || {};
 
   const handleSave = async (
     e: React.FormEvent | React.MouseEvent<HTMLButtonElement>,
@@ -113,8 +113,8 @@ export function AcademicBackgroundForm({
                 <Select
                   name="programChoice"
                   defaultValue={
-                    application?.programChoice ||
-                    application?.program_choice ||
+                    (application?.programChoice as string) ||
+                    (application?.program_choice as string) ||
                     ""
                   }
                 >

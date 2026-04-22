@@ -38,7 +38,10 @@ export function DonutBreakdownChart({
         },
         { current: 0, values: [] }
     ).values;
-    const donutBackground = segments.length > 0 ? `conic-gradient(${segments.join(", ")})` : "var(--color-muted)";
+   const donutBackground =
+     segments.length > 0
+       ? `conic-gradient(${segments.join(", ")})`
+       : "hsl(var(--muted))";
 
     return (
         <div className={cn("grid gap-6 lg:grid-cols-[190px_1fr] lg:items-center", className)}>

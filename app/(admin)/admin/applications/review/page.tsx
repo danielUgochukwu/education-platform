@@ -44,29 +44,31 @@ export default async function ApplicationReviewPage({
 
     if (!application) {
         return (
-            <PageContainer
-                title="Application Review"
-                description="No application selected for review."
-                action={
-                    <Button asChild variant="outline">
-                        <Link href="/admin/applications">Back to Applications</Link>
-                    </Button>
-                }
-            >
-                <Card className="border-border/60">
-                    <CardHeader>
-                        <CardTitle>No Application Found</CardTitle>
-                        <CardDescription>
-                            Please select an application from the queue to start a review.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Button asChild>
-                            <Link href="/admin/applications">Go to Application Queue</Link>
-                        </Button>
-                    </CardContent>
-                </Card>
-            </PageContainer>
+          <PageContainer
+            title="Application Review"
+            description="No application selected for review."
+            action={
+              <Button asChild variant="outline">
+                <Link href="/admin/applications">Back to Applications</Link>
+              </Button>
+            }
+          >
+            <div className="border border-border/50 rounded-xl overflow-hidden">
+              <div className="px-5 py-3.5 border-b border-border/50 bg-muted/20">
+                <p className="text-xs font-semibold">No Application Found</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  Please select an application from the queue to start a review.
+                </p>
+              </div>
+              <div className="p-5">
+                <Button asChild size="sm" className="rounded-md">
+                  <Link href="/admin/applications">
+                    Go to Application Queue
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </PageContainer>
         );
     }
 

@@ -88,8 +88,8 @@ export function AllocateFundingDialog({ sponsors, scholars, programs }: Allocate
             setAmount("");
             setProgramId("none");
             router.refresh();
-        } catch (err: any) {
-            setError(err.message || "Failed to allocate funds.");
+        } catch (err) {
+            setError((err as Error).message || "Failed to allocate funds.");
         } finally {
             setIsSaving(false);
         }

@@ -1,9 +1,18 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getDonorDashboardData } from "@/lib/supabase/actions";
 
-function formatPercent(value: number | null) {
-    return value === null ? "N/A" : `${value}%`;
-}
+type Metric = {
+    label: string;
+    value: string | number;
+    description: string;
+};
+
+type Scholar = {
+    first_name: string;
+    last_name: string;
+    program?: string;
+    progress_score?: number;
+};
 
 export async function GET() {
     const supabase = await createSupabaseServerClient();
@@ -27,11 +36,11 @@ export async function GET() {
         ...fundingRecords.map((r) => `- ${r.programs?.name || "Support Line"}: N${(r.amount / 1000000).toFixed(1)}M`),
         "",
         "Impact Metrics",
-        ...impactMetrics.map((metric: any) => `- ${metric.label}: ${metric.value} - ${metric.description}`),
+        ...impactMetrics.map((metric: Metric) => `- ${metric.label}: ${metric.value} - ${metric.description}`),
         "",
         "Sponsored Scholars",
         ...sponsoredScholars.map(
-            (scholar: any) =>
+            (scholar: Scholar) =>
                 `- ${scholar.first_name} ${scholar.last_name}: ${scholar.program || "Tech Track"}, progress ${scholar.progress_score || 0}%`
         ),
         "",

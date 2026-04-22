@@ -14,6 +14,61 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getScholarDocuments } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 
+type ScholarDocument = {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  updated_on: string;
+  expires_on?: string | null;
+  owner: string;
+};
+
+const DocCard = ({
+  title,
+  icon: Icon,
+  type,
+  scholarDocuments,
+}: {
+  title: string;
+  icon: React.ElementType;
+  type: string;
+  scholarDocuments: ScholarDocument[];
+}) => {
+  const docs = scholarDocuments.filter(
+    (d: ScholarDocument) =>
+      d.type === type || (type === "Identity" && d.type === "Compliance")
+  );
+  return (
+    <div className="border border-border/50 rounded-xl overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/50 bg-muted/20">
+        <p className="text-xs font-semibold">{title}</p>
+        <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+      </div>
+      <div className="p-4 space-y-2">
+        {docs.map((doc: ScholarDocument) => (
+          <div
+            key={doc.id}
+            className="flex items-center justify-between p-3 border border-border/50 rounded-lg bg-muted/20"
+          >
+            <div className="flex items-center gap-2.5">
+              <FileText className="h-3.5 w-3.5 text-primary shrink-0" />
+              <span className="text-xs font-medium">{doc.name}</span>
+            </div>
+            <StatusBadge status={doc.status} />
+          </div>
+        ))}
+        {docs.length === 0 && (
+          <p className="text-xs text-muted-foreground italic py-2">
+            No {title.toLowerCase()} found.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
 export default async function DocumentsPage() {
   const supabase = await createSupabaseServerClient();
   const {
@@ -22,49 +77,6 @@ export default async function DocumentsPage() {
   if (!user) redirect("/login");
 
   const scholarDocuments = await getScholarDocuments(user.id);
-
-  const DocCard = ({
-    title,
-    icon: Icon,
-    type,
-  }: {
-    title: string;
-    icon: any;
-    type: string;
-  }) => {
-    const docs = scholarDocuments.filter(
-      (d: any) =>
-        d.type === type || (type === "Identity" && d.type === "Compliance")
-    );
-    return (
-      <div className="border border-border/50 rounded-xl overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/50 bg-muted/20">
-          <p className="text-xs font-semibold">{title}</p>
-          <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-        </div>
-        <div className="p-4 space-y-2">
-          {docs.map((doc: any) => (
-            <div
-              key={doc.id}
-              className="flex items-center justify-between p-3 border border-border/50 rounded-lg bg-muted/20"
-            >
-              <div className="flex items-center gap-2.5">
-                <FileText className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span className="text-xs font-medium">{doc.name}</span>
-              </div>
-              <StatusBadge status={doc.status} />
-            </div>
-          ))}
-          {docs.length === 0 && (
-            <p className="text-xs text-muted-foreground italic py-2">
-              No {title.toLowerCase()} found.
-            </p>
-          )}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <PageContainer
       title="Documents & Compliance"
@@ -78,8 +90,8 @@ export default async function DocumentsPage() {
     >
       <div className="space-y-5">
         <div className="grid gap-5 md:grid-cols-2">
-          <DocCard title="Identity & Profile" icon={Shield} type="Identity" />
-          <DocCard title="Academic Records" icon={FileText} type="Academic" />
+          <DocCard title="Identity & Profile" icon={Shield} type="Identity" scholarDocuments={scholarDocuments} />
+          <DocCard title="Academic Records" icon={FileText} type="Academic" scholarDocuments={scholarDocuments} />
         </div>
 
         {/* Ledger */}
@@ -103,7 +115,7 @@ export default async function DocumentsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {scholarDocuments.map((doc: any) => (
+                {scholarDocuments.map((doc: ScholarDocument) => (
                   <TableRow key={doc.id}>
                     <TableCell className="font-medium text-sm">
                       {doc.name}

@@ -8,6 +8,15 @@ import { getScholarDashboardData } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 import { scholarOpportunities as opportunities } from "@/lib/constants";
 
+type OpportunityMilestone = {
+  category: string;
+  title: string;
+  status: string;
+  impact_description?: string | null;
+  evidence_link?: string | null;
+};
+
+
 export default async function OpportunitiesPage() {
   const supabase = await createSupabaseServerClient();
   const {
@@ -18,10 +27,10 @@ export default async function OpportunitiesPage() {
   const { profile, milestones } = await getScholarDashboardData(user.id);
   const placementStages = milestones
     .filter(
-      (m: any) =>
+      (m: OpportunityMilestone) =>
         m.category === "internships" || m.category === "industry placements"
     )
-    .map((m: any) => ({
+    .map((m: OpportunityMilestone) => ({
       label: m.title,
       status: m.status,
       detail:
@@ -99,7 +108,7 @@ export default async function OpportunitiesPage() {
             </div>
             <div className="p-5">
               <div className="relative border-l border-border/50 pl-6 space-y-6">
-                {placementStages.map((stage, index) => (
+                {placementStages.map((stage) => (
                   <div key={stage.label} className="relative">
                     <div
                       className={`absolute -left-[13px] top-1 h-3 w-3 rounded-full ${

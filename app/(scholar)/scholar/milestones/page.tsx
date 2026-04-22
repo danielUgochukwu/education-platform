@@ -6,6 +6,18 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getScholarDashboardData } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 
+type MilestoneEntry = {
+  id: string;
+  title: string;
+  category: string;
+  status: string;
+  due_date: string;
+  owner?: string | null;
+  impact_description?: string | null;
+  evidence_link?: string | null;
+};
+
+
 const categoryCompletion = [
   { label: "Course completion", value: 100 },
   { label: "Internships", value: 65 },
@@ -22,7 +34,7 @@ export default async function MilestonesPage() {
   if (!user) redirect("/login");
 
   const { milestones } = await getScholarDashboardData(user.id);
-  const milestonesList = milestones.map((m: any) => ({
+  const milestonesList = milestones.map((m: MilestoneEntry) => ({
     id: m.id,
     title: m.title,
     category: m.category,
@@ -40,17 +52,17 @@ export default async function MilestonesPage() {
   const stats = [
     {
       label: "Completed",
-      value: milestonesList.filter((m: any) => m.status === "completed").length,
+      value: milestonesList.filter((m: { status: string }) => m.status === "completed").length,
       detail: "Milestones already delivered",
     },
     {
       label: "In progress",
-      value: milestonesList.filter((m: any) => m.status === "active").length,
+      value: milestonesList.filter((m: { status: string }) => m.status === "active").length,
       detail: "Current milestones under execution",
     },
     {
       label: "Upcoming",
-      value: milestonesList.filter((m: any) => m.status === "upcoming").length,
+      value: milestonesList.filter((m: { status: string }) => m.status === "upcoming").length,
       detail: "Milestones queued for the next cycle",
     },
   ];
@@ -114,7 +126,7 @@ export default async function MilestonesPage() {
               </div>
             </div>
             <div className="divide-y divide-border/50">
-              {milestonesList.map((m: any) => (
+              {milestonesList.map((m: { id: string, title: string, category: string, status: string, dueDate: string, owner: string, impact: string, evidence: string }) => (
                 <div key={m.id} className="p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                     <div>

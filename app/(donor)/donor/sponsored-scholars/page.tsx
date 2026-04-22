@@ -10,6 +10,20 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getDonorDashboardData } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
 
+type SponsoredScholar = {
+    id: string;
+    first_name?: string | null;
+    last_name?: string | null;
+    program?: string | null;
+    status?: string | null;
+    progress_score?: number | null;
+    cohort?: string | null;
+    institution?: string | null;
+    bio?: string | null;
+    placement_status?: string | null;
+};
+
+
 export default async function SponsoredScholarsPage() {
     const supabase = await createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -21,10 +35,10 @@ export default async function SponsoredScholarsPage() {
     const { sponsoredScholars } = await getDonorDashboardData(user.id);
 
     const averageProgress = sponsoredScholars.length > 0
-        ? Math.round(sponsoredScholars.reduce((sum: number, scholar: any) => sum + (scholar.progress_score || 0), 0) / sponsoredScholars.length)
+        ? Math.round(sponsoredScholars.reduce((sum: number, scholar: SponsoredScholar) => sum + (scholar.progress_score || 0), 0) / sponsoredScholars.length)
         : 0;
 
-    const strongPerformers = sponsoredScholars.filter((scholar: any) => (scholar.progress_score || 0) >= 80).length;
+    const strongPerformers = sponsoredScholars.filter((scholar: SponsoredScholar) => (scholar.progress_score || 0) >= 80).length;
 
     return (
         <PageContainer
@@ -40,7 +54,7 @@ export default async function SponsoredScholarsPage() {
                 </div>
 
                 <div className="grid gap-4 xl:grid-cols-2">
-                    {sponsoredScholars.map((scholar: any) => (
+                    {sponsoredScholars.map((scholar: SponsoredScholar) => (
                         <Card key={scholar.id} className="border-border/60">
                             <CardContent className="p-5">
                                 <div className="flex items-start gap-4">

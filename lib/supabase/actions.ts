@@ -4,11 +4,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseAdminClient } from "./admin";
 import { createSupabaseServerClient } from "./server";
 import {
-    Scholar,
-    Milestone,
-    Announcement,
-    ImpactMetric,
-    FundingRecord,
     ApplicationStatus,
     DocumentStatus,
     DocumentType,
@@ -484,7 +479,7 @@ async function resolveProgramAndCohortSelection(
     }
 
     const programId = ((matchedProgram as Record<string, unknown>).id as string).trim();
-    const { data: latestCohort, error: cohortError } = await runWithTablePermissionFallback(
+    const { data: latestCohort, error: cohortError } = await runWithTablePermissionFallback<any>(
         supabase,
         "cohorts",
         async (client) =>
@@ -1105,12 +1100,13 @@ export async function getAdminScholars() {
     }
 
     return (data || []).map(profile => {
-        const application = (profile.applications as any[])?.[0];
+        const applications = profile.applications as Array<{ programs?: { title?: string }, cohorts?: { year?: string } }> | undefined;
+        const application = applications?.[0];
         return {
             ...profile,
             program: application?.programs?.title,
             cohort: application?.cohorts?.year,
-            progress_score: (profile as any).progress_score || 0, // Fallback if not in schema
+            progress_score: (profile as Record<string, unknown>).progress_score || 0, // Fallback if not in schema
         };
     });
 }
@@ -1138,9 +1134,9 @@ export async function getAdminScholarManagementData() {
 
     // Calculate health breakdown based on progress scores
     const healthBreakdown = {
-        onTrack: scholars.filter(s => (s as any).progress_score >= 70).length,
-        atRisk: scholars.filter(s => (s as any).progress_score >= 40 && (s as any).progress_score < 70).length,
-        offTrack: scholars.filter(s => (s as any).progress_score < 40).length,
+        onTrack: scholars.filter(s => Number((s as Record<string, unknown>).progress_score) >= 70).length,
+        atRisk: scholars.filter(s => { const score = Number((s as Record<string, unknown>).progress_score); return score >= 40 && score < 70; }).length,
+        offTrack: scholars.filter(s => Number((s as Record<string, unknown>).progress_score) < 40).length,
     };
 
     const totalScholars = scholars.length || 1;
@@ -1857,6 +1853,6 @@ export async function getAvailableCohorts() {
         id: row.id,
         year: row.year,
         programId: row.program_id,
-        programName: (row.programs as any)?.title || "Unknown Program"
+        programName: (row.programs as { title?: string })?.title || "Unknown Program"
     }));
 }

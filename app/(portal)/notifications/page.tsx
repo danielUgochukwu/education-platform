@@ -8,6 +8,16 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { getNotifications } from "@/lib/supabase/actions";
 
+type NotificationEntry = {
+  id: string;
+  type: string;
+  is_read: boolean;
+  title: string;
+  body: string;
+  created_at: string;
+};
+
+
 const notifIcon: Record<string, React.ReactNode> = {
     info: <Info className="h-4 w-4 text-blue-500" />,
     warning: <AlertTriangle className="h-4 w-4 text-amber-500" />,
@@ -31,8 +41,8 @@ export default async function NotificationsPage() {
     }
 
     const notifications = await getNotifications(user.id);
-    const unread = notifications.filter((n: any) => !n.is_read);
-    const read = notifications.filter((n: any) => n.is_read);
+    const unread = notifications.filter((n: NotificationEntry) => !n.is_read);
+    const read = notifications.filter((n: NotificationEntry) => n.is_read);
 
     return (
         <PageContainer
@@ -54,7 +64,7 @@ export default async function NotificationsPage() {
                             </h2>
                             <Badge className="h-5 text-[10px]">{unread.length}</Badge>
                         </div>
-                        {unread.map((notif: any) => (
+                        {unread.map((notif: NotificationEntry) => (
                             <NotifCard key={notif.id} notif={notif} />
                         ))}
                     </div>
@@ -64,7 +74,7 @@ export default async function NotificationsPage() {
                     <div className="space-y-3">
                         {(unread.length > 0) && <Separator />}
                         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Earlier</h2>
-                        {read.map((notif: any) => (
+                        {read.map((notif: NotificationEntry) => (
                             <NotifCard key={notif.id} notif={notif} isRead />
                         ))}
                     </div>
@@ -74,7 +84,7 @@ export default async function NotificationsPage() {
                     <div className="text-center py-20 text-muted-foreground">
                         <Bell className="h-12 w-12 mx-auto mb-4 opacity-20" />
                         <p className="font-semibold">No notifications yet</p>
-                        <p className="text-sm mt-1">You'll be notified of important application updates here.</p>
+                        <p className="text-sm mt-1">You&apos;ll be notified of important application updates here.</p>
                     </div>
                 )}
             </div>
@@ -82,7 +92,7 @@ export default async function NotificationsPage() {
     );
 }
 
-function NotifCard({ notif, isRead }: { notif: any; isRead?: boolean }) {
+function NotifCard({ notif, isRead }: { notif: NotificationEntry; isRead?: boolean }) {
     return (
         <Card className={`border transition-colors ${isRead ? "border-border/40 bg-background" : `${notifBg[notif.type] || notifBg.info} border`}`}>
             <CardContent className="p-4 flex items-start gap-3">

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Filter, Search, X } from "lucide-react";
+import { Filter, Search } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 

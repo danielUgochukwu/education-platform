@@ -1,9 +1,19 @@
 import { PageContainer } from "@/components/layout/page-container";
-import { Badge } from "@/components/ui/badge";
 import { Calendar, MessageSquare, Target, User } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getScholarDashboardData } from "@/lib/supabase/actions";
 import { redirect } from "next/navigation";
+
+type MentorSession = {
+  id: string;
+  date: string;
+  mentor_name: string;
+  theme: string;
+  sentiment?: string | null;
+  summary: string;
+  strengths?: string[] | null;
+  action_items?: string[] | null;
+};
 
 const sentimentClasses: Record<string, string> = {
   Strong:
@@ -22,7 +32,7 @@ export default async function MentorFeedbackPage() {
   if (!user) redirect("/login");
 
   const { profile, mentorSessions } = await getScholarDashboardData(user.id);
-  const sessions = mentorSessions.map((s: any) => ({
+  const sessions = mentorSessions.map((s: MentorSession) => ({
     id: s.id,
     date: new Date(s.date).toLocaleDateString("en-US", {
       year: "numeric",
@@ -129,7 +139,7 @@ export default async function MentorFeedbackPage() {
               </div>
             </div>
             <div className="divide-y divide-border/50">
-              {sessions.map((session: any, index: number) => (
+              {sessions.map((session: { id: string, theme: string, sentiment: string, date: string, mentor: string, summary: string, strengths: string[], actionItems: string[] }, index: number) => (
                 <div key={session.id} className="p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
                     <div>

@@ -121,7 +121,7 @@ export default async function FundingAllocationPage() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {sponsoredScholars.map((scholar: SponsoredScholar) => (
+                                    {(sponsoredScholars as SponsoredScholar[]).map((scholar) => (
                                         <TableRow key={scholar.id}>
                                             <TableCell className="font-medium">{scholar.first_name} {scholar.last_name}</TableCell>
                                             <TableCell>{scholar.program || "Tech Track"}</TableCell>

@@ -144,6 +144,7 @@ function SignupPageContent() {
   return (
     <div className="min-h-screen flex items-start md:items-center justify-center p-4 bg-muted/30">
       <div className="w-full max-w-3xl grid md:grid-cols-[5fr_7fr] border border-border/50 rounded-xl overflow-hidden shadow-sm my-8 md:my-0">
+      
         {/* ── Left: Brand Panel ── */}
         <div className="bg-foreground p-8 md:p-10 hidden md:flex flex-col gap-8 justify-between">
           <Link href="/" className="flex items-center gap-2.5">

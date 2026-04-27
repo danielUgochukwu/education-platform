@@ -85,7 +85,7 @@ export function ApplicationWizard({ application, profile, documents }: { applica
       case 4:
         return (
           <DocumentUploadForm
-            documents={documents as any}
+            documents={documents}
             onNext={next}
             onBack={prev}
           />
@@ -95,7 +95,7 @@ export function ApplicationWizard({ application, profile, documents }: { applica
           <ApplicationReview
             application={application}
             profile={profile}
-            documents={documents as any}
+            documents={documents}
             onBack={prev}
             onEdit={goToStep}
           />

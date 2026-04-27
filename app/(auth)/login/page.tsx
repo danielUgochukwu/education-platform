@@ -84,57 +84,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-3xl grid md:grid-cols-2 border border-border/50 rounded-xl overflow-hidden shadow-sm">
-        {/* ── Left: Brand Panel ── */}
-        <div className="bg-foreground p-10 flex-col justify-between hidden md:flex">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center shrink-0">
-              <span className="text-primary-foreground font-bold text-sm">
-                N
-              </span>
-            </div>
-            <span className="text-background font-bold text-sm tracking-tight">
-              National Talent Initiative
-            </span>
-          </Link>
-
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2 mb-4">
-              <span className="inline-block w-5 h-px bg-primary" />
-              Secure Portal
-            </p>
-            <h2 className="text-2xl font-bold leading-snug tracking-tight text-background mb-3">
-              Shaping Nigeria&apos;s future,{" "}
-              <span className="text-background/50 font-medium">
-                one scholar at a time.
-              </span>
-            </h2>
-            <p className="text-sm text-background/45 leading-relaxed">
-              Access your dashboard to track applications, funding status, and
-              programme milestones.
-            </p>
-          </div>
-
-          <div className="flex divide-x divide-background/10 border-t border-background/10 pt-5">
-            {[
-              { value: "5,000+", label: "Scholars" },
-              { value: "36", label: "States" },
-              { value: "98%", label: "Employed" },
-            ].map((s, i) => (
-              <div
-                key={i}
-                className={`flex-1 ${
-                  i === 0 ? "pr-4" : i === 2 ? "pl-4" : "px-4"
-                }`}
-              >
-                <div className="text-lg font-bold text-background tracking-tight leading-none">
-                  {s.value}
-                </div>
-                <div className="text-xs text-background/40 mt-1">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
+       
         {/* ── Right: Form Panel ── */}
         <div className="bg-background p-8 md:p-10 flex flex-col justify-center gap-6">
           {/* Mobile logo */}

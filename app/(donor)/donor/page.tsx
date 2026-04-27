@@ -66,7 +66,7 @@ export default async function DonorDashboardPage() {
     } = await getDonorDashboardData(user.id);
 
     const averageProgress = sponsoredScholars.length > 0
-        ? Math.round((sponsoredScholars as SponsoredScholar[]).reduce((sum: number, scholar: SponsoredScholar) => sum + (scholar.progress_score || 0), 0) / sponsoredScholars.length)
+        ? Math.round(sponsoredScholars.reduce((sum: number, scholar: SponsoredScholar) => sum + (scholar.progress_score || 0), 0) / sponsoredScholars.length)
         : 0;
 
     const totalFunding = fundingRecords.reduce((acc: number, curr: FundingRecord) => acc + Number(curr.amount), 0);
@@ -91,9 +91,9 @@ export default async function DonorDashboardPage() {
     }));
 
     const scholarOutcomeBreakdown = [
-        { label: "High Performance", value: (sponsoredScholars as SponsoredScholar[]).filter((s: SponsoredScholar) => (s.progress_score || 0) >= 80).length, color: "var(--primary)" },
-        { label: "On Track", value: (sponsoredScholars as SponsoredScholar[]).filter((s: SponsoredScholar) => (s.progress_score || 0) >= 60 && (s.progress_score || 0) < 80).length, color: "#f59e0b" },
-        { label: "Support Needed", value: (sponsoredScholars as SponsoredScholar[]).filter((s: SponsoredScholar) => (s.progress_score || 0) < 60).length, color: "#ef4444" },
+        { label: "High Performance", value: sponsoredScholars.filter((s: SponsoredScholar) => (s.progress_score || 0) >= 80).length, color: "var(--primary)" },
+        { label: "On Track", value: sponsoredScholars.filter((s: SponsoredScholar) => (s.progress_score || 0) >= 60 && (s.progress_score || 0) < 80).length, color: "#f59e0b" },
+        { label: "Support Needed", value: sponsoredScholars.filter((s: SponsoredScholar) => (s.progress_score || 0) < 60).length, color: "#ef4444" },
     ].map(item => ({
         ...item,
         value: sponsoredScholars.length > 0 ? Math.round((item.value / sponsoredScholars.length) * 100) : 0
@@ -147,7 +147,7 @@ export default async function DonorDashboardPage() {
                                     {[
                                         { label: "Funding visibility", value: 100, detail: "Every allocation line is trackable by category and scholar." },
                                         { label: "Scholar development coverage", value: averageProgress, detail: "Sponsored scholars remain on-track across academic and career milestones." },
-                                        { label: "Outcome reporting cadence", value: 93, detail: `${(sponsoredScholars as SponsoredScholar[]).filter((s: SponsoredScholar) => s.status === "graduated").length} graduated` },
+                                        { label: "Outcome reporting cadence", value: 93, detail: "Quarterly impact packets and annual reports are current." },
                                     ].map((item) => (
                                         <div key={item.label} className="space-y-2">
                                             <div className="flex items-center justify-between gap-4">
@@ -247,7 +247,7 @@ export default async function DonorDashboardPage() {
                         </Button>
                     </CardHeader>
                     <CardContent className="grid gap-4 lg:grid-cols-2">
-                        {(sponsoredScholars as SponsoredScholar[]).map((scholar: SponsoredScholar) => {
+                        {sponsoredScholars.map((scholar: SponsoredScholar) => {
                             const firstName = scholar.first_name?.trim() || "";
                             const lastName = scholar.last_name?.trim() || "";
                             const scholarInitials = `${firstName.charAt(0)}${lastName.charAt(0)}`.trim() || "?";
@@ -263,7 +263,7 @@ export default async function DonorDashboardPage() {
                                         <div className="flex-1">
                                             <div className="flex flex-wrap items-center gap-2">
                                                 <p className="font-semibold">{scholar.first_name} {scholar.last_name}</p>
-                                                <Badge variant="outline">{(scholar.progress_score || 0)}%</Badge>
+                                                <Badge variant="outline">Cohort {scholar.cohort || "2026"}</Badge>
                                             </div>
                                             <p className="text-sm text-muted-foreground">{scholar.program || "Technology Track"} · {scholar.institution || "NTDI Academy"}</p>
                                         </div>

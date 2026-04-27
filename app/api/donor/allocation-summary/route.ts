@@ -8,10 +8,10 @@ type Metric = {
 };
 
 type Scholar = {
-    first_name: string;
-    last_name: string;
-    program?: string;
-    progress_score?: number;
+    first_name: string | null;
+    last_name: string | null;
+    program?: string | null;
+    progress_score?: number | null;
 };
 
 export async function GET() {
@@ -41,7 +41,7 @@ export async function GET() {
         "Sponsored Scholars",
         ...sponsoredScholars.map(
             (scholar: Scholar) =>
-                `- ${scholar.first_name} ${scholar.last_name}: ${scholar.program || "Tech Track"}, progress ${scholar.progress_score || 0}%`
+                `- ${scholar.first_name || ""} ${scholar.last_name || ""}: ${scholar.program || "Tech Track"}, progress ${scholar.progress_score || 0}%`
         ),
         "",
     ].join("\n");

@@ -958,10 +958,36 @@ export async function getDonorDashboardData(donorId: string) {
             .filter(Boolean)
     ));
 
-    let sponsoredScholars: Array<Record<string, unknown>> = [];
+    type DonorSponsoredScholar = {
+        id: string;
+        first_name: string | null;
+        last_name: string | null;
+        program: string | null;
+        status: string | null;
+        progress_score: number | null;
+        cohort: string | null;
+        institution: string | null;
+        bio: string | null;
+        placement_status?: string | null;
+    };
+
+    let sponsoredScholars: DonorSponsoredScholar[] = [];
     if (scholarIds.length > 0) {
         const { data } = await supabase.from("profiles").select("*").in("id", scholarIds);
-        sponsoredScholars = data || [];
+        sponsoredScholars = (data || []).map((scholar: Record<string, unknown>) => ({
+            id: typeof scholar.id === "string" ? scholar.id : "",
+            first_name: typeof scholar.first_name === "string" ? scholar.first_name : null,
+            last_name: typeof scholar.last_name === "string" ? scholar.last_name : null,
+            program: typeof scholar.program === "string" ? scholar.program : null,
+            status: typeof scholar.status === "string" ? scholar.status : null,
+            progress_score: Number.isFinite(Number(scholar.progress_score))
+                ? Number(scholar.progress_score)
+                : null,
+            cohort: typeof scholar.cohort === "string" ? scholar.cohort : null,
+            institution: typeof scholar.institution === "string" ? scholar.institution : null,
+            bio: typeof scholar.bio === "string" ? scholar.bio : null,
+            placement_status: typeof scholar.placement_status === "string" ? scholar.placement_status : null,
+        }));
     }
 
     return {

@@ -251,6 +251,7 @@ export default async function DonorDashboardPage() {
                             const firstName = scholar.first_name?.trim() || "";
                             const lastName = scholar.last_name?.trim() || "";
                             const scholarInitials = `${firstName.charAt(0)}${lastName.charAt(0)}`.trim() || "?";
+                            const progressScore = scholar.progress_score || 0;
 
                             return (
                                 <div key={scholar.id} className="rounded-xl border bg-background p-4">
@@ -268,16 +269,16 @@ export default async function DonorDashboardPage() {
                                             <p className="text-sm text-muted-foreground">{scholar.program || "Technology Track"} · {scholar.institution || "NTDI Academy"}</p>
                                         </div>
                                         <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">
-                                            {scholar.progress_score >= 80 ? "Excellent" : scholar.progress_score >= 60 ? "On Track" : "Needs Review"}
+                                            {progressScore >= 80 ? "Excellent" : progressScore >= 60 ? "On Track" : "Needs Review"}
                                         </Badge>
                                     </div>
 
                                     <div className="mt-4 space-y-2">
                                         <div className="flex items-center justify-between text-sm">
                                             <span className="text-muted-foreground">Development score</span>
-                                            <span className="font-semibold">{scholar.progress_score || 0}%</span>
+                                            <span className="font-semibold">{progressScore}%</span>
                                         </div>
-                                        <Progress value={scholar.progress_score || 0} className="h-2" />
+                                        <Progress value={progressScore} className="h-2" />
                                     </div>
 
                                     <p className="mt-4 text-sm text-muted-foreground">{scholar.bio?.slice(0, 100) || "Progressing well across all academic tracks and career readiness modules."}...</p>

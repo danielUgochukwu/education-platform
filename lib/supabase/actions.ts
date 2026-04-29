@@ -12,6 +12,7 @@ import {
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 type ServerSupabaseClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PublicSupabaseClient = SupabaseClient<any, "public", any>;
 
 function getProgramName(program: unknown): string {
@@ -479,7 +480,7 @@ async function resolveProgramAndCohortSelection(
     }
 
     const programId = ((matchedProgram as Record<string, unknown>).id as string).trim();
-    const { data: latestCohort, error: cohortError } = await runWithTablePermissionFallback<any>(
+    const { data: latestCohort, error: cohortError } = await runWithTablePermissionFallback<{ id: string } | null>(
         supabase,
         "cohorts",
         async (client) =>

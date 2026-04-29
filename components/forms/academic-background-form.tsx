@@ -32,7 +32,7 @@ export function AcademicBackgroundForm({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const ab = (application?.academic_background as Record<string, any>) || {};
+  const ab = (application?.academic_background as Record<string, string>) || {};
 
   const handleSave = async (
     e: React.FormEvent | React.MouseEvent<HTMLButtonElement>,

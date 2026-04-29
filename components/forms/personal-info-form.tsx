@@ -23,6 +23,29 @@ interface PersonalInfoFormProps {
   onNext?: () => void;
 }
 
+type SavedPersonalInfo = Partial<{
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dateOfBirth: string;
+  gender: string;
+  nationalId: string;
+  stateOfOrigin: string;
+  lgaOfOrigin: string;
+  address: string;
+  city: string;
+  resState: string;
+}>;
+
+type ApplicantProfile = Partial<
+  Record<
+    "first_name" | "last_name" | "email" | "phone" | "state_of_origin",
+    string | null
+  >
+>;
+
 export function PersonalInfoForm({
   application,
   profile,
@@ -31,7 +54,8 @@ export function PersonalInfoForm({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const pi = application?.personal_info || {};
+  const pi = (application?.personal_info || {}) as SavedPersonalInfo;
+  const profileData = profile as ApplicantProfile;
 
   const handleSave = async (
     e: React.FormEvent | React.MouseEvent<HTMLButtonElement>,
@@ -54,7 +78,7 @@ export function PersonalInfoForm({
         firstName: getString("firstName"),
         middleName: getString("middleName"),
         lastName: getString("lastName"),
-        email: pi.email || profile.email || "",
+        email: pi.email || profileData.email || "",
         phone: getString("phone"),
         dateOfBirth: getString("dob"),
         gender: getString("gender"),
@@ -113,7 +137,7 @@ export function PersonalInfoForm({
                     id="firstName"
                     name="firstName"
                     className="h-9 text-sm"
-                    defaultValue={pi.firstName || profile?.first_name || ""}
+                    defaultValue={pi.firstName || profileData.first_name || ""}
                     required
                   />
                 </div>
@@ -136,7 +160,7 @@ export function PersonalInfoForm({
                     id="lastName"
                     name="lastName"
                     className="h-9 text-sm"
-                    defaultValue={pi.lastName || profile?.last_name || ""}
+                    defaultValue={pi.lastName || profileData.last_name || ""}
                     required
                   />
                 </div>
@@ -159,7 +183,7 @@ export function PersonalInfoForm({
                     id="email"
                     type="email"
                     className="h-9 text-sm"
-                    defaultValue={pi.email || profile.email}
+                    defaultValue={pi.email || profileData.email || ""}
                     disabled
                   />
                 </div>
@@ -172,7 +196,7 @@ export function PersonalInfoForm({
                     name="phone"
                     type="tel"
                     className="h-9 text-sm"
-                    defaultValue={pi.phone || profile.phone || ""}
+                    defaultValue={pi.phone || profileData.phone || ""}
                     required
                   />
                 </div>
@@ -246,7 +270,9 @@ export function PersonalInfoForm({
                   </Label>
                   <Select
                     name="stateOfOrigin"
-                    defaultValue={pi.stateOfOrigin || profile.state_of_origin}
+                    defaultValue={
+                      pi.stateOfOrigin || profileData.state_of_origin || undefined
+                    }
                   >
                     <SelectTrigger id="state" className="h-9 text-sm">
                       <SelectValue placeholder="Select state" />

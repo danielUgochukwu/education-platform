@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { saveApplicationStep } from "@/lib/supabase/actions";
 import { cn } from "@/lib/utils";
+import type { EssaySubmission } from "@/types";
 
 interface EssayFormProps {
   application: Record<string, unknown>;
@@ -23,7 +24,18 @@ interface EssayFormProps {
   onBack?: () => void;
 }
 
-const essayPrompts = [
+type EssayId = keyof EssaySubmission;
+type EssayFormData = Partial<Record<EssayId, string>>;
+
+type EssayPrompt = {
+  id: EssayId;
+  label: string;
+  wordMin: number;
+  wordMax: number;
+  prompt: string;
+};
+
+const essayPrompts: EssayPrompt[] = [
   {
     id: "whyApply",
     label: "Why are you applying?",
@@ -62,14 +74,31 @@ function wordCount(text: string) {
   return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
 }
 
+function getInitialEssayData(value: unknown): EssayFormData {
+  if (!value || typeof value !== "object") {
+    return {};
+  }
+
+  const source = value as Partial<Record<EssayId, unknown>>;
+
+  return essayPrompts.reduce<EssayFormData>((initialData, essay) => {
+    const essayValue = source[essay.id];
+    if (typeof essayValue === "string") {
+      initialData[essay.id] = essayValue;
+    }
+    return initialData;
+  }, {});
+}
+
 export function EssayForm({ application, onNext, onBack }: EssayFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const essays = application?.essays || {};
-  const [formData, setFormData] = useState(essays);
+  const [formData, setFormData] = useState<EssayFormData>(() =>
+    getInitialEssayData(application?.essays)
+  );
 
-  const handleTextChange = (id: string, value: string) => {
-    setFormData((prev: Record<string, string>) => ({ ...prev, [id]: value }));
+  const handleTextChange = (id: EssayId, value: string) => {
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleSave = async (
@@ -94,7 +123,7 @@ export function EssayForm({ application, onNext, onBack }: EssayFormProps) {
     }
     setLoading(true);
     try {
-      const { error } = await saveApplicationStep(3, formData, isNext);
+      const { error } = await saveApplicationStep(3, { ...formData }, isNext);
       if (error) {
         toast.error(error);
         return;

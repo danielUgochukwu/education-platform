@@ -12,10 +12,27 @@ export async function proxy(request: NextRequest) {
     let response = NextResponse.next({
         request,
     });
+    const pathname = request.nextUrl.pathname;
+    const isAuthRoute = pathname === "/login" || pathname === "/signup";
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+    if (!supabaseUrl || !supabasePublishableKey) {
+        if (isProtectedPath(pathname)) {
+            const loginUrl = new URL("/login", request.url);
+            loginUrl.searchParams.set(
+                "next",
+                `${pathname}${request.nextUrl.search}`
+            );
+            return NextResponse.redirect(loginUrl);
+        }
+
+        return response;
+    }
 
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "",
+        supabaseUrl,
+        supabasePublishableKey,
         {
             cookies: {
                 getAll() {
@@ -35,9 +52,6 @@ export async function proxy(request: NextRequest) {
     const {
         data: { user },
     } = await supabase.auth.getUser();
-
-    const pathname = request.nextUrl.pathname;
-    const isAuthRoute = pathname === "/login" || pathname === "/signup";
 
     if (!user && isProtectedPath(pathname)) {
         const loginUrl = new URL("/login", request.url);

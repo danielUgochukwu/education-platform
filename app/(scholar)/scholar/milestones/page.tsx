@@ -1,6 +1,7 @@
 import { PageContainer } from "@/components/layout/page-container";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/ui/status-badge";
+import type { BadgeStatus } from "@/components/ui/status-badge";
 import { Calendar, Flag, Target } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getScholarDashboardData } from "@/lib/supabase/actions";
@@ -10,7 +11,7 @@ type MilestoneEntry = {
   id: string;
   title: string;
   category: string;
-  status: string;
+  status: BadgeStatus;
   due_date: string;
   owner?: string | null;
   impact_description?: string | null;
@@ -52,17 +53,17 @@ export default async function MilestonesPage() {
   const stats = [
     {
       label: "Completed",
-      value: milestonesList.filter((m: { status: string }) => m.status === "completed").length,
+      value: milestonesList.filter((m: { status: BadgeStatus }) => m.status === "completed").length,
       detail: "Milestones already delivered",
     },
     {
       label: "In progress",
-      value: milestonesList.filter((m: { status: string }) => m.status === "active").length,
+      value: milestonesList.filter((m: { status: BadgeStatus }) => m.status === "active").length,
       detail: "Current milestones under execution",
     },
     {
       label: "Upcoming",
-      value: milestonesList.filter((m: { status: string }) => m.status === "upcoming").length,
+      value: milestonesList.filter((m: { status: BadgeStatus }) => m.status === "upcoming").length,
       detail: "Milestones queued for the next cycle",
     },
   ];
@@ -126,7 +127,7 @@ export default async function MilestonesPage() {
               </div>
             </div>
             <div className="divide-y divide-border/50">
-              {milestonesList.map((m: { id: string, title: string, category: string, status: string, dueDate: string, owner: string, impact: string, evidence: string }) => (
+              {milestonesList.map((m: { id: string, title: string, category: string, status: BadgeStatus, dueDate: string, owner: string, impact: string, evidence: string }) => (
                 <div key={m.id} className="p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                     <div>

@@ -2,6 +2,7 @@ import { PageContainer } from "@/components/layout/page-container";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/ui/status-badge";
+import type { BadgeStatus } from "@/components/ui/status-badge";
 import {
   Table,
   TableBody,
@@ -16,7 +17,7 @@ import { redirect } from "next/navigation";
 
 type FundingRecord = {
   id: string;
-  status: string;
+  status: BadgeStatus;
   amount: number | string;
   category: string;
   disbursement_date?: string | null;
@@ -58,20 +59,24 @@ export default async function FundingOverviewPage() {
 
   const { profile, fundingRecords } = await getScholarDashboardData(user.id);
 
-  const fmt = (n: number) =>
+  const toAmount = (value: number | string | null | undefined) => {
+    const amount = Number(value);
+    return Number.isFinite(amount) ? amount : 0;
+  };
+  const fmt = (value: number | string | null | undefined) =>
     new Intl.NumberFormat("en-NG", {
       style: "currency",
       currency: "NGN",
       maximumFractionDigits: 0,
-    }).format(n);
-  const totalApproved = profile?.approved_funding || 4800000;
+    }).format(toAmount(value));
+  const totalApproved = toAmount(profile?.approved_funding || 4800000);
   const totalDisbursed = fundingRecords.reduce(
     (acc: number, r: FundingRecord) =>
-      acc + (r.status === "completed" ? Number(r.amount) : 0),
+      acc + (r.status === "completed" ? toAmount(r.amount) : 0),
     0
   );
   const nextStipend =
-    fundingRecords.find((r: FundingRecord) => r.status === "pending")?.amount || 350000;
+    toAmount(fundingRecords.find((r: FundingRecord) => r.status === "pending")?.amount || 350000);
 
   const ledger = fundingRecords.map((r: FundingRecord) => ({
     id: r.id,
@@ -203,7 +208,7 @@ export default async function FundingOverviewPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {ledger.map((d: { id: string, date: string, category: string, amount: string, reference: string, status: string }) => (
+              {ledger.map((d: { id: string, date: string, category: string, amount: string, reference: string, status: BadgeStatus }) => (
                 <TableRow key={d.id}>
                   <TableCell className="font-medium text-sm">
                     {d.date}

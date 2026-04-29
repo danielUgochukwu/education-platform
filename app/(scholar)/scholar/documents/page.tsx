@@ -1,6 +1,7 @@
 import { PageContainer } from "@/components/layout/page-container";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
+import type { BadgeStatus } from "@/components/ui/status-badge";
 import {
   Table,
   TableBody,
@@ -18,7 +19,7 @@ type ScholarDocument = {
   id: string;
   name: string;
   type: string;
-  status: string;
+  status: BadgeStatus;
   updated_on: string;
   expires_on?: string | null;
   owner: string;

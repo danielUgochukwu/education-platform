@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
+import type { BadgeStatus } from "@/components/ui/status-badge";
 import {
   Table,
   TableBody,
@@ -24,7 +25,7 @@ import { redirect } from "next/navigation";
 type ProgressReport = {
   id: string;
   period: string;
-  status: string;
+  status: BadgeStatus;
   reviewer?: string | null;
   score?: number | string | null;
   summary?: string | null;

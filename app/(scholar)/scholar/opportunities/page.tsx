@@ -2,6 +2,7 @@ import { PageContainer } from "@/components/layout/page-container";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/ui/status-badge";
+import type { BadgeStatus } from "@/components/ui/status-badge";
 import { ArrowRight, Briefcase, Compass, Target } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getScholarDashboardData } from "@/lib/supabase/actions";
@@ -11,7 +12,7 @@ import { scholarOpportunities as opportunities } from "@/lib/constants";
 type OpportunityMilestone = {
   category: string;
   title: string;
-  status: string;
+  status: BadgeStatus;
   impact_description?: string | null;
   evidence_link?: string | null;
 };

@@ -12,6 +12,7 @@
     "@arcjet/next": "^1.3.0",
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.2",
+    "@sentry/nextjs": "^10.51.0",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.99.2",
     "@vercel/analytics": "^2.0.1",

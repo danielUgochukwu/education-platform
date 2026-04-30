@@ -1,6 +1,7 @@
 "use server";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { resolveUserRoleForSession } from "@/lib/auth/roles";
 import { createSupabaseAdminClient } from "./admin";
 import { createSupabaseServerClient } from "./server";
 import {
@@ -14,6 +15,24 @@ const MS_PER_DAY = 1000 * 60 * 60 * 24;
 type ServerSupabaseClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PublicSupabaseClient = SupabaseClient<any, "public", any>;
+
+const ADMIN_ACCESS_ROLES = new Set(["admin", "reviewer", "partner"]);
+
+async function verifyAdminAccess(supabase: ServerSupabaseClient): Promise<void> {
+    const {
+        data: { user },
+        error,
+    } = await supabase.auth.getUser();
+
+    if (error || !user) {
+        throw new Error("Unauthorized admin access.");
+    }
+
+    const role = await resolveUserRoleForSession(supabase, user);
+    if (!ADMIN_ACCESS_ROLES.has(role)) {
+        throw new Error("Forbidden admin access.");
+    }
+}
 
 function getProgramName(program: unknown): string {
     if (!program || typeof program !== "object") return "";
@@ -884,6 +903,7 @@ export async function getScholarDashboardData(scholarId: string) {
 
 export async function getAdminDashboardData() {
     const supabase = await createSupabaseServerClient();
+    await verifyAdminAccess(supabase);
 
     const [
         scholarsCount,
@@ -1029,6 +1049,8 @@ export async function getScholarDocuments(scholarId: string) {
 
 export async function getAdminUsers() {
     const supabase = await createSupabaseServerClient();
+    await verifyAdminAccess(supabase);
+
     const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -1043,6 +1065,8 @@ export async function getAdminUsers() {
 
 export async function getAdminSponsors() {
     const supabase = await createSupabaseServerClient();
+    await verifyAdminAccess(supabase);
+
     const { data, error } = await supabase
         .from("profiles")
         .select(`
@@ -1061,6 +1085,8 @@ export async function getAdminSponsors() {
 
 export async function getAdminPrograms() {
     const supabase = await createSupabaseServerClient();
+    await verifyAdminAccess(supabase);
+
     const { data, error } = await supabase
         .from("programs")
         .select("*");
@@ -1074,6 +1100,8 @@ export async function getAdminPrograms() {
 
 export async function getAdminCohorts() {
     const supabase = await createSupabaseServerClient();
+    await verifyAdminAccess(supabase);
+
     const [cohorts, applications] = await Promise.all([
         getAdminCohortsData(supabase),
         fetchAdminApplicationsData(supabase),
@@ -1084,6 +1112,8 @@ export async function getAdminCohorts() {
 
 export async function getAdminFundingLedger() {
     const supabase = await createSupabaseServerClient();
+    await verifyAdminAccess(supabase);
+
     const { data, error } = await supabase
         .from("funding_records")
         .select(`
@@ -1102,11 +1132,15 @@ export async function getAdminFundingLedger() {
 
 export async function getAdminApplications() {
     const supabase = await createSupabaseServerClient();
+    await verifyAdminAccess(supabase);
+
     return fetchAdminApplicationsData(supabase);
 }
 
 export async function getAdminScholars() {
     const supabase = await createSupabaseServerClient();
+    await verifyAdminAccess(supabase);
+
     const { data, error } = await supabase
         .from("profiles")
         .select(`
@@ -1140,6 +1174,7 @@ export async function getAdminScholars() {
 
 export async function getAdminScholarManagementData() {
     const supabase = await createSupabaseServerClient();
+    await verifyAdminAccess(supabase);
 
     // Fetch scholars with their primary application info
     const scholars = await getAdminScholars();
@@ -1188,6 +1223,8 @@ export async function getAdminScholarManagementData() {
 
 export async function getAdminApplicationById(id: string) {
     const supabase = await createSupabaseServerClient();
+    await verifyAdminAccess(supabase);
+
     const { data, error } = await supabase
         .from("applications")
         .select(`
@@ -1727,11 +1764,7 @@ export async function updateApplicationDecision(
     cohortId?: string | null
 ): Promise<{ error: string | null }> {
     const supabase = await createSupabaseServerClient();
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-        return { error: "Unauthorized" };
-    }
+    await verifyAdminAccess(supabase);
 
     const sanitizedApplicationId = applicationId.trim();
     const sanitizedApplicantId = applicantId.trim();
@@ -1771,11 +1804,7 @@ export async function updateApplicationDocumentStatus(
     status: DocumentStatus
 ): Promise<{ error: string | null }> {
     const supabase = await createSupabaseServerClient();
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-        return { error: "Unauthorized" };
-    }
+    await verifyAdminAccess(supabase);
 
     const sanitizedApplicationId = applicationId.trim();
     if (!sanitizedApplicationId) {
@@ -1807,11 +1836,7 @@ export async function allocateFunding(
     programId?: string
 ): Promise<{ error: string | null }> {
     const supabase = await createSupabaseServerClient();
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-        return { error: "Unauthorized" };
-    }
+    await verifyAdminAccess(supabase);
 
     const sanitizedSponsorId = typeof sponsorId === "string" ? sponsorId.trim() : "";
     if (!sanitizedSponsorId) {
@@ -1861,6 +1886,8 @@ export async function allocateFunding(
 }
 export async function getAvailableCohorts() {
     const supabase = await createSupabaseServerClient();
+    await verifyAdminAccess(supabase);
+
     const { data, error } = await supabase
         .from("cohorts")
         .select(`

@@ -216,11 +216,13 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                   }
                 }}
               >
-                {({ open }) => (
+                {(widgetState) => (
                   <div
                     onClick={(e) => {
                       e.preventDefault();
-                      open();
+                      if (widgetState && typeof widgetState.open === 'function') {
+                        widgetState.open();
+                      }
                     }}
                     className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white text-xs font-medium"
                   >

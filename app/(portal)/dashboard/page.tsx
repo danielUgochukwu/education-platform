@@ -107,7 +107,7 @@ export default async function ApplicantDashboard() {
                                                 {isPending && <p className="text-xs text-muted-foreground/60 mt-0.5">Not started</p>}
                                             </div>
                                             {isActive && (
-                                                <Link href={`/application/step-${s.step}`}>
+                                                <Link href="/application">
                                                     <Button size="sm" variant="outline" className="text-xs h-7 shrink-0">Continue</Button>
                                                 </Link>
                                             )}

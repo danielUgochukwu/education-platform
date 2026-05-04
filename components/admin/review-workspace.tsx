@@ -22,6 +22,7 @@ import {
     CheckCircle2,
     ClipboardPen,
     Clock,
+    ExternalLink,
     FileText,
     Loader2,
     UserCheck,
@@ -81,10 +82,12 @@ const documentStatusIcon: Record<DocumentStatus, React.ReactNode> = {
 const documentSlotLabels: Record<string, string> = {
     transcript: "Academic Transcripts / WAEC Result",
     id: "Government-Issued ID",
+    government_id: "Government-Issued ID",
     reference_letter_academic: "Reference Letter 1 (Academic)",
     reference_letter_community: "Reference Letter 2 (Community)",
     jamb_result: "JAMB / UTME Result",
     essay: "Statement of Purpose",
+    statement_of_purpose: "Statement of Purpose",
 };
 
 function getInitialScores(application: ReviewWorkspaceApplication): Record<string, number> {
@@ -126,6 +129,16 @@ function getDocumentStatusClassName(status: DocumentStatus): string {
         default:
             return "border-border bg-background text-foreground";
     }
+}
+
+function formatDocumentUploadedAt(uploadedAt: string): string {
+    const date = new Date(uploadedAt);
+
+    if (Number.isNaN(date.getTime()) || date.getTime() === 0) {
+        return "Upload date unavailable";
+    }
+
+    return `Uploaded ${date.toLocaleDateString()}`;
 }
 
 export function ReviewWorkspace({ application, cohorts }: ReviewWorkspaceProps) {
@@ -447,7 +460,7 @@ export function ReviewWorkspace({ application, cohorts }: ReviewWorkspaceProps) 
                                                         <p className="font-medium">{getDocumentDisplayLabel(document)}</p>
                                                         <p className="mt-1 truncate text-sm text-muted-foreground">{document.name}</p>
                                                         <p className="mt-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                                                            Uploaded {new Date(document.uploadedAt).toLocaleDateString()}
+                                                            {formatDocumentUploadedAt(document.uploadedAt)}
                                                         </p>
                                                     </div>
                                                     <Badge variant="outline" className={getDocumentStatusClassName(document.status)}>
@@ -457,6 +470,14 @@ export function ReviewWorkspace({ application, cohorts }: ReviewWorkspaceProps) 
                                                 </div>
 
                                                 <div className="flex flex-wrap gap-2">
+                                                    {document.url && (
+                                                        <Button asChild type="button" size="sm" variant="secondary">
+                                                            <a href={document.url} target="_blank" rel="noreferrer">
+                                                                <ExternalLink className="mr-2 h-4 w-4" />
+                                                                Open document
+                                                            </a>
+                                                        </Button>
+                                                    )}
                                                     <Button
                                                         type="button"
                                                         size="sm"

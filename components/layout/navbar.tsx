@@ -166,9 +166,8 @@ export default function Navbar() {
 
         <div className="px-4 pb-8 pt-4 border-t border-border/50 flex flex-col gap-3">
           <Button asChild className="w-full rounded-md gap-2">
-            <Link href="/apply" onClick={() => setOpen(false)}>
-              Join the First Cohort
-              <ArrowRight className="w-4 h-4" />
+            <Link href="/login" onClick={() => setOpen(false)}>
+              Log in
             </Link>
           </Button>
           <Link

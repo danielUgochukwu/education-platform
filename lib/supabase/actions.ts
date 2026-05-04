@@ -788,38 +788,96 @@ function isDocumentStatus(value: unknown): value is DocumentStatus {
     return typeof value === "string" && SUPPORTED_DOCUMENT_STATUSES.has(value as DocumentStatus);
 }
 
+function getStringValue(source: Record<string, unknown>, keys: string[]): string {
+    for (const key of keys) {
+        const value = source[key];
+        if (typeof value === "string" && value.trim()) {
+            return value.trim();
+        }
+    }
+
+    return "";
+}
+
+function getDocumentSize(value: unknown): number {
+    if (typeof value === "number" && Number.isFinite(value)) {
+        return value;
+    }
+
+    if (typeof value === "string") {
+        const parsedValue = Number(value);
+        return Number.isFinite(parsedValue) ? parsedValue : 0;
+    }
+
+    return 0;
+}
+
+function getDocumentName(source: Record<string, unknown>, fallbackId: string): string {
+    const name = getStringValue(source, [
+        "name",
+        "fileName",
+        "file_name",
+        "filename",
+        "original_filename",
+        "title",
+    ]);
+
+    if (name) {
+        return name;
+    }
+
+    const url = getStringValue(source, ["url", "secure_url", "file_url", "href"]);
+    const urlName = url.split("/").pop()?.split("?")[0]?.trim();
+    if (urlName) {
+        return decodeURIComponent(urlName);
+    }
+
+    const slot = getStringValue(source, ["slot", "document_slot", "category"]);
+    if (slot) {
+        return slot.replace(/[_-]+/g, " ");
+    }
+
+    return fallbackId ? `Document ${fallbackId.slice(0, 8)}` : "Uploaded document";
+}
+
 function normalizeApplicationDocuments(value: unknown): UploadedDocument[] {
     if (!Array.isArray(value)) {
         return [];
     }
 
     return value
-        .flatMap((entry) => {
+        .flatMap((entry, index) => {
             if (!entry || typeof entry !== "object") {
                 return [];
             }
 
             const source = entry as Record<string, unknown>;
-            const id = typeof source.id === "string" ? source.id.trim() : "";
-            const name = typeof source.name === "string" ? source.name.trim() : "";
+            const url = getStringValue(source, ["url", "secure_url", "file_url", "href"]);
+            const publicId = getStringValue(source, ["publicId", "public_id"]);
+            const id =
+                getStringValue(source, ["id"]) ||
+                publicId ||
+                url ||
+                `legacy-document-${index}`;
             const uploadedAtSource =
-                typeof source.uploadedAt === "string"
-                    ? source.uploadedAt
-                    : typeof source.updated_on === "string"
-                        ? source.updated_on
-                        : typeof source.created_at === "string"
-                            ? source.created_at
-                            : "";
-
-            if (!id || !name || !uploadedAtSource) {
-                return [];
-            }
+                getStringValue(source, [
+                    "uploadedAt",
+                    "uploaded_at",
+                    "updated_on",
+                    "updated_at",
+                    "created_at",
+                    "date",
+                ]) || new Date(0).toISOString();
 
             const normalizedDocument: UploadedDocument = {
                 id,
-                type: isDocumentType(source.type) ? source.type : "other",
-                name,
-                size: typeof source.size === "number" && Number.isFinite(source.size) ? source.size : 0,
+                type: isDocumentType(source.type)
+                    ? source.type
+                    : isDocumentType(source.document_type)
+                        ? source.document_type
+                        : "other",
+                name: getDocumentName(source, id),
+                size: getDocumentSize(source.size),
                 uploadedAt: uploadedAtSource,
                 status: isDocumentStatus(source.status) ? source.status : "pending",
             };
@@ -832,12 +890,12 @@ function normalizeApplicationDocuments(value: unknown): UploadedDocument[] {
                 normalizedDocument.owner = source.owner.trim();
             }
 
-            if (typeof source.url === "string" && source.url.trim()) {
-                normalizedDocument.url = source.url.trim();
+            if (url) {
+                normalizedDocument.url = url;
             }
 
-            if (typeof source.publicId === "string" && source.publicId.trim()) {
-                normalizedDocument.publicId = source.publicId.trim();
+            if (publicId) {
+                normalizedDocument.publicId = publicId;
             }
 
             if (typeof source.mimeType === "string" && source.mimeType.trim()) {
